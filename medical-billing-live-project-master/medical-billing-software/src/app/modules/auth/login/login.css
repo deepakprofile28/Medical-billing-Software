@@ -1,0 +1,552 @@
+/* ===============================
+   Global Login Background
+================================== */
+
+.login-container{
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    padding:40px;
+
+    background:
+    radial-gradient(circle at top left,#dff1ff 0%,transparent 30%),
+    radial-gradient(circle at bottom right,#cbe6ff 0%,transparent 35%),
+    linear-gradient(135deg,#f7fbff,#eaf5ff);
+}
+
+/* ===================================
+   login Card
+=================================== */
+.login-card{
+
+    width:1100px;
+
+    min-height:60px;
+
+    background:white;
+
+    border-radius:30px;
+
+    overflow:hidden;
+
+    display:grid;
+
+    grid-template-columns:1fr 1fr;
+
+    box-shadow:
+    0 30px 60px rgba(0,0,0,.08);
+
+}
+
+/* ===================================
+   Left Panel
+=================================== */
+
+.login-left{
+
+    background:linear-gradient(
+        180deg,
+        #0f4c81,
+        #1565c0
+    );
+
+    color:#fff;
+
+    padding:60px;
+
+    display:flex;
+
+    flex-direction:column;
+
+    justify-content:space-between;
+
+    position:relative;
+
+}
+
+
+/* ===================================
+  Brand section
+=================================== */
+.brand i{
+
+    font-size:70px;
+
+    margin-bottom:20px;
+
+}
+
+.brand h2{
+
+    font-size:40px;
+
+    font-weight:700;
+
+    margin-bottom:10px;
+
+}
+
+.brand p{
+
+    font-size:18px;
+
+    opacity:.8;
+
+
+
+}
+
+/* ===================================
+Features
+=================================== */
+.features{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:22px;
+
+}
+
+/* ===================================
+Single Feature
+=================================== */
+
+.feature{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:15px;
+
+    font-size:18px;
+
+}
+/* ===================================
+Icon
+=================================== */
+
+.feature i{
+
+    font-size:22px;
+
+    color:#90caf9;
+
+}
+/* ===================================
+Hover Effect
+=================================== */
+
+.feature{
+
+    transition:.3s;
+}
+
+.feature:hover{
+
+    transform:translateX(8px);
+
+}
+/* ===================================
+Add Decorative Circle
+=================================== */
+.login-left::before{
+
+    content:"";
+
+    width:320px;
+
+    height:320px;
+
+    border-radius:50%;
+
+    position:absolute;
+
+    background:rgba(255,255,255,.08);
+
+    top:-120px;
+
+    right:-120px;
+
+}
+/* ===================================
+Second Circle
+=================================== */
+
+.login-left::after{
+
+    content:"";
+
+    width:220px;
+
+    height:220px;
+
+    border-radius:50%;
+
+    position:absolute;
+
+    background:rgba(255,255,255,.05);
+
+    bottom:-90px;
+
+    left:-90px;
+
+}
+
+
+
+/* ===================================
+   Right Panel
+=================================== */
+
+.login-right{
+
+    background:#ffffff;
+
+    padding:70px 60px;
+
+    display:flex;
+
+    flex-direction:column;
+
+    justify-content:center;
+
+}
+/* ===================================
+Welcome Title
+=================================== */
+.login-right h3{
+
+    font-size:36px;
+
+    font-weight:700;
+
+    color:#0f4c81;
+
+    margin-bottom:10px;
+
+}
+/* ===================================
+   Subtitle
+=================================== */
+.login-right p{
+
+    color:#6c757d;
+
+    margin-bottom:40px;
+
+    font-size:16px;
+
+}
+/* ===================================
+Labels
+=================================== */
+.login-right label{
+
+    font-weight:600;
+
+    color:#34495e;
+
+    margin-bottom:8px;
+
+}
+/* ===================================
+   Input Box
+=================================== */
+.form-control{
+
+    height:55px;
+
+    border-radius:14px;
+
+    border:1px solid #dbe7f3;
+
+    padding:0 18px;
+
+    font-size:15px;
+
+    transition:.3s;
+
+    box-shadow:none;
+
+}
+/* ===================================
+   Input Focus
+=================================== */
+.form-control:focus{
+
+    border-color:#1565c0;
+
+    box-shadow:0 0 0 4px rgba(21,101,192,.12);
+
+}
+/* ===================================
+   Forgot Password
+=================================== */
+.login-right a{
+
+    text-decoration:none;
+
+    font-weight:600;
+
+    color:#1565c0;
+
+}
+
+.login-right a:hover{
+
+    text-decoration:underline;
+
+}
+/* ===================================
+   Login Button
+=================================== */
+.btn-primary{
+
+    height:55px;
+
+    border-radius:14px;
+
+    border:none;
+
+    font-size:17px;
+
+    font-weight:600;
+
+    background:#1565c0;
+
+    transition:.3s;
+
+}
+/* ===================================
+  Hover
+=================================== */
+.btn-primary:hover{
+
+    transform:translateY(-2px);
+
+    box-shadow:0 15px 30px rgba(21,101,192,.25);
+
+}
+/* ===================================
+  Checkbox
+=================================== */
+
+.form-check-label{
+
+    cursor:pointer;
+
+    color:#555;
+
+}
+
+
+/* ===================================
+   Responsive Design
+=================================== */
+
+
+/* ===================================
+ Tablet 
+=================================== */
+@media (max-width: 992px) {
+
+    .login-card{
+        width:100%;
+        grid-template-columns:1fr;
+    }
+
+    .login-left{
+
+        padding:40px;
+        min-height:280px;
+
+    }
+
+    .login-right{
+
+        padding:40px;
+
+    }
+
+}
+
+
+/* ===================================
+ mobile 
+=================================== */
+
+
+@media (max-width:768px){
+
+    .login-container{
+
+        padding:20px;
+
+    }
+
+    .login-card{
+
+        border-radius:20px;
+
+    }
+
+    .login-left{
+
+        padding:30px;
+        text-align:center;
+
+    }
+
+    .brand h2{
+
+        font-size:32px;
+
+    }
+
+    .brand p{
+
+        font-size:15px;
+
+    }
+
+    .features{
+
+        gap:15px;
+
+        margin-top:30px;
+
+    }
+
+    .feature{
+
+        justify-content:center;
+
+        font-size:16px;
+
+    }
+
+    .login-right{
+
+        padding:30px;
+
+    }
+
+    .login-right h3{
+
+        font-size:30px;
+
+    }
+
+}
+
+/* ===================================
+ Small mobile 
+=================================== */
+/* Small Mobile */
+
+@media (max-width:480px){
+
+    .login-container{
+
+        padding:15px;
+
+    }
+
+    .login-left{
+
+        padding:25px;
+
+    }
+
+    .login-right{
+
+        padding:25px;
+
+    }
+
+    .brand i{
+
+        font-size:55px;
+
+    }
+
+    .brand h2{
+
+        font-size:26px;
+
+    }
+
+    .login-right h3{
+
+        font-size:26px;
+
+    }
+
+    .form-control{
+
+        height:50px;
+
+    }
+
+    .btn-primary{
+
+        height:50px;
+
+    }
+
+}
+
+/* ===================================
+ Validation
+=================================== */
+.text-danger{
+
+    font-size:13px;
+
+    margin-top:6px;
+
+    display:block;
+
+}
+
+
+/* ===================================
+Password field eye shown
+=================================== */
+.password-field{
+
+    position:relative;
+
+}
+
+.eye-btn{
+
+    position:absolute;
+
+    right:15px;
+
+    top:50%;
+
+    transform:translateY(-50%);
+
+    border:none;
+
+    background:transparent;
+
+    cursor:pointer;
+
+    color:#6c757d;
+
+    font-size:18px;
+
+}
+.eye-btn:hover{
+
+    color:#1565c0;
+
+}

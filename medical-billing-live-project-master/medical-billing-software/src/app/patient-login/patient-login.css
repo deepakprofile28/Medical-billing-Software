@@ -1,0 +1,119 @@
+.patient-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.patient-card {
+  width: 100%;
+  max-width: 860px;
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  box-shadow: 0 15px 40px rgba(24, 50, 74, 0.15);
+  padding: 32px;
+  border: 1px solid rgba(255, 255, 255, 0.7);
+}
+
+.card-header {
+  margin-bottom: 24px;
+}
+
+.card-header h2 {
+  margin: 0 0 6px;
+  color: #1f4f7a;
+  font-size: 28px;
+}
+
+.card-header p {
+  margin: 0;
+  color: #567086;
+}
+
+.patient-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.field.full-width {
+  grid-column: 1 / -1;
+}
+
+label {
+  font-weight: 600;
+  color: #24506f;
+}
+
+input, select, textarea {
+  border: 1px solid #c4d9e8;
+  border-radius: 10px;
+  padding: 12px 14px;
+  font-size: 14px;
+  outline: none;
+  background: #f9fcff;
+  color: #18324a;
+}
+
+input:focus, select:focus, textarea:focus {
+  border-color: #2b8cdb;
+  box-shadow: 0 0 0 3px rgba(43, 140, 219, 0.16);
+}
+
+textarea {
+  resize: vertical;
+}
+
+.button-row {
+  display: flex;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.btn {
+  border: none;
+  border-radius: 10px;
+  padding: 12px 18px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.btn:hover {
+  transform: translateY(-1px);
+}
+
+.btn.save {
+  background: linear-gradient(135deg, #2b8cdb, #1f6fa8);
+  color: white;
+  box-shadow: 0 8px 16px rgba(43, 140, 219, 0.2);
+}
+
+.btn.cancel {
+  background: #eef5fb;
+  color: #35556d;
+}
+
+@media (max-width: 700px) {
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .patient-card {
+    padding: 22px;
+  }
+}

@@ -1,0 +1,68 @@
+html, body {
+    margin: 0;
+    padding: 0;
+    height: 10%;
+    font-family: Arial, sans-serif;
+     overflow-x: hidden;
+    overflow-y: hidden;
+}
+
+body {
+    min-height: 100vh;
+    background:
+        radial-gradient(circle at top left, rgba(255,255,255,0.7), transparent 35%),
+        radial-gradient(circle at bottom right, rgba(255,255,255,0.5), transparent 35%),
+        linear-gradient(135deg, #f7fbff 0%, #dcefff 50%, #edf8ff 100%);
+    background-attachment: fixed;
+    overflow-x: hidden;
+}
+
+/* Floating Medical Crosses */
+body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.08;
+
+    background-image:
+      linear-gradient(#1e88e5,#1e88e5),
+      linear-gradient(#1e88e5,#1e88e5),
+      linear-gradient(#1e88e5,#1e88e5),
+      linear-gradient(#1e88e5,#1e88e5);
+
+    background-size:
+      25px 8px,
+      8px 25px,
+      20px 6px,
+      6px 20px;
+
+    background-position:
+      8% 15%,
+      8% 15%,
+      85% 25%,
+      85% 25%;
+
+    background-repeat: no-repeat;
+}
+
+/* Bottom Wave */
+body::after{
+    content:"";
+    position:fixed;
+    left:-10%;
+    bottom:-120px;
+    width:120%;
+    height:250px;
+    background:rgba(33,150,243,.12);
+    border-radius:50%;
+    transform:rotate(-3deg);
+    pointer-events:none;
+}
+
+.card, .container, .form-container {
+    background: rgba(255,255,255,0.88);
+    backdrop-filter: blur(8px);
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0,0,0,.1);
+}

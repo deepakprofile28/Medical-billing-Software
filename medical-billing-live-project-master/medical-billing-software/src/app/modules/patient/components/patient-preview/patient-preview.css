@@ -1,0 +1,134 @@
+.preview-card{
+
+    background:#FFFFFF;
+
+    border-radius:28px;
+
+    padding:30px;
+
+    box-shadow:0 18px 45px rgba(15,23,42,.08);
+
+    border:1px solid rgba(37,99,235,.08);
+
+}
+
+.avatar-section{
+
+    text-align:center;
+
+    margin-bottom:28px;
+
+}
+
+.avatar-ring{
+
+    width:130px;
+
+    height:130px;
+
+    margin:auto;
+
+    border-radius:50%;
+
+    padding:6px;
+
+    background:conic-gradient(
+
+        #2563EB,
+
+        #06B6D4,
+
+        #10B981,
+
+        #2563EB
+
+    );
+
+}
+
+.avatar{
+
+    width:100%;
+
+    height:100%;
+
+    border-radius:50%;
+
+    background:#F8FAFC;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    font-size:42px;
+
+    font-weight:700;
+
+    color:#2563EB;
+
+}
+
+.avatar-section h3{
+
+    margin-top:22px;
+
+    margin-bottom:8px;
+
+    font-size:24px;
+
+    font-weight:700;
+
+    color:#1E293B;
+
+}
+
+.avatar-section p{
+
+    color:#64748B;
+
+    font-size:15px;
+
+}
+.patient-status{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    margin-top:25px;
+
+}
+.status{
+
+    background:#DCFCE7;
+
+    color:#15803D;
+
+    padding:8px 14px;
+
+    border-radius:30px;
+
+    font-size:13px;
+
+    font-weight:600;
+
+}
+.patient-id{
+
+    background:#EFF6FF;
+
+    color:#2563EB;
+
+    padding:8px 14px;
+
+    border-radius:30px;
+
+    font-size:13px;
+
+    font-weight:700;
+
+}

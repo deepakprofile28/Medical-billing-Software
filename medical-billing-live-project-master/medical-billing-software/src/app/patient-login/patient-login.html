@@ -1,0 +1,57 @@
+<div class="patient-page">
+  <div class="patient-card">
+    <div class="card-header">
+      <h2>Patient Registration</h2>
+      <p>Enter patient details securely</p>
+    </div>
+
+    <form [formGroup]="patientForm" class="patient-form">
+      <div class="form-grid">
+        <div class="field">
+          <label>Patient Name</label>
+          <input type="text" placeholder="Patient Name" formControlName="patientName" />
+        </div>
+
+        <div class="field">
+          <label>Mobile</label>
+          <input type="text" placeholder="Mobile" formControlName="mobile" />
+        </div>
+
+        <div class="field">
+          <label>Email</label>
+          <input type="email" placeholder="Email" formControlName="email" />
+        </div>
+
+        <div class="field">
+          <label>Date of Birth</label>
+          <input type="date" formControlName="dob" (change)="calculateAge()" />
+        </div>
+
+        <div class="field">
+          <label>Age</label>
+          <input type="text" [value]="age" readonly />
+        </div>
+
+        <div class="field">
+          <label>Gender</label>
+          <select formControlName="gender">
+            <option value="">Select</option>
+            <option>Male</option>
+            <option>Female</option>
+            <option>Other</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="field full-width">
+        <label>Address</label>
+        <textarea formControlName="address" rows="4"></textarea>
+      </div>
+
+      <div class="button-row">
+        <button type="button" class="btn save" (click)="savePatient()">Save</button>
+        <button type="button" class="btn cancel" (click)="resetForm()">Cancel</button>
+      </div>
+    </form>
+  </div>
+</div>

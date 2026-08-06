@@ -1,0 +1,5 @@
+Bootstrap - npm install bootstrap bootstrap-icons
+
+auth-guard - ng g guard core/guards/auth
+
+modules  - ng g c modules/auth/login

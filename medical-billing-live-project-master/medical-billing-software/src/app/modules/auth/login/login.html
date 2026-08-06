@@ -1,0 +1,160 @@
+<div class="login-container">
+
+  <div class="login-card">
+
+    <!-- Left Side -->
+    <div class="login-left">
+
+      <div class="brand">
+
+<i class="bi bi-align-middle"></i>
+
+        <h2>MedBill Pro</h2>
+
+        <p>Smart Medical Billing Software</p>
+
+      </div>
+
+      <div class="features">
+
+        <div class="feature">
+          <i class="bi bi-check-circle-fill"></i>
+          <span>Patient Management</span>
+        </div>
+
+        <div class="feature">
+          <i class="bi bi-check-circle-fill"></i>
+          <span>Billing & Invoice</span>
+        </div>
+
+        <div class="feature">
+          <i class="bi bi-check-circle-fill"></i>
+          <span>Pharmacy Management</span>
+        </div>
+
+        <div class="feature">
+          <i class="bi bi-check-circle-fill"></i>
+          <span>Reports & Analytics</span>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- Right Side -->
+    <div class="login-right">
+
+      <h3>Welcome Back 👋</h3>
+
+      <p>Please sign in to continue.</p>
+
+      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+        <div class="mb-3">
+
+          <label>Email</label>
+
+         <input type="email" formControlName="email" id='ln-email' class="form-control"placeholder="Enter your username or email ">
+        @if(loginForm.get('email')?.touched &&
+    loginForm.get('email')?.hasError('required')){
+
+    <small class="text-danger">
+
+        Email is required
+
+    </small>
+
+}
+
+@if(loginForm.get('email')?.touched &&
+    loginForm.get('email')?.hasError('email')){
+
+    <small class="text-danger">
+
+        Invalid email address
+
+    </small>
+
+}
+        </div>
+
+        <div class="mb-3">
+
+          <label>Password</label>
+
+<div class="password-field">
+
+    <input
+        [type]="hidePassword ? 'password' : 'text'"
+        id="ln-password"
+        class="form-control"
+        formControlName="password"
+        placeholder="Enter your password">
+
+    <button
+        type="button"
+        class="eye-btn"
+        (click)="togglePassword()">
+
+        <i
+            class="bi"
+            [class.bi-eye]="hidePassword"
+            [class.bi-eye-slash]="!hidePassword">
+        </i>
+
+    </button>
+
+</div>
+@if(loginForm.get('password')?.touched &&
+    loginForm.get('password')?.hasError('required')){
+
+    <small class="text-danger">
+
+        Password is required
+
+    </small>
+
+}
+
+@if(loginForm.get('password')?.touched &&
+    loginForm.get('password')?.hasError('minlength')){
+
+    <small class="text-danger">
+
+        Minimum 6 characters required
+
+    </small>
+
+}
+        </div>
+
+        <div class="d-flex justify-content-between mb-4">
+
+          <div class="form-check">
+
+            <input
+              class="form-check-input"
+              type="checkbox">
+
+            <label class="form-check-label"id=remember-me>
+
+              Remember Me
+
+            </label>
+
+          </div>
+
+          <a href="#">Forgot Password?</a>
+
+        </div>
+
+        <button class="btn btn-primary w-100" [disabled]="loginForm.invalid">Sign In
+
+</button>
+
+      </form>
+
+    </div>
+
+  </div>
+
+</div>

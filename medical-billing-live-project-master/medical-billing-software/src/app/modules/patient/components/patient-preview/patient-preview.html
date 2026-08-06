@@ -1,0 +1,144 @@
+<!-- <!-- <div class="preview-card">
+
+    <div class="profile-section">
+
+        <div class="avatar">
+
+            {{patientForm.value.name?.charAt(0) || 'P'}}
+
+        </div>
+
+        <h3>
+
+            {{patientForm.value.name || 'Patient Name'}}
+
+        </h3>
+
+        <p>
+
+            {{patientForm.value.gender || 'Gender'}}
+
+        </p>
+
+    </div>
+
+    <div class="info-list">
+
+        <div class="info-item">
+
+            <span>📱 Mobile</span>
+
+            <strong>
+
+                {{patientForm.value.mobile || '----------'}}
+
+            </strong>
+
+        </div>
+
+        <div class="info-item">
+
+            <span>🩸 Blood Group</span>
+
+            <strong>
+
+                {{patientForm.value.bloodGroup || '--'}}
+
+            </strong>
+
+        </div>
+
+        <div class="info-item">
+
+            <span>🎂 Age</span>
+
+            <strong>
+
+                {{patientAge || '--'}} Years
+
+            </strong>
+
+        </div>
+
+    </div>
+
+    <div class="completion">
+
+        <div class="progress-header">
+
+            <span>Profile Completion</span>
+
+            <span>{{completion}}%</span>
+
+        </div>
+
+        <div class="progress-bar">
+
+            <div
+                class="progress-fill"
+                [style.width.%]="completion">
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+</div>
+
+
+
+ -->
+
+ <div class="preview-card">
+
+    <!-- Avatar Section -->
+
+    <div class="avatar-section">
+
+        <div class="avatar-ring">
+
+            <div class="avatar">
+
+                {{patientForm.value.name?.charAt(0) || 'P'}}
+
+            </div>
+
+        </div>
+
+        <h3>
+
+            {{patientForm.value.name || 'Patient Name'}}
+
+        </h3>
+
+        <p>
+
+            {{patientForm.value.gender || 'Gender'}}
+            •
+            {{patientAge || '--'}} Years
+
+        </p>
+
+    </div>
+
+   <!--Status -->
+
+      <div class="patient-status">
+
+        <span class="status">
+
+            🟢 New Patient
+
+        </span>
+
+        <span class="patient-id">
+
+            PID-240001
+
+        </span>
+
+    </div>
+
+</div>  
