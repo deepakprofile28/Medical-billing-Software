@@ -1,157 +1,264 @@
-/* ================= PREVIEW PANEL ================= */
+/* =========================================================
+   PATIENT REGISTRATION PAGE
+========================================================= */
+
+.patient-page {
+  min-height: 100vh;
+  background: #f4f7fb;
+  padding: 24px;
+  box-sizing: border-box;
+}
+
+.patient-container {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 18px;
+}
+
+.page-header h2 {
+  margin: 0;
+  font-size: 25px;
+  font-weight: 600;
+  color: #172033;
+}
+
+.page-header p {
+  margin: 5px 0 0;
+  font-size: 13px;
+  color: #667085;
+}
+
+.draft-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #ffffff;
+  padding: 9px 15px;
+  border-radius: 22px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+  font-size: 13px;
+  color: #344054;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  background: #12b76a;
+  border-radius: 50%;
+}
+
+
+/* =========================================================
+   STEPPER
+========================================================= */
+
+.stepper-section {
+  display: flex;
+  align-items: center;
+  background: #ffffff;
+  padding: 15px 16px;
+  border-radius: 15px;
+  margin-bottom: 16px;
+  box-shadow: 0 5px 18px rgba(0, 0, 0, 0.06);
+}
+
+.step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 75px;
+  gap: 6px;
+}
+
+.step-circle {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #e9eef5;
+  color: #64748b;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.step span {
+  font-size: 11px;
+  color: #475467;
+}
+
+.step.active .step-circle {
+  background: #2864e8;
+  color: #ffffff;
+}
+
+.step.active span {
+  color: #2864e8;
+  font-weight: 600;
+}
+
+.step-line {
+  height: 2px;
+  flex: 1;
+  background: #dce3ed;
+  margin-bottom: 17px;
+}
+
+
+/* =========================================================
+   MAIN CONTENT
+========================================================= */
+
+.content-section {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 16px;
+  align-items: start;
+}
+
+
+/* =========================================================
+   PREVIEW PANEL
+========================================================= */
 
 .preview-panel {
-  width: 280px;
-  min-width: 280px;
+  position: sticky;
+  top: 20px;
 }
 
 .preview-card {
   background: #ffffff;
-  border-radius: 16px;
-  padding: 20px;
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
-
-  min-height: 420px;
-  max-height: 560px;
-
-  overflow: hidden;
-  position: relative;
+  border-radius: 15px;
+  padding: 20px 18px;
+  box-shadow: 0 5px 18px rgba(0, 0, 0, 0.07);
 }
 
 
-/* ================= PATIENT HEADER ================= */
+/* =========================================================
+   AVATAR
+========================================================= */
 
 .avatar {
-  width: 58px;
-  height: 58px;
+  width: 64px;
+  height: 64px;
   margin: 0 auto 10px;
 
   display: flex;
-  align-items: center;
   justify-content: center;
-
-  background: #2864e8;
-  color: white;
+  align-items: center;
 
   border-radius: 50%;
+  background: #2864e8;
+  color: #ffffff;
 
-  font-size: 24px;
+  font-size: 25px;
   font-weight: 600;
 }
 
-.preview-card h3 {
+.preview-card > h3 {
   text-align: center;
-  margin: 5px 0;
-
+  margin: 0;
+  color: #1d2939;
   font-size: 20px;
-  color: #1f2937;
+  font-weight: 500;
 }
 
 .preview-card > p {
   text-align: center;
-  margin: 0 0 10px;
-
-  font-size: 13px;
-  color: #64748b;
+  margin: 5px 0 12px;
+  color: #667085;
+  font-size: 12px;
 }
 
 
-/* ================= STATUS ================= */
+/* =========================================================
+   PATIENT STATUS
+========================================================= */
+
+.patient-status {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 7px;
+  margin-bottom: 15px;
+}
+
+.status {
+  background: #ecfdf3;
+  color: #027a48;
+  padding: 5px 9px;
+  border-radius: 15px;
+  font-size: 11px;
+  font-weight: 500;
+}
 
 .patient-id {
-  display: block;
-  width: fit-content;
-
-  margin: 10px auto 15px;
-  padding: 5px 10px;
-
-  background: #eef5ff;
-  color: #2563eb;
-
-  border-radius: 20px;
-
+  background: #eff6ff;
+  color: #2864e8;
+  padding: 5px 9px;
+  border-radius: 15px;
   font-size: 11px;
+  font-weight: 500;
+}
+
+
+/* =========================================================
+   PREVIEW SECTION HEADINGS
+========================================================= */
+
+.preview-card hr {
+  border: 0;
+  border-top: 1px solid #edf0f5;
+  margin: 15px 0;
+}
+
+.preview-card h4 {
+  margin: 0 0 9px;
+  font-size: 14px;
   font-weight: 600;
+  color: #344054;
 }
 
 
-/* ================= PREVIEW SLIDER ================= */
-
-.preview-slider {
-  position: relative;
-  width: 100%;
-
-  overflow: hidden;
-}
-
-
-/* Each step preview */
-
-.preview-slide {
-  width: 100%;
-
-  animation: slideIn 0.35s ease-in-out;
-}
-
-
-/* Slider animation */
-
-@keyframes slideIn {
-  from {
-    opacity: 0;
-    transform: translateX(30px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-
-/* ================= SECTION TITLE ================= */
-
-.preview-section-title {
-  font-size: 15px;
-  font-weight: 600;
-
-  color: #1e293b;
-
-  margin: 12px 0 10px;
-
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-
-/* ================= PREVIEW ITEM ================= */
+/* =========================================================
+   PREVIEW ITEMS
+========================================================= */
 
 .preview-item {
   display: flex;
-
   justify-content: space-between;
   align-items: center;
 
-  padding: 8px 0;
+  gap: 10px;
+  min-height: 29px;
 
-  border-bottom: 1px solid #f1f5f9;
-
-  font-size: 12px;
+  font-size: 11px;
 }
 
 .preview-item span {
-  color: #475569;
+  color: #475467;
+  white-space: nowrap;
 }
 
 .preview-item strong {
-  color: #1e293b;
-
-  font-size: 12px;
-
-  max-width: 130px;
+  color: #1d2939;
+  font-size: 11px;
+  font-weight: 500;
 
   text-align: right;
+  max-width: 145px;
 
   overflow: hidden;
   text-overflow: ellipsis;
@@ -159,66 +266,260 @@
 }
 
 
-/* ================= SLIDER INDICATOR ================= */
+/* =========================================================
+   PREVIEW SECTION - COMPLETED STEPS
+========================================================= */
 
-.preview-indicator {
-  display: flex;
-  justify-content: center;
-
-  gap: 5px;
-
-  margin-top: 15px;
+.preview-card h4 {
+  position: relative;
+  padding-left: 10px;
 }
 
-.preview-dot {
-  width: 6px;
-  height: 6px;
-
-  border-radius: 50%;
-
-  background: #cbd5e1;
-
-  transition: 0.3s;
-}
-
-.preview-dot.active {
-  width: 18px;
-
-  border-radius: 10px;
-
+.preview-card h4::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 3px;
+  width: 3px;
+  height: 13px;
+  border-radius: 5px;
   background: #2864e8;
 }
 
 
-/* ================= REVIEW STEP ================= */
+/* =========================================================
+   FORM PANEL
+========================================================= */
 
-.review-preview {
-  max-height: 430px;
-
-  overflow-y: auto;
+.form-panel {
+  min-width: 0;
 }
 
-.review-preview::-webkit-scrollbar {
-  width: 4px;
+.form-card {
+  background: #ffffff;
+  border-radius: 15px;
+  padding: 20px;
+  box-shadow: 0 5px 18px rgba(0, 0, 0, 0.07);
 }
 
-.review-preview::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
+
+/* =========================================================
+   CARD HEADER
+========================================================= */
+
+.card-header {
+  margin-bottom: 18px;
+}
+
+.card-header h2 {
+  margin: 0;
+  color: #172033;
+  font-size: 19px;
+  font-weight: 600;
+}
+
+.card-header p {
+  margin: 5px 0 0;
+  color: #667085;
+  font-size: 12px;
+}
+
+
+/* =========================================================
+   FORM GRID
+========================================================= */
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-group label {
+  font-size: 12px;
+  font-weight: 500;
+  color: #344054;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  width: 100%;
+  box-sizing: border-box;
+
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+
+  padding: 10px 12px;
+
+  font-size: 12px;
+  color: #1d2939;
+
+  background: #ffffff;
+  outline: none;
+
+  transition: 0.2s ease;
+}
+
+.form-group input,
+.form-group select {
+  height: 38px;
+}
+
+.form-group textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  border-color: #2864e8;
+  box-shadow: 0 0 0 3px rgba(40, 100, 232, 0.1);
+}
+
+.form-group input::placeholder,
+.form-group textarea::placeholder {
+  color: #98a2b3;
+}
+
+
+/* =========================================================
+   FOOTER ACTIONS
+========================================================= */
+
+.footer-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  margin-top: 16px;
+}
+
+.btn-secondary,
+.btn-primary {
+  height: 38px;
+  padding: 0 22px;
+
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 500;
+
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.btn-secondary {
+  background: #ffffff;
+  color: #1d2939;
+  border: 1px solid #cbd5e1;
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background: #f8fafc;
+}
+
+.btn-secondary:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.btn-primary {
+  background: #2864e8;
+  color: #ffffff;
+  border: 1px solid #2864e8;
+}
+
+.btn-primary:hover {
+  background: #1f54c9;
+}
+
+
+/* =========================================================
+   REVIEW PAGE
+========================================================= */
+
+.review-section {
+  border: 1px solid #e4e7ec;
   border-radius: 10px;
+  padding: 15px;
+  margin-top: 15px;
+  background: #fafbfc;
+}
+
+.review-section h3 {
+  margin: 0 0 12px;
+  font-size: 15px;
+  color: #1d2939;
+}
+
+.review-section p {
+  display: flex;
+  justify-content: space-between;
+  margin: 7px 0;
+  font-size: 12px;
+  color: #475467;
+}
+
+.review-section strong {
+  color: #344054;
 }
 
 
-/* ================= RESPONSIVE ================= */
+/* =========================================================
+   RESPONSIVE
+========================================================= */
 
 @media (max-width: 900px) {
 
+  .content-section {
+    grid-template-columns: 1fr;
+  }
+
   .preview-panel {
-    width: 100%;
-    min-width: 100%;
+    position: static;
   }
 
   .preview-card {
-    min-height: auto;
+    max-height: none;
+  }
+}
+
+
+@media (max-width: 650px) {
+
+  .patient-page {
+    padding: 12px;
   }
 
+  .page-header {
+    align-items: flex-start;
+  }
+
+  .stepper-section {
+    overflow-x: auto;
+  }
+
+  .step {
+    min-width: 65px;
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .footer-actions {
+    gap: 10px;
+  }
+
+  .btn-secondary,
+  .btn-primary {
+    flex: 1;
+  }
 }
