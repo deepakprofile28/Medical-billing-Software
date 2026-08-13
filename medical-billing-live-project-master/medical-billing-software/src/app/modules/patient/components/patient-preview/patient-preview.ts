@@ -5,7 +5,7 @@ import { FormGroup, ReactiveFormsModule } from '@angular/forms';
   selector: 'app-patient-preview',
   imports: [ReactiveFormsModule],
   templateUrl: './patient-preview.html',
-  styleUrl: './patient-preview.css',
+  styleUrls: ['./patient-preview.css'],
 })
 export class PatientPreview {
 

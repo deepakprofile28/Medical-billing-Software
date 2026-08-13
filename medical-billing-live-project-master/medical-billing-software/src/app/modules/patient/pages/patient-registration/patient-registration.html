@@ -1,300 +1,196 @@
-<div class="patient-page">
+<div class="preview-slider">
 
-  <div class="patient-container">
+  @if (currentStep === 1) {
 
-    <!-- ================= Header ================= -->
-    <div class="page-header">
+    <div class="preview-slide">
 
-      <div>
-        <h2>Patient Registration</h2>
-        <p>Create a new patient record</p>
-      </div>
+      <h4 class="preview-section-title">
+        👤 Personal Details
+      </h4>
 
-      <div class="draft-status">
-        <span class="dot"></span>
-        Draft Saved
-      </div>
-
-    </div>
-
-    <!-- ================= Stepper ================= -->
-    <div class="stepper-section">
-
-      <div class="step active">
-        <div class="step-circle">1</div>
-        <span>Personal</span>
-      </div>
-
-      <div class="step-line"></div>
-
-      <div class="step">
-        <div class="step-circle">2</div>
-        <span>Address</span>
-      </div>
-
-      <div class="step-line"></div>
-
-      <div class="step">
-        <div class="step-circle">3</div>
-        <span>Medical</span>
-      </div>
-
-      <div class="step-line"></div>
-
-      <div class="step">
-        <div class="step-circle">4</div>
-        <span>Insurance</span>
-      </div>
-
-      <div class="step-line"></div>
-
-      <div class="step">
-        <div class="step-circle">5</div>
-        <span>Review</span>
-      </div>
-
-    </div>
-
-    <!-- ================= Main Content ================= -->
-    <div class="content-section">
-
-      <!-- ================= Preview ================= -->
-      <div class="preview-panel">
-
-        <div class="preview-card">
-
-    <div class="avatar">
-
-        {{ patientForm.value.name?.charAt(0) || 'P' }}
-
-    </div>
-
-    <h3>
-
-        {{ patientForm.value.name || 'Patient Name' }}
-
-    </h3>
-
-    <p>
-
-        {{ patientForm.value.gender || 'Gender' }}
-
-    </p>
-
-    <div class="patient-id">
-
-        Patient ID : Auto Generated
-
-    </div>
-
-    <hr>
-
-    <div class="preview-item">
-
+      <div class="preview-item">
         <span>📱 Mobile</span>
+        <strong>{{ patientForm.value.mobile || '--' }}</strong>
+      </div>
 
-        <strong>{{ patientForm.value.mobile || '----------' }}</strong>
-
-    </div>
-
-    <div class="preview-item">
-
+      <div class="preview-item">
         <span>✉ Email</span>
+        <strong>{{ patientForm.value.email || '--' }}</strong>
+      </div>
 
-        <strong>{{ patientForm.value.email || '----------' }}</strong>
-
-    </div>
-
-    <div class="preview-item">
-
+      <div class="preview-item">
         <span>🩸 Blood Group</span>
-
         <strong>{{ patientForm.value.bloodGroup || '--' }}</strong>
+      </div>
 
-    </div>
-    
-    <div class="preview-item">
-
+      <div class="preview-item">
         <span>🎂 DOB</span>
-
         <strong>{{ patientForm.value.dob || '--' }}</strong>
-
-    </div>
-
-</div>
-
       </div>
 
-      <!-- ================= Form ================= -->
-      <div class="form-panel">
+      <div class="preview-item">
+        <span>💍 Marital Status</span>
+        <strong>{{ patientForm.value.maritalStatus || '--' }}</strong>
+      </div>
 
-        <form [formGroup]="patientForm">
-
-          <div class="form-card">
-
-            <div class="card-header">
-              <h2>Personal Information</h2>
-              <p>Complete patient basic details</p>
-            </div>
-
-            <div class="form-grid">
-
-              <div class="form-group">
-                <label>Full Name</label>
-                <input
-                  type="text"
-                  formControlName="name"
-                  placeholder="Enter full name">
-              </div>
-
-              <div class="form-group">
-                <label>Mobile Number</label>
-                <input
-                  type="text"
-                  formControlName="mobile"
-                  placeholder="Enter mobile number">
-              </div>
-
-              <div class="form-group">
-                <label>Email Address</label>
-                <input
-                  type="email"
-                  formControlName="email"
-                  placeholder="Enter email address">
-              </div>
-
-              <div class="form-group">
-                <label>Date of Birth</label>
-                <input
-                  type="date"
-                  formControlName="dob">
-              </div>
-
-              <div class="form-group">
-                <label>Gender</label>
-
-                <select formControlName="gender">
-                  <option value="">Select Gender</option>
-                  <option value="Male">Male</option>
-                  <option value="Female">Female</option>
-                  <option value="Other">Other</option>
-                </select>
-
-              </div>
-
-              <div class="form-group">
-                <label>Blood Group</label>
-
-                <select formControlName="bloodGroup">
-                  <option value="">Select Blood Group</option>
-                  <option>A+</option>
-                  <option>A-</option>
-                  <option>B+</option>
-                  <option>B-</option>
-                  <option>AB+</option>
-                  <option>AB-</option>
-                  <option>O+</option>
-                  <option>O-</option>
-                </select>
-
-              </div>
-
-              <div class="form-group">
-
-    <label>Marital Status</label>
-
-    <select formControlName="maritalStatus">
-
-        <option value="">Select Status</option>
-
-        <option>Single</option>
-
-        <option>Married</option>
-
-        <option>Divorced</option>
-
-        <option>Widowed</option>
-
-    </select>
-
-</div>
-<div class="form-group">
-
-    <label>Occupation</label>
-
-    <input
-        type="text"
-        formControlName="occupation"
-        placeholder="Enter Occupation">
-
-</div>
-<div class="form-group">
-
-    <label>Aadhaar Number</label>
-
-    <input
-        type="text"
-        maxlength="12"
-        formControlName="aadhaar"
-        placeholder="Enter Aadhaar Number">
-
-</div>
-<div class="form-group">
-
-    <label>PAN Number</label>
-
-    <input
-        type="text"
-        maxlength="10"
-        formControlName="pan"
-        placeholder="Enter PAN Number">
-
-</div>
-<div class="form-group">
-
-    <label>Emergency Contact</label>
-
-    <input
-        type="text"
-        formControlName="emergencyContact"
-        placeholder="Enter Emergency Contact">
-
-</div>
-<div class="form-group">
-
-    <label>Emergency Contact Name</label>
-
-    <input
-        type="text"
-        formControlName="emergencyName"
-        placeholder="Enter Contact Person Name">
-
-</div>
-
-            </div>
-
-          </div>
-
-          <!-- ================= Footer ================= -->
-
-          <div class="footer-actions">
-
-            <button type="button" class="btn-secondary">
-              Previous
-            </button>
-
-            <button type="submit" class="btn-primary">
-              Save & Continue
-            </button>
-
-          </div>
-
-        </form>
-
+      <div class="preview-item">
+        <span>💼 Occupation</span>
+        <strong>{{ patientForm.value.occupation || '--' }}</strong>
       </div>
 
     </div>
 
-  </div>
+  }
+
+  @if (currentStep === 2) {
+
+    <div class="preview-slide">
+
+      <h4 class="preview-section-title">
+        🏠 Address Details
+      </h4>
+
+      <div class="preview-item">
+        <span>🏠 Address</span>
+        <strong>{{ patientForm.value.address1 || '--' }}</strong>
+      </div>
+
+      <div class="preview-item">
+        <span>🏠 Address 2</span>
+        <strong>{{ patientForm.value.address2 || '--' }}</strong>
+      </div>
+
+      <div class="preview-item">
+        <span>🏙 City</span>
+        <strong>{{ patientForm.value.city || '--' }}</strong>
+      </div>
+
+      <div class="preview-item">
+        <span>📍 State</span>
+        <strong>{{ patientForm.value.state || '--' }}</strong>
+      </div>
+
+      <div class="preview-item">
+        <span>🌍 Country</span>
+        <strong>{{ patientForm.value.country || '--' }}</strong>
+      </div>
+
+      <div class="preview-item">
+        <span>📮 Pincode</span>
+        <strong>{{ patientForm.value.pincode || '--' }}</strong>
+      </div>
+
+    </div>
+
+  }
+
+  @if (currentStep === 3) {
+
+    <div class="preview-slide">
+
+      <h4 class="preview-section-title">
+        🩺 Medical Details
+      </h4>
+
+      <div class="preview-item">
+        <span>Medical History</span>
+        <strong>--</strong>
+      </div>
+
+      <div class="preview-item">
+        <span>Allergies</span>
+        <strong>--</strong>
+      </div>
+
+      <div class="preview-item">
+        <span>Medication</span>
+        <strong>--</strong>
+      </div>
+
+    </div>
+
+  }
+
+  @if (currentStep === 4) {
+
+    <div class="preview-slide">
+
+      <h4 class="preview-section-title">
+        🛡 Insurance Details
+      </h4>
+
+      <div class="preview-item">
+        <span>Provider</span>
+        <strong>--</strong>
+      </div>
+
+      <div class="preview-item">
+        <span>Policy Number</span>
+        <strong>--</strong>
+      </div>
+
+      <div class="preview-item">
+        <span>Insurance Type</span>
+        <strong>--</strong>
+      </div>
+
+    </div>
+
+  }
+
+  @if (currentStep === 5) {
+
+    <div class="preview-slide review-preview">
+
+      <h4 class="preview-section-title">
+        📋 Complete Review
+      </h4>
+
+      <!-- Personal -->
+
+      <h5>Personal Details</h5>
+
+      <div class="preview-item">
+        <span>Name</span>
+        <strong>{{ patientForm.value.name || '--' }}</strong>
+      </div>
+
+      <div class="preview-item">
+        <span>Mobile</span>
+        <strong>{{ patientForm.value.mobile || '--' }}</strong>
+      </div>
+
+      <div class="preview-item">
+        <span>Email</span>
+        <strong>{{ patientForm.value.email || '--' }}</strong>
+      </div>
+
+      <!-- Address -->
+
+      <h5>Address Details</h5>
+
+      <div class="preview-item">
+        <span>Address</span>
+        <strong>{{ patientForm.value.address1 || '--' }}</strong>
+      </div>
+
+      <div class="preview-item">
+        <span>City</span>
+        <strong>{{ patientForm.value.city || '--' }}</strong>
+      </div>
+
+      <div class="preview-item">
+        <span>State</span>
+        <strong>{{ patientForm.value.state || '--' }}</strong>
+      </div>
+
+      <div class="preview-item">
+        <span>Pincode</span>
+        <strong>{{ patientForm.value.pincode || '--' }}</strong>
+      </div>
+
+    </div>
+
+  }
 
 </div>

@@ -132,3 +132,24 @@
     font-weight:700;
 
 }
+.preview-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid #E5E7EB;
+    font-size: 14px;
+}
+
+.preview-item:last-child {
+    border-bottom: none;
+}
+
+.preview-item span {
+    color: #64748B;
+}
+
+.preview-item strong {
+    color: #1E293B;
+    font-weight: 600;
+}

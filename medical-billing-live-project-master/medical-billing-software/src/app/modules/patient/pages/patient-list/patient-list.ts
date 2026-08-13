@@ -4,6 +4,6 @@ import { Component } from '@angular/core';
   selector: 'app-patient-list',
   imports: [],
   templateUrl: './patient-list.html',
-  styleUrl: './patient-list.css',
+  styleUrls: ['./patient-list.css'],
 })
 export class PatientList {}

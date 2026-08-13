@@ -4,6 +4,6 @@ import { Component } from '@angular/core';
   selector: 'app-app-button',
   imports: [],
   templateUrl: './app-button.html',
-  styleUrl: './app-button.css',
+  styleUrls: ['./app-button.css'],
 })
 export class AppButton {}

@@ -5,7 +5,7 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
   selector: 'app-patient-login',
   imports: [ReactiveFormsModule],
   templateUrl: './patient-login.html',
-  styleUrl: './patient-login.css',
+  styleUrls: ['./patient-login.css'],
 })
 export class PatientLogin implements OnInit {
    patientForm!: FormGroup;

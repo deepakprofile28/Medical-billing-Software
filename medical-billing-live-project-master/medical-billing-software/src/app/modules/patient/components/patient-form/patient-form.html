@@ -1,1 +1,73 @@
-<p>patient-form works!</p>
+<div class="form-card">
+
+  <div class="card-header">
+    <h2>Address Information</h2>
+    <p>Enter patient address details</p>
+  </div>
+
+  <div class="form-grid">
+
+    <!-- Address Line 1 -->
+    <div class="form-group">
+      <label>Address Line 1</label>
+
+      <input
+        type="text"
+        formControlName="address1"
+        placeholder="Enter Address Line 1">
+    </div>
+
+    <!-- Address Line 2 -->
+    <div class="form-group">
+      <label>Address Line 2</label>
+
+      <input
+        type="text"
+        formControlName="address2"
+        placeholder="Enter Address Line 2">
+    </div>
+
+    <!-- City -->
+    <div class="form-group">
+      <label>City</label>
+
+      <input
+        type="text"
+        formControlName="city"
+        placeholder="Enter City">
+    </div>
+
+    <!-- State -->
+    <div class="form-group">
+      <label>State</label>
+
+      <input
+        type="text"
+        formControlName="state"
+        placeholder="Enter State">
+    </div>
+
+    <!-- Country -->
+    <div class="form-group">
+      <label>Country</label>
+
+      <input
+        type="text"
+        formControlName="country"
+        placeholder="Enter Country">
+    </div>
+
+    <!-- Pincode -->
+    <div class="form-group">
+      <label>Pincode</label>
+
+      <input
+        type="text"
+        maxlength="6"
+        formControlName="pincode"
+        placeholder="Enter Pincode">
+    </div>
+
+  </div>
+
+</div>

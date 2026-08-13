@@ -1,9 +1,16 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
+import { FormGroup, ReactiveFormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-patient-form',
-  imports: [],
+  standalone: true,
+  imports: [ReactiveFormsModule],
   templateUrl: './patient-form.html',
-  styleUrl: './patient-form.css',
+  styleUrls: ['./patient-form.css']
 })
-export class PatientForm {}
+export class PatientForm {
+
+  @Input() patientForm!: FormGroup;
+  
+
+}

@@ -1,44 +1,87 @@
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
-import { CommonModule } from '@angular/common';
-import { AppCard } from '../../../../shared/components/app-card/app-card';
+import { PatientForm } from '../../components/patient-form/patient-form';
+// path உங்க project structure-க்கு ஏற்ற மாதிரி change பண்ணுங்க
+
 @Component({
   selector: 'app-patient-registration',
-  imports: [ReactiveFormsModule, CommonModule,
-    ReactiveFormsModule],
+  standalone: true,
+  imports: [
+    ReactiveFormsModule,
+    PatientForm
+  ],
   templateUrl: './patient-registration.html',
-  styleUrl: './patient-registration.css',
+  styleUrl: './patient-registration.css'
 })
 export class PatientRegistration {
-  patientForm!: FormGroup;
-  constructor(private fb: FormBuilder) {}
-  ngOnInit(): void {
 
-  this.patientForm = this.fb.group({
+  currentStep = 1;
 
-    name: [''],
+  patientAge = 0;
 
-    mobile: [''],
+  patientForm: FormGroup;
 
-    email: [''],
+  constructor(private fb: FormBuilder) {
 
-    gender: [''],
+    this.patientForm = this.fb.group({
 
-    bloodGroup: [''],
+      // Personal
+      name: [''],
+      mobile: [''],
+      email: [''],
+      dob: [''],
+      gender: [''],
+      bloodGroup: [''],
+      maritalStatus: [''],
+      occupation: [''],
+      aadhaar: [''],
+      pan: [''],
+      emergencyContact: [''],
+      emergencyName: [''],
 
-    dob: [''],
-   
-    maritalStatus: [''],
+      // Address
+      address1: [''],
+      address2: [''],
+      city: [''],
+      state: [''],
+      country: ['India'],
+      pincode: ['']
 
-occupation: [''],
+    });
 
-aadhaar: [''],
-pan: [''],
+  }
 
-emergencyContact: [''],
-emergencyName: ['']
 
-  });
+  nextStep(): void {
 
-}
+    if (this.currentStep < 5) {
+
+      this.currentStep++;
+
+    } else {
+
+      this.savePatient();
+
+    }
+
+  }
+
+
+  previousStep(): void {
+
+    if (this.currentStep > 1) {
+
+      this.currentStep--;
+
+    }
+
+  }
+
+
+  savePatient(): void {
+
+    console.log('Patient Data:', this.patientForm.value);
+
+  }
+
 }

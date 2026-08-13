@@ -4,6 +4,6 @@ import { Component } from '@angular/core';
   selector: 'app-progress-stepper',
   imports: [],
   templateUrl: './progress-stepper.html',
-  styleUrl: './progress-stepper.css',
+  styleUrls: ['./progress-stepper.css'],
 })
 export class ProgressStepper {}

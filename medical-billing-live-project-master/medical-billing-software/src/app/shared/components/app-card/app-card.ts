@@ -5,6 +5,6 @@ import { ReactiveFormsModule } from '@angular/forms';
   selector: 'app-card',
   imports: [ReactiveFormsModule],
   templateUrl: './app-card.html',
-  styleUrl: './app-card.css',
+  styleUrls: ['./app-card.css'],
 })
 export class AppCard {}
