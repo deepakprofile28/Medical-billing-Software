@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { FormGroup, ReactiveFormsModule } from '@angular/forms';
 
 @Component({
@@ -11,6 +11,11 @@ import { FormGroup, ReactiveFormsModule } from '@angular/forms';
 export class PatientForm {
 
   @Input() patientForm!: FormGroup;
-  
+  @Output() nextStep = new EventEmitter<void>();
 
+  onNext(): void {
+    if (this.patientForm.valid) {
+      this.nextStep.emit();
+    }
+  }
 }

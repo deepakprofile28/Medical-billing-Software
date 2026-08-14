@@ -52,19 +52,49 @@
         <strong>{{ patientForm.value.bloodGroup || '--' }}</strong>
     </div>
 
-    <div class="preview-item">
-        <span>🏠 City</span>
-        <strong>{{ patientForm.value.city || '--' }}</strong>
-    </div>
+    <!-- Address Details Carousel -->
+    <div class="address-section">
+        <div class="address-carousel">
+            <button class="arrow-btn prev-btn" (click)="prevAddressDetail()" [disabled]="currentAddressStep === 0">
+                ❮
+            </button>
 
-    <div class="preview-item">
-        <span>📍 State</span>
-        <strong>{{ patientForm.value.state || '--' }}</strong>
-    </div>
+            <div class="address-detail">
+                <div *ngIf="currentAddressStep === 0" class="address-item">
+                    <span>🏠 Address Line 1</span>
+                    <strong>{{ patientForm.value.address1 || '--' }}</strong>
+                </div>
+                <div *ngIf="currentAddressStep === 1" class="address-item">
+                    <span>📬 Address Line 2</span>
+                    <strong>{{ patientForm.value.address2 || '--' }}</strong>
+                </div>
+                <div *ngIf="currentAddressStep === 2" class="address-item">
+                    <span>🏘️ City</span>
+                    <strong>{{ patientForm.value.city || '--' }}</strong>
+                </div>
+                <div *ngIf="currentAddressStep === 3" class="address-item">
+                    <span>📍 State</span>
+                    <strong>{{ patientForm.value.state || '--' }}</strong>
+                </div>
+                <div *ngIf="currentAddressStep === 4" class="address-item">
+                    <span>🌍 Country</span>
+                    <strong>{{ patientForm.value.country || '--' }}</strong>
+                </div>
+                <div *ngIf="currentAddressStep === 5" class="address-item">
+                    <span>📮 Pincode</span>
+                    <strong>{{ patientForm.value.pincode || '--' }}</strong>
+                </div>
+            </div>
 
-    <div class="preview-item">
-        <span>📮 Pincode</span>
-        <strong>{{ patientForm.value.pincode || '--' }}</strong>
+            <button class="arrow-btn next-btn" (click)="nextAddressDetail()" [disabled]="currentAddressStep === 5">
+                ❯
+            </button>
+        </div>
+
+        <!-- Step Indicator -->
+        <div class="step-indicator">
+            {{ currentAddressStep + 1 }} / 6
+        </div>
     </div>
 
 </div>
