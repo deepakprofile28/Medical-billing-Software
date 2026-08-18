@@ -93,167 +93,200 @@
       <!-- ================= PREVIEW ================= -->
       <div class="preview-panel">
 
-        <div class="preview-card">
+        <div class="preview-viewport" #previewPanel>
 
-          <!-- Avatar -->
-          <div class="avatar">
-            {{ patientForm.value.name?.charAt(0) || 'P' }}
-          </div>
+          <div class="preview-track">
 
-          <!-- Name -->
-          <h3>
-            {{ patientForm.value.name || 'Patient Name' }}
-          </h3>
+            <!-- Slide 1: Personal -->
+            <div class="preview-card" role="group" aria-label="Personal preview">
+              <div class="avatar">{{ patientForm.value.name?.charAt(0) || 'P' }}</div>
 
-          <!-- Gender + Age -->
-          <p>
-            {{ patientForm.value.gender || 'Gender' }}
-            •
-            {{ patientAge || '--' }} Years
-          </p>
+              <h3>{{ patientForm.value.name || 'Patient Name' }}</h3>
 
+              <p>
+                {{ patientForm.value.gender || 'Gender' }}
+                • {{ patientAge || '--' }} Years
+              </p>
 
-          <!-- Patient Status -->
-          <div class="patient-status">
+              <div class="patient-status">
+                <span class="status">🟢 New Patient</span>
+                <span class="patient-id">PID-240001</span>
+              </div>
 
-            <span class="status">
-              🟢 New Patient
-            </span>
+              <hr>
 
-            <span class="patient-id">
-              PID-240001
-            </span>
+              <h4>Personal Details</h4>
 
-          </div>
+              <div class="preview-item">
+                <span>📱 Mobile</span>
+                <strong>{{ patientForm.value.mobile || '--' }}</strong>
+              </div>
 
+              <div class="preview-item">
+                <span>✉ Email</span>
+                <strong>{{ patientForm.value.email || '--' }}</strong>
+              </div>
 
-          <!-- ================= PERSONAL PREVIEW ================= -->
-          <hr>
+              <div class="preview-item">
+                <span>🩸 Blood Group</span>
+                <strong>{{ patientForm.value.bloodGroup || '--' }}</strong>
+              </div>
 
-          <h4>Personal Details</h4>
+              <div class="preview-item">
+                <span>🎂 DOB</span>
+                <strong>{{ patientForm.value.dob || '--' }}</strong>
+              </div>
 
-          <div class="preview-item">
-            <span>📱 Mobile</span>
-            <strong>
-              {{ patientForm.value.mobile || '--' }}
-            </strong>
-          </div>
+              <div class="preview-item">
+                <span>💍 Marital Status</span>
+                <strong>{{ patientForm.value.maritalStatus || '--' }}</strong>
+              </div>
 
-          <div class="preview-item">
-            <span>✉ Email</span>
-            <strong>
-              {{ patientForm.value.email || '--' }}
-            </strong>
-          </div>
-
-          <div class="preview-item">
-            <span>🩸 Blood Group</span>
-            <strong>
-              {{ patientForm.value.bloodGroup || '--' }}
-            </strong>
-          </div>
-
-          <div class="preview-item">
-            <span>🎂 DOB</span>
-            <strong>
-              {{ patientForm.value.dob || '--' }}
-            </strong>
-          </div>
-
-          <div class="preview-item">
-            <span>💍 Marital Status</span>
-            <strong>
-              {{ patientForm.value.maritalStatus || '--' }}
-            </strong>
-          </div>
-
-          <div class="preview-item">
-            <span>💼 Occupation</span>
-            <strong>
-              {{ patientForm.value.occupation || '--' }}
-            </strong>
-          </div>
-
-
-          <!-- ================= ADDRESS PREVIEW ================= -->
-          @if (currentStep >= 2) {
-
-            <hr>
-
-            <h4>Address Details</h4>
-
-            <div class="preview-item">
-              <span>🏠 Address</span>
-              <strong>
-                {{ patientForm.value.address1 || '--' }}
-              </strong>
+              <div class="preview-item">
+                <span>💼 Occupation</span>
+                <strong>{{ patientForm.value.occupation || '--' }}</strong>
+              </div>
             </div>
 
-            <div class="preview-item">
-              <span>🏠 Address 2</span>
-              <strong>
-                {{ patientForm.value.address2 || '--' }}
-              </strong>
-            </div>
 
-            <div class="preview-item">
-              <span>🏙 City</span>
-              <strong>
+            <!-- Slide 2: Address -->
+            <div class="preview-card" role="group" aria-label="Address preview">
+              <div class="avatar">{{ patientForm.value.name?.charAt(0) || 'P' }}</div>
+
+              <h3>Address</h3>
+
+              <p>
                 {{ patientForm.value.city || '--' }}
-              </strong>
+                • {{ patientForm.value.state || '--' }}
+              </p>
+
+              <hr>
+
+              <h4>Address Details</h4>
+
+              <div class="preview-item">
+                <span>🏠 Address</span>
+                <strong>{{ patientForm.value.address1 || '--' }}</strong>
+              </div>
+
+              <div class="preview-item">
+                <span>🏠 Address 2</span>
+                <strong>{{ patientForm.value.address2 || '--' }}</strong>
+              </div>
+
+              <div class="preview-item">
+                <span>🏙 City</span>
+                <strong>{{ patientForm.value.city || '--' }}</strong>
+              </div>
+
+              <div class="preview-item">
+                <span>📍 State</span>
+                <strong>{{ patientForm.value.state || '--' }}</strong>
+              </div>
+
+              <div class="preview-item">
+                <span>🌍 Country</span>
+                <strong>{{ patientForm.value.country || '--' }}</strong>
+              </div>
+
+              <div class="preview-item">
+                <span>📮 Pincode</span>
+                <strong>{{ patientForm.value.pincode || '--' }}</strong>
+              </div>
             </div>
 
-            <div class="preview-item">
-              <span>📍 State</span>
-              <strong>
-                {{ patientForm.value.state || '--' }}
-              </strong>
+
+            <!-- Slide 3: Medical -->
+            <div class="preview-card" role="group" aria-label="Medical preview">
+              <div class="avatar">{{ patientForm.value.name?.charAt(0) || 'P' }}</div>
+
+              <h3>Medical</h3>
+
+              <p>Summary of medical info</p>
+
+              <hr>
+
+              <h4>Medical Details</h4>
+
+              <div class="preview-item">
+                <span>🩺 Medical Information</span>
+                <strong>Added</strong>
+              </div>
             </div>
 
-            <div class="preview-item">
-              <span>🌍 Country</span>
-              <strong>
-                {{ patientForm.value.country || '--' }}
-              </strong>
+
+            <!-- Slide 4: Insurance -->
+            <div class="preview-card" role="group" aria-label="Insurance preview">
+              <div class="avatar">{{ patientForm.value.name?.charAt(0) || 'P' }}</div>
+
+              <h3>Insurance</h3>
+
+              <p>Policy overview</p>
+
+              <hr>
+
+              <h4>Insurance Details</h4>
+
+              <div class="preview-item">
+                <span>🛡 Insurance</span>
+                <strong>Added</strong>
+              </div>
             </div>
 
-            <div class="preview-item">
-              <span>📮 Pincode</span>
-              <strong>
-                {{ patientForm.value.pincode || '--' }}
-              </strong>
+
+            <!-- Slide 5: Review -->
+            <div class="preview-card" role="group" aria-label="Review preview">
+              <div class="avatar">{{ patientForm.value.name?.charAt(0) || 'P' }}</div>
+
+              <h3>Review</h3>
+
+              <p>All details at a glance</p>
+
+              <hr>
+
+              <h4>Summary</h4>
+
+              <div class="preview-item">
+                <span>Name</span>
+                <strong>{{ patientForm.value.name || '--' }}</strong>
+              </div>
+
+              <div class="preview-item">
+                <span>Mobile</span>
+                <strong>{{ patientForm.value.mobile || '--' }}</strong>
+              </div>
+
+              <div class="preview-item">
+                <span>Email</span>
+                <strong>{{ patientForm.value.email || '--' }}</strong>
+              </div>
             </div>
 
+          </div>
+        </div>
+
+
+        <!-- Preview controls -->
+        <div class="preview-controls">
+
+          @if (previewIndex > 0) {
+            <button
+              class="preview-control-btn previous-preview"
+              type="button"
+              aria-label="Previous preview"
+              (click)="prevPreview()">
+              Previous
+            </button>
           }
 
-
-          <!-- ================= MEDICAL PREVIEW ================= -->
-          @if (currentStep >= 3) {
-
-            <hr>
-
-            <h4>Medical Details</h4>
-
-            <div class="preview-item">
-              <span>🩺 Medical Information</span>
-              <strong>Added</strong>
-            </div>
-
-          }
-
-
-          <!-- ================= INSURANCE PREVIEW ================= -->
-          @if (currentStep >= 4) {
-
-            <hr>
-
-            <h4>Insurance Details</h4>
-
-            <div class="preview-item">
-              <span>🛡 Insurance</span>
-              <strong>Added</strong>
-            </div>
-
+          @if (previewIndex < totalPreviews - 1) {
+            <button
+              class="preview-control-btn next-preview"
+              type="button"
+              aria-label="Next preview"
+              (click)="nextPreview()">
+              Next Preview
+            </button>
           }
 
         </div>
@@ -745,5 +778,3 @@
     </div>
 
   </div>
-
-</div>

@@ -3,15 +3,20 @@
 ========================================================= */
 
 .patient-page {
+  height: 100vh;
   min-height: 100vh;
   background: #f4f7fb;
   padding: 24px;
   box-sizing: border-box;
+  overflow: hidden;
 }
 
 .patient-container {
   max-width: 1000px;
+  height: 100%;
   margin: 0px auto;
+  display: flex;
+  flex-direction: column;
 }
 
 
@@ -67,7 +72,7 @@
   display: flex;
   align-items: center;
   background: #ffffff;
-  padding: 15px 16px;
+  padding: 0px 16px;
   border-radius: 15px;
   margin-bottom: 16px;
   box-shadow: 0 5px 18px rgba(0, 0, 0, 0.06);
@@ -129,6 +134,8 @@
   grid-template-columns: 280px 1fr;
   gap: 16px;
   align-items: start;
+  flex: 1;
+  min-height: 0;
 }
 
 
@@ -139,12 +146,30 @@
 .preview-panel {
   position: sticky;
   top: 20px;
+  width: 100%;
+  min-width: 0;
+}
+
+.preview-viewport {
+  width: 100%;
+  overflow: hidden;
+  border-radius: 15px;
+}
+
+.preview-track {
+  display: flex;
+  width: 100%;
+  transition: transform 0.35s ease;
 }
 
 .preview-card {
+  flex: 0 0 100%;
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
   background: #ffffff;
   border-radius: 15px;
-  padding: 20px 18px;
+  padding: 18px 20px;
   box-shadow: 0 5px 18px rgba(0, 0, 0, 0.07);
 }
 
@@ -228,10 +253,23 @@
 }
 
 .preview-card h4 {
+  position: relative;
   margin: 0 0 9px;
+  padding-left: 10px;
   font-size: 14px;
   font-weight: 600;
   color: #344054;
+}
+
+.preview-card h4::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 3px;
+  width: 3px;
+  height: 13px;
+  border-radius: 5px;
+  background: #2864e8;
 }
 
 
@@ -270,38 +308,66 @@
 
 
 /* =========================================================
-   PREVIEW SECTION - COMPLETED STEPS
+   PREVIEW CONTROLS
 ========================================================= */
 
-.preview-card h4 {
-  position: relative;
-  padding-left: 10px;
+.preview-controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+  min-height: 32px;
 }
 
-.preview-card h4::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  top: 3px;
-  width: 3px;
-  height: 13px;
-  border-radius: 5px;
+.preview-control-btn {
+  height: 30px;
+  padding: 0 12px;
+  border-radius: 7px;
+  font-size: 10px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: 0.2s ease;
+  box-sizing: border-box;
+}
+
+.next-preview {
   background: #2864e8;
+  color: #ffffff;
+  border: 1px solid #2864e8;
+}
+
+.next-preview:hover {
+  background: #1f54c9;
+}
+
+.previous-preview {
+  background: #ffffff;
+  color: #1d2939;
+  border: 1px solid #cbd5e1;
+}
+
+.previous-preview:hover {
+  background: #f8fafc;
 }
 
 
 /* =========================================================
+   /* =========================================================
    FORM PANEL
 ========================================================= */
 
 .form-panel {
   min-width: 0;
+  flex: 1;
+  min-height: 0;
+  padding-bottom: 72px;
 }
 
 .form-card {
   background: #ffffff;
   border-radius: 15px;
-  padding: 20px;
+  padding: 13px;
   box-shadow: 0 5px 18px rgba(0, 0, 0, 0.07);
 }
 
@@ -401,14 +467,21 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 10px;
+  width: 100%;
+  box-sizing: border-box;
 
   margin-top: 16px;
 }
 
 .btn-secondary,
 .btn-primary {
+  flex: 1 1 0;
+  min-width: 0;
   height: 38px;
   padding: 0 22px;
+  box-sizing: border-box;
+  white-space: nowrap;
 
   border-radius: 8px;
   font-size: 12px;
@@ -504,7 +577,7 @@
 
 
 @media (max-width: 650px) {
-
+  
   .patient-page {
     padding: 12px;
   }
@@ -525,12 +598,45 @@
     grid-template-columns: 1fr;
   }
 
+  /* On small screens keep footer actions visible by fixing them to the viewport bottom */
   .footer-actions {
+    position: fixed;
+    left: 12px;
+    right: 12px;
+    bottom: 12px;
+    display: flex;
     gap: 10px;
+    justify-content: space-between;
+    align-items: center;
+    width: auto;
+    max-width: calc(100vw - 24px);
+    padding: 8px;
+    background: rgba(255,255,255,0.95);
+    border-radius: 10px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+    z-index: 250;
+    box-sizing: border-box;
   }
 
   .btn-secondary,
   .btn-primary {
-    flex: 1;
+    flex: 1 1 0;
+    min-width: 0;
+    white-space: nowrap;
+  }
+
+  /* Ensure buttons are large enough for touch and visible */
+  .footer-actions .btn-secondary,
+  .footer-actions .btn-primary {
+    height: 44px;
+    padding: 0 16px;
+    min-width: 0;
+    box-sizing: border-box;
+  }
+
+  /* Add bottom padding so page content isn't hidden under the fixed footer */
+  .form-panel {
+    padding-bottom: 88px;
   }
 }
+
