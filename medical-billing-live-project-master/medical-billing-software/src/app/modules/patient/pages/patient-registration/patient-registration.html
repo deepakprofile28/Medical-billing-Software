@@ -149,92 +149,180 @@
             </div>
 
 
-            <!-- Slide 2: Address -->
-            <div class="preview-card" role="group" aria-label="Address preview">
-              <div class="avatar">{{ patientForm.value.name?.charAt(0) || 'P' }}</div>
+         <!-- Slide 2: Address -->
+<div class="preview-card" role="group" aria-label="Address preview">
 
-              <h3>Address</h3>
+  <div class="avatar">
+    {{ patientForm.value.name?.charAt(0) || 'P' }}
+  </div>
 
-              <p>
-                {{ patientForm.value.city || '--' }}
-                • {{ patientForm.value.state || '--' }}
-              </p>
+  <h3>Address</h3>
 
-              <hr>
+  <p>
+    {{ patientForm.value.city || '--' }}
+    • {{ patientForm.value.state || '--' }}
+  </p>
 
-              <h4>Address Details</h4>
+  <hr>
 
-              <div class="preview-item">
-                <span>🏠 Address</span>
-                <strong>{{ patientForm.value.address1 || '--' }}</strong>
-              </div>
+  <h4>Address Details</h4>
 
-              <div class="preview-item">
-                <span>🏠 Address 2</span>
-                <strong>{{ patientForm.value.address2 || '--' }}</strong>
-              </div>
+  <div class="preview-item">
+    <span>🏠 Address</span>
+    <strong>
+      {{ patientForm.value.address1 || '--' }}
+    </strong>
+  </div>
 
-              <div class="preview-item">
-                <span>🏙 City</span>
-                <strong>{{ patientForm.value.city || '--' }}</strong>
-              </div>
+  <div class="preview-item">
+    <span>🏠 Address 2</span>
+    <strong>
+      {{ patientForm.value.address2 || '--' }}
+    </strong>
+  </div>
 
-              <div class="preview-item">
-                <span>📍 State</span>
-                <strong>{{ patientForm.value.state || '--' }}</strong>
-              </div>
+  <div class="preview-item">
+    <span>📍 District</span>
+    <strong>
+      {{ patientForm.value.district || '--' }}
+    </strong>
+  </div>
 
-              <div class="preview-item">
-                <span>🌍 Country</span>
-                <strong>{{ patientForm.value.country || '--' }}</strong>
-              </div>
+  <div class="preview-item">
+    <span>🏙 City</span>
+    <strong>
+      {{ patientForm.value.city || '--' }}
+    </strong>
+  </div>
 
-              <div class="preview-item">
-                <span>📮 Pincode</span>
-                <strong>{{ patientForm.value.pincode || '--' }}</strong>
-              </div>
-            </div>
+  <div class="preview-item">
+    <span>📍 State</span>
+    <strong>
+      {{ patientForm.value.state || '--' }}
+    </strong>
+  </div>
 
+  <div class="preview-item">
+    <span>🌍 Country</span>
+    <strong>
+      {{ patientForm.value.country || '--' }}
+    </strong>
+  </div>
 
-            <!-- Slide 3: Medical -->
-            <div class="preview-card" role="group" aria-label="Medical preview">
-              <div class="avatar">{{ patientForm.value.name?.charAt(0) || 'P' }}</div>
+  
 
-              <h3>Medical</h3>
+</div>
+          <!-- Slide 3: Medical -->
+<div
+  class="preview-card"
+  role="group"
+  aria-label="Medical preview">
 
-              <p>Summary of medical info</p>
+  <div class="avatar">
+    {{ patientForm.value.name?.charAt(0) || 'P' }}
+  </div>
 
-              <hr>
+  <h3>Medical</h3>
 
-              <h4>Medical Details</h4>
+  <p>Summary of medical info</p>
 
-              <div class="preview-item">
-                <span>🩺 Medical Information</span>
-                <strong>Added</strong>
-              </div>
-            </div>
+  <hr>
 
-
-            <!-- Slide 4: Insurance -->
-            <div class="preview-card" role="group" aria-label="Insurance preview">
-              <div class="avatar">{{ patientForm.value.name?.charAt(0) || 'P' }}</div>
-
-              <h3>Insurance</h3>
-
-              <p>Policy overview</p>
-
-              <hr>
-
-              <h4>Insurance Details</h4>
-
-              <div class="preview-item">
-                <span>🛡 Insurance</span>
-                <strong>Added</strong>
-              </div>
-            </div>
+  <h4>Medical Details</h4>
 
 
-            <!-- Slide 5: Review -->
+  <!-- Medical History -->
+  <div class="preview-item">
+
+    <span>🩺 Medical History</span>
+
+    <strong>
+      {{ patientForm.value.medicalHistory || '--' }}
+    </strong>
+
+  </div>
+
+
+  <!-- Current Medication -->
+  <div class="preview-item">
+
+    <span>💊 Medication</span>
+
+    <strong>
+      {{ patientForm.value.currentMedication || '--' }}
+    </strong>
+
+  </div>
+
+
+  <!-- Allergies -->
+  <div class="preview-item">
+
+    <span>⚠️ Allergies</span>
+
+    <strong>
+      {{ patientForm.value.allergies || '--' }}
+    </strong>
+
+  </div>
+
+</div>
+
+<!-- Slide 4: Insurance -->
+<div
+  class="preview-card"
+  role="group"
+  aria-label="Insurance preview">
+
+  <div class="avatar">
+    {{ patientForm.value.name?.charAt(0) || 'P' }}
+  </div>
+
+  <h3>Insurance</h3>
+
+  <p>Policy overview</p>
+
+  <hr>
+
+  <h4>Insurance Details</h4>
+
+
+  <!-- Insurance Provider -->
+  <div class="preview-item">
+
+    <span>🏥 Provider</span>
+
+    <strong>
+      {{ patientForm.value.insuranceProvider || '--' }}
+    </strong>
+
+  </div>
+
+
+  <!-- Policy Number -->
+  <div class="preview-item">
+
+    <span>🛡 Policy Number</span>
+
+    <strong>
+      {{ patientForm.value.policyNumber || '--' }}
+    </strong>
+
+  </div>
+
+
+  <!-- Policy Holder -->
+  <div class="preview-item">
+
+    <span>👤 Policy Holder</span>
+
+    <strong>
+      {{ patientForm.value.policyHolderName || '--' }}
+    </strong>
+
+  </div>
+
+</div>            <!-- Slide 5: Review -->
             <div class="preview-card" role="group" aria-label="Review preview">
               <div class="avatar">{{ patientForm.value.name?.charAt(0) || 'P' }}</div>
 
@@ -537,213 +625,290 @@
         <!-- ================= STEP 3 MEDICAL ================= -->
         @if (currentStep === 3) {
 
-          <div class="form-card">
+         <form [formGroup]="patientForm">
 
-            <div class="card-header">
+  <div class="form-card">
 
-              <h2>Medical Information</h2>
+    <div class="card-header">
 
-              <p>
-                Enter patient medical details
-              </p>
+      <h2>Medical Information</h2>
 
-            </div>
+      <p>
+        Enter patient medical details
+      </p>
 
-            <div class="form-grid">
+    </div>
 
-              <div class="form-group">
+    <div class="form-grid">
 
-                <label>Medical History</label>
+      <!-- Medical History -->
+      <div class="form-group">
 
-                <textarea
-                  placeholder="Enter medical history">
-                </textarea>
+        <label>Medical History</label>
 
-              </div>
+        <textarea
+          formControlName="medicalHistory"
+          placeholder="Enter medical history">
+        </textarea>
 
-              <div class="form-group">
-
-                <label>Current Medication</label>
-
-                <textarea
-                  placeholder="Enter current medication">
-                </textarea>
-
-              </div>
-
-              <div class="form-group">
-
-                <label>Allergies</label>
-
-                <textarea
-                  placeholder="Enter allergies">
-                </textarea>
-
-              </div>
-
-            </div>
-
-          </div>
-
-        }
+      </div>
 
 
-        <!-- ================= STEP 4 INSURANCE ================= -->
-        @if (currentStep === 4) {
+      <!-- Current Medication -->
+      <div class="form-group">
 
-          <div class="form-card">
+        <label>Current Medication</label>
 
-            <div class="card-header">
+        <textarea
+          formControlName="currentMedication"
+          placeholder="Enter current medication">
+        </textarea>
 
-              <h2>Insurance Information</h2>
+      </div>
 
-              <p>
-                Enter patient insurance details
-              </p>
 
-            </div>
+      <!-- Allergies -->
+      <div class="form-group">
 
-            <div class="form-grid">
+        <label>Allergies</label>
 
-              <div class="form-group">
+        <textarea
+          formControlName="allergies"
+          placeholder="Enter allergies">
+        </textarea>
 
-                <label>Insurance Provider</label>
+      </div>
 
-                <input
-                  type="text"
-                  placeholder="Enter insurance provider">
+    </div>
 
-              </div>
+  </div>
 
-              <div class="form-group">
-
-                <label>Policy Number</label>
-
-                <input
-                  type="text"
-                  placeholder="Enter policy number">
-
-              </div>
-
-              <div class="form-group">
-
-                <label>Policy Holder Name</label>
-
-                <input
-                  type="text"
-                  placeholder="Enter policy holder name">
-
-              </div>
-
-            </div>
-
-          </div>
+</form>
 
         }
 
 
+        <!-- ================= STEP 4 INSURANCE ================= -->@if (currentStep === 4) {
+
+  <form [formGroup]="patientForm">
+
+    <div class="form-card">
+
+      <div class="card-header">
+
+        <h2>Insurance Information</h2>
+
+        <p>
+          Enter patient insurance details
+        </p>
+
+      </div>
+
+      <div class="form-grid">
+
+        <!-- Insurance Provider -->
+        <div class="form-group">
+
+          <label>Insurance Provider</label>
+
+          <input
+            type="text"
+            formControlName="insuranceProvider"
+            placeholder="Enter insurance provider">
+
+        </div>
+
+
+        <!-- Policy Number -->
+        <div class="form-group">
+
+          <label>Policy Number</label>
+
+          <input
+            type="text"
+            formControlName="policyNumber"
+            placeholder="Enter policy number">
+
+        </div>
+
+
+        <!-- Policy Holder Name -->
+        <div class="form-group">
+
+          <label>Policy Holder Name</label>
+
+          <input
+            type="text"
+            formControlName="policyHolderName"
+            placeholder="Enter policy holder name">
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </form>
+
+}
         <!-- ================= STEP 5 REVIEW ================= -->
         @if (currentStep === 5) {
 
-          <div class="form-card">
+  <div class="review-scroll">
 
-            <div class="card-header">
+    <div class="form-card">
 
-              <h2>Review Patient Information</h2>
+      <div class="card-header">
 
-              <p>
-                Review all patient details before saving.
-              </p>
+        <h2>Review Patient Information</h2>
 
-            </div>
+        <p>
+          Review all patient details before saving.
+        </p>
 
-
-            <!-- Personal Review -->
-            <div class="review-section">
-
-              <h3>Personal Information</h3>
-
-              <p>
-                <strong>Name:</strong>
-                {{ patientForm.value.name || '--' }}
-              </p>
-
-              <p>
-                <strong>Mobile:</strong>
-                {{ patientForm.value.mobile || '--' }}
-              </p>
-
-              <p>
-                <strong>Email:</strong>
-                {{ patientForm.value.email || '--' }}
-              </p>
-
-              <p>
-                <strong>DOB:</strong>
-                {{ patientForm.value.dob || '--' }}
-              </p>
-
-              <p>
-                <strong>Gender:</strong>
-                {{ patientForm.value.gender || '--' }}
-              </p>
-
-              <p>
-                <strong>Blood Group:</strong>
-                {{ patientForm.value.bloodGroup || '--' }}
-              </p>
-
-              <p>
-                <strong>Marital Status:</strong>
-                {{ patientForm.value.maritalStatus || '--' }}
-              </p>
-
-              <p>
-                <strong>Occupation:</strong>
-                {{ patientForm.value.occupation || '--' }}
-              </p>
-
-            </div>
+      </div>
 
 
-            <!-- Address Review -->
-            <div class="review-section">
+      <!-- Personal Review -->
+      <div class="review-section">
 
-              <h3>Address Information</h3>
+        <h3>Personal Information</h3>
 
-              <p>
-                <strong>Address 1:</strong>
-                {{ patientForm.value.address1 || '--' }}
-              </p>
+        <p>
+          <strong>Name:</strong>
+          {{ patientForm.value.name || '--' }}
+        </p>
 
-              <p>
-                <strong>Address 2:</strong>
-                {{ patientForm.value.address2 || '--' }}
-              </p>
+        <p>
+          <strong>Mobile:</strong>
+          {{ patientForm.value.mobile || '--' }}
+        </p>
 
-              <p>
-                <strong>City:</strong>
-                {{ patientForm.value.city || '--' }}
-              </p>
+        <p>
+          <strong>Email:</strong>
+          {{ patientForm.value.email || '--' }}
+        </p>
 
-              <p>
-                <strong>State:</strong>
-                {{ patientForm.value.state || '--' }}
-              </p>
+        <p>
+          <strong>DOB:</strong>
+          {{ patientForm.value.dob || '--' }}
+        </p>
 
-              <p>
-                <strong>Country:</strong>
-                {{ patientForm.value.country || '--' }}
-              </p>
+        <p>
+          <strong>Gender:</strong>
+          {{ patientForm.value.gender || '--' }}
+        </p>
 
-              <p>
-                <strong>Pincode:</strong>
-                {{ patientForm.value.pincode || '--' }}
-              </p>
+        <p>
+          <strong>Blood Group:</strong>
+          {{ patientForm.value.bloodGroup || '--' }}
+        </p>
 
-            </div>
+        <p>
+          <strong>Marital Status:</strong>
+          {{ patientForm.value.maritalStatus || '--' }}
+        </p>
 
-          </div>
+        <p>
+          <strong>Occupation:</strong>
+          {{ patientForm.value.occupation || '--' }}
+        </p>
+
+      </div>
+
+
+      <!-- Address Review -->
+      <div class="review-section">
+
+        <h3>Address Information</h3>
+
+        <p>
+          <strong>Address 1:</strong>
+          {{ patientForm.value.address1 || '--' }}
+        </p>
+
+        <p>
+          <strong>Address 2:</strong>
+          {{ patientForm.value.address2 || '--' }}
+        </p>
+
+        <p>
+          <strong>District:</strong>
+          {{ patientForm.value.district || '--' }}
+        </p>
+
+        <p>
+          <strong>City:</strong>
+          {{ patientForm.value.city || '--' }}
+        </p>
+
+        <p>
+          <strong>State:</strong>
+          {{ patientForm.value.state || '--' }}
+        </p>
+
+        <p>
+          <strong>Country:</strong>
+          {{ patientForm.value.country || '--' }}
+        </p>
+
+        <p>
+          <strong>Pincode:</strong>
+          {{ patientForm.value.pincode || '--' }}
+        </p>
+
+      </div>
+
+
+      <!-- Medical Review -->
+      <div class="review-section">
+
+        <h3>Medical Information</h3>
+
+        <p>
+          <strong>Medical History:</strong>
+          {{ patientForm.value.medicalHistory || '--' }}
+        </p>
+
+        <p>
+          <strong>Current Medication:</strong>
+          {{ patientForm.value.currentMedication || '--' }}
+        </p>
+
+        <p>
+          <strong>Allergies:</strong>
+          {{ patientForm.value.allergies || '--' }}
+        </p>
+
+      </div>
+
+
+      <!-- Insurance Review -->
+      <div class="review-section">
+
+        <h3>Insurance Information</h3>
+
+        <p>
+          <strong>Insurance Provider:</strong>
+          {{ patientForm.value.insuranceProvider || '--' }}
+        </p>
+
+        <p>
+          <strong>Policy Number:</strong>
+          {{ patientForm.value.policyNumber || '--' }}
+        </p>
+
+        <p>
+          <strong>Policy Holder Name:</strong>
+          {{ patientForm.value.policyHolderName || '--' }}
+        </p>
+
+      </div>
+
+    </div>
+
+  </div>
+
 
         }
 

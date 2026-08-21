@@ -80,10 +80,7 @@
                     <span>🌍 Country</span>
                     <strong>{{ patientForm.value.country || '--' }}</strong>
                 </div>
-                <div *ngIf="currentAddressStep === 5" class="address-item">
-                    <span>📮 Pincode</span>
-                    <strong>{{ patientForm.value.pincode || '--' }}</strong>
-                </div>
+                
             </div>
 
             <button class="arrow-btn next-btn" (click)="nextAddressDetail()" [disabled]="currentAddressStep === 5">

@@ -1,4 +1,4 @@
-<div class="form-card">
+<div class="form-card" [formGroup]="patientForm">
 
   <div class="card-header">
     <h2>Address Information</h2>
@@ -7,25 +7,38 @@
 
   <div class="form-grid">
 
-    <!-- Address Line 1 -->
+    <!-- Address 1 -->
     <div class="form-group">
-      <label>Address Line 1</label>
+      <label>Address 1</label>
 
       <input
         type="text"
         formControlName="address1"
-        placeholder="Enter Address Line 1">
+        placeholder="Enter Address 1">
     </div>
 
-    <!-- Address Line 2 -->
+
+    <!-- Address 2 -->
     <div class="form-group">
-      <label>Address Line 2</label>
+      <label>Address 2</label>
 
       <input
         type="text"
         formControlName="address2"
-        placeholder="Enter Address Line 2">
+        placeholder="Enter Address 2">
     </div>
+
+
+    <!-- District -->
+    <div class="form-group">
+      <label>District</label>
+
+      <input
+        type="text"
+        formControlName="district"
+        placeholder="Enter District">
+    </div>
+
 
     <!-- City -->
     <div class="form-group">
@@ -37,6 +50,7 @@
         placeholder="Enter City">
     </div>
 
+
     <!-- State -->
     <div class="form-group">
       <label>State</label>
@@ -46,6 +60,7 @@
         formControlName="state"
         placeholder="Enter State">
     </div>
+
 
     <!-- Country -->
     <div class="form-group">
@@ -57,16 +72,7 @@
         placeholder="Enter Country">
     </div>
 
-    <!-- Pincode -->
-    <div class="form-group">
-      <label>Pincode</label>
-
-      <input
-        type="text"
-        maxlength="6"
-        formControlName="pincode"
-        placeholder="Enter Pincode">
-    </div>
 
   </div>
 
+</div>
