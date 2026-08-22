@@ -1,0 +1,49 @@
+.patient-list-page{
+  padding:25px;
+  background:#F5F7FB;
+  min-height:100vh;
+}
+
+.page-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:20px;
+}
+
+.page-header h2{
+  font-size:28px;
+  color:#1E293B;
+}
+
+.add-btn{
+  background:#2563EB;
+  color:#fff;
+  border:none;
+  padding:12px 24px;
+  border-radius:10px;
+  cursor:pointer;
+}
+
+table{
+  width:100%;
+  border-collapse:collapse;
+  background:#fff;
+  border-radius:15px;
+  overflow:hidden;
+}
+
+th{
+  background:#2563EB;
+  color:white;
+  padding:15px;
+}
+
+td{
+  padding:15px;
+  border-bottom:1px solid #E5E7EB;
+}
+
+button{
+  margin-right:10px;
+}

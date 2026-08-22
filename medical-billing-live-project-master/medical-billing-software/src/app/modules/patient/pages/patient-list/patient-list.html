@@ -1,1 +1,68 @@
-<p>patient-list works!</p>
+<div class="patient-list-page">
+
+  <div class="page-header">
+
+    <div>
+      <h2>Patients</h2>
+      <p>Manage Registered Patients</p>
+    </div>
+
+    <button type="button" class="add-btn">
+      + New Patient
+    </button>
+
+  </div>
+
+  <table>
+
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Mobile</th>
+        <th>Gender</th>
+        <th>City</th>
+        <th>Blood Group</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+
+    <tbody>
+
+      <tr *ngFor="let patient of patients">
+
+        <td>{{ patient.id }}</td>
+
+        <td>{{ patient.name || '--' }}</td>
+
+        <td>{{ patient.mobile || '--' }}</td>
+
+        <td>{{ patient.gender || '--' }}</td>
+
+        <td>{{ patient.city || '--' }}</td>
+
+        <td>{{ patient.bloodGroup || '--' }}</td>
+
+        <td>
+          <button type="button">
+            Edit
+          </button>
+
+          <button type="button">
+            Delete
+          </button>
+        </td>
+
+      </tr>
+
+      <tr *ngIf="!loading && patients.length === 0">
+        <td colspan="7" style="text-align:center;">
+          No patients found
+        </td>
+      </tr>
+
+    </tbody>
+
+  </table>
+
+</div>

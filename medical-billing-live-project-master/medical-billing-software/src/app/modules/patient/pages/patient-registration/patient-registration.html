@@ -1,5 +1,38 @@
 <div class="patient-page">
 
+  <!-- ================= SUCCESS / ERROR TOAST ================= -->
+  <div
+    *ngIf="showToastVisible"
+    class="toast-overlay">
+
+    <div
+      class="custom-toast"
+      [ngClass]="showToastType">
+
+      <!-- Tick Icon -->
+      <div class="toast-icon">
+        ✓
+      </div>
+
+      <!-- Message -->
+      <div class="toast-message">
+        {{ showToastMessage }}
+      </div>
+
+      <!-- Close Button -->
+      <button
+        type="button"
+        class="toast-close"
+        (click)="closeToast()"
+        aria-label="Close">
+        ×
+      </button>
+
+    </div>
+
+  </div>
+
+
   <div class="patient-container">
 
     <!-- ================= HEADER ================= -->
