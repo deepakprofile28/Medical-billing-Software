@@ -10,23 +10,42 @@ export class PatientService {
 
   constructor(private http: HttpClient) {}
 
+  // CREATE
   savePatient(patientData: any) {
-    return this.http.post(this.apiUrl, patientData);
+    return this.http.post(
+      this.apiUrl,
+      patientData
+    );
   }
 
+  // GET ALL
   getPatients() {
-    return this.http.get<any>(this.apiUrl);
+    return this.http.get<any[]>(
+      this.apiUrl
+    );
   }
 
+  // GET BY ID
   getPatientById(id: number) {
-    return this.http.get<any>(`${this.apiUrl}/${id}`);
+    return this.http.get<any>(
+      `${this.apiUrl}/${id}`
+    );
   }
 
+  // UPDATE
   updatePatient(id: number, patientData: any) {
-    return this.http.put(`${this.apiUrl}/${id}`, patientData);
+    return this.http.put(
+      `${this.apiUrl}/${id}`,
+      patientData
+    );
   }
 
-  deletePatient(id: number) {
-    return this.http.delete(`${this.apiUrl}/${id}`);
-  }
+  // DELETE
+deletePatient(id: number) {
+
+  return this.http.delete(
+    `http://localhost:8082/api/patients/${id}`
+  );
+
+}
 }

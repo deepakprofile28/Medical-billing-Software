@@ -1,5 +1,6 @@
 <div class="patient-list-page">
 
+  <!-- ================= HEADER ================= -->
   <div class="page-header">
 
     <div>
@@ -7,62 +8,133 @@
       <p>Manage Registered Patients</p>
     </div>
 
-    <button type="button" class="add-btn">
+    <button
+      type="button"
+      class="add-btn">
       + New Patient
     </button>
 
   </div>
 
-  <table>
 
-    <thead>
-      <tr>
-        <th>ID</th>
-        <th>Name</th>
-        <th>Mobile</th>
-        <th>Gender</th>
-        <th>City</th>
-        <th>Blood Group</th>
-        <th>Actions</th>
-      </tr>
-    </thead>
+  <!-- ================= TOTAL ================= -->
+  <div class="patient-summary">
+    <span>Total Patients</span>
+    <strong>{{ patients.length }}</strong>
+  </div>
 
-    <tbody>
 
-      <tr *ngFor="let patient of patients">
+  <!-- ================= PATIENT TABLE ================= -->
+  <div class="table-wrapper">
 
-        <td>{{ patient.id }}</td>
+    <table class="patient-table">
 
-        <td>{{ patient.name || '--' }}</td>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Name</th>
+          <th>Mobile</th>
+          <th>Email</th>
+          <th>Gender</th>
+          <th>Blood Group</th>
+          <th>City</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
 
-        <td>{{ patient.mobile || '--' }}</td>
 
-        <td>{{ patient.gender || '--' }}</td>
+      <tbody>
 
-        <td>{{ patient.city || '--' }}</td>
+        <tr *ngFor="let patient of patients; let i = index">
 
-        <td>{{ patient.bloodGroup || '--' }}</td>
+          <!-- ID -->
+          <td>
+            {{ patient.id || i + 1 }}
+          </td>
 
-        <td>
-          <button type="button">
-            Edit
-          </button>
 
-          <button type="button">
-            Delete
-          </button>
-        </td>
+          <!-- Name -->
+          <td>
+            <span class="patient-name">
+              {{ patient.name || '--' }}
+            </span>
+          </td>
 
-      </tr>
 
-      <tr *ngIf="!loading && patients.length === 0">
-        <td colspan="7" style="text-align:center;">
-          No patients found
-        </td>
-      </tr>
+          <!-- Mobile -->
+          <td>
+            {{ patient.mobile || '--' }}
+          </td>
 
-    </tbody>
 
-  </table>
+          <!-- Email -->
+          <td>
+            <span class="email">
+              {{ patient.email || '--' }}
+            </span>
+          </td>
+
+
+          <!-- Gender -->
+          <td>
+            {{ patient.gender || '--' }}
+          </td>
+
+
+          <!-- Blood Group -->
+          <td>
+            {{ patient.bloodGroup || '--' }}
+          </td>
+
+
+          <!-- City -->
+          <td>
+            {{ patient.city || '--' }}
+          </td>
+
+
+          <!-- Actions -->
+          <td>
+
+            <div class="action-buttons">
+
+              <button
+                type="button"
+                class="edit-btn"
+                (click)="editPatient(patient)">
+                Edit
+              </button>
+
+            <button
+  type="button"
+  (click)="deletePatient(patient.id)">
+  Delete
+</button>
+
+            </div>
+
+          </td>
+
+        </tr>
+
+
+        <!-- No Data -->
+        <tr *ngIf="patients.length === 0">
+
+          <td
+            colspan="8"
+            class="no-data">
+
+            No patients found
+
+          </td>
+
+        </tr>
+
+      </tbody>
+
+    </table>
+
+  </div>
 
 </div>
