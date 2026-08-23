@@ -15,24 +15,20 @@ export const routes: Routes = [
   //  { path: 'PatientRegistration', component: PatientRegistration },
   //     { path: 'Appcard', component: AppCard },
   {
-    path:'',
-    redirectTo:'patients',
-    pathMatch:'full'
+    path: 'patients',
+    component: PatientList
   },
 
   {
-    path:'patients',
-    component:PatientList
+    path: 'patient-registration',
+    component: PatientRegistration
   },
 
   {
-    path:'patient-registration',
-    component:PatientRegistration
-  },
-
-  {
-    path:'patient-registration/:id',
-    component:PatientRegistration
+    path: '',
+    redirectTo: 'patients',
+    pathMatch: 'full'
   }
 
 ];
+
