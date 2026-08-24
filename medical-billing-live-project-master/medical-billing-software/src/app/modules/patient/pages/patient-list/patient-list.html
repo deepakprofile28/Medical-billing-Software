@@ -1,6 +1,7 @@
 <div class="patient-list-page">
 
   <!-- ================= HEADER ================= -->
+
   <div class="page-header">
 
     <div>
@@ -12,13 +13,16 @@
       type="button"
       class="add-btn"
       (click)="addNewPatient()">
+
       + New Patient
+
     </button>
 
   </div>
 
 
   <!-- ================= SUMMARY ================= -->
+
   <div class="patient-summary">
 
     <strong>Total Patients:</strong>
@@ -27,8 +31,93 @@
 
   </div>
 
+<!-- ================= SEARCH & FILTER ================= -->
+
+<div class="patient-filters">
+
+  <!-- SEARCH -->
+  <div class="search-box">
+
+    <input
+      type="text"
+      [(ngModel)]="searchText"
+      (input)="applyFilters()"
+      placeholder="Search by ID, name, mobile, email, city or state"
+    />
+
+  </div>
+
+
+  <!-- GENDER -->
+
+  <div class="filter-box">
+
+    <select
+      [(ngModel)]="selectedGender"
+      (change)="applyFilters()">
+
+      <option value="">
+        All Gender
+      </option>
+
+      <option value="Male">
+        Male
+      </option>
+
+      <option value="Female">
+        Female
+      </option>
+
+      <option value="Other">
+        Other
+      </option>
+
+    </select>
+
+  </div>
+
+
+  <!-- BLOOD GROUP -->
+
+  <div class="filter-box">
+
+    <select
+      [(ngModel)]="selectedBloodGroup"
+      (change)="applyFilters()">
+
+      <option value="">
+        All Blood Groups
+      </option>
+
+      <option value="A+">A+</option>
+      <option value="A-">A-</option>
+      <option value="B+">B+</option>
+      <option value="B-">B-</option>
+      <option value="AB+">AB+</option>
+      <option value="AB-">AB-</option>
+      <option value="O+">O+</option>
+      <option value="O-">O-</option>
+
+    </select>
+
+  </div>
+
+
+  <!-- CLEAR -->
+
+  <button
+    type="button"
+    class="clear-filter-btn"
+    (click)="clearFilters()">
+
+    Clear
+
+  </button>
+
+</div>
 
   <!-- ================= LOADING ================= -->
+
   <div
     class="loading-message"
     *ngIf="loading">
@@ -39,6 +128,7 @@
 
 
   <!-- ================= TABLE ================= -->
+
   <div
     class="table-container"
     *ngIf="!loading">
@@ -48,6 +138,7 @@
       <thead>
 
         <tr>
+
           <th>ID</th>
           <th>Name</th>
           <th>Mobile</th>
@@ -57,94 +148,73 @@
           <th>City</th>
           <th>State</th>
           <th>Actions</th>
+
         </tr>
 
       </thead>
 
 
-      <tbody>
+<tbody>
 
-        <!-- PATIENT DATA -->
-        <tr
-          *ngFor="let patient of patients">
+  <tr
+    *ngFor="let patient of filteredPatients">
 
-          <!-- ID -->
-          <td>
-            {{ patient.id || '--' }}
-          </td>
+    <td>{{ patient.id || '--' }}</td>
 
-          <!-- NAME -->
-          <td>
-            {{ patient.name || '--' }}
-          </td>
+    <td>{{ patient.name || '--' }}</td>
 
-          <!-- MOBILE -->
-          <td>
-            {{ patient.mobile || '--' }}
-          </td>
+    <td>{{ patient.mobile || '--' }}</td>
 
-          <!-- EMAIL -->
-          <td>
-            {{ patient.email || '--' }}
-          </td>
+    <td>{{ patient.email || '--' }}</td>
 
-          <!-- GENDER -->
-          <td>
-            {{ patient.gender || '--' }}
-          </td>
+    <td>{{ patient.gender || '--' }}</td>
 
-          <!-- BLOOD GROUP -->
-          <td>
-            {{ patient.bloodGroup || '--' }}
-          </td>
+    <td>{{ patient.bloodGroup || '--' }}</td>
 
-          <!-- CITY -->
-          <td>
-            {{ patient.city || '--' }}
-          </td>
+    <td>{{ patient.city || '--' }}</td>
 
-          <!-- STATE -->
-          <td>
-            {{ patient.state || '--' }}
-          </td>
+    <td>{{ patient.state || '--' }}</td>
 
-          <!-- ACTIONS -->
-          <td class="actions">
+    <td class="actions">
 
-            <button
-              type="button"
-              class="edit-btn"
-              (click)="editPatient(patient)">
-              Edit
-            </button>
+      <button
+        type="button"
+        class="edit-btn"
+        (click)="editPatient(patient)">
+        Edit
+      </button>
 
-            <button
-              type="button"
-              class="delete-btn"
-              (click)="deletePatient(patient.id)">
-              Delete
-            </button>
+      <button
+        type="button"
+        class="delete-btn"
+        (click)="deletePatient(patient.id)">
+        Delete
+      </button>
 
-          </td>
+    </td>
 
-        </tr>
+  </tr>
 
 
-        <!-- NO DATA -->
-        <tr
-          *ngIf="!loading && patients.length === 0">
+  <!-- NO DATA -->
 
-          <td
-            colspan="9"
-            class="no-data">
+  <tr
+    *ngIf="
+      !loading &&
+      filteredPatients.length === 0
+    ">
 
-            No patients found.
+    <td
+      colspan="9"
+      class="no-data">
 
-          </td>
+      No patients found.
 
-        </tr>
+    </td>
 
-      </tbody>
+  </tr>
+
+</tbody>      
 
     </table>
 
