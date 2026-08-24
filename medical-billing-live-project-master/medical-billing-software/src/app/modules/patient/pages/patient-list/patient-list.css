@@ -625,3 +625,29 @@ tbody tr:last-child td {
   }
 
 }
+.download-excel-btn {
+  height: 44px;
+  padding: 0 18px;
+
+  border: none;
+  border-radius: 8px;
+
+  background: #16a34a;
+  color: #ffffff;
+
+  font-size: 14px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition: all 0.2s ease;
+}
+
+.download-excel-btn:hover {
+  background: #15803d;
+  transform: translateY(-1px);
+}
+
+.download-excel-btn:active {
+  transform: scale(0.97);
+}

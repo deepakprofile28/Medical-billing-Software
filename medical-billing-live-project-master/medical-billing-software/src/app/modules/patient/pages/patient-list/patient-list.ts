@@ -8,6 +8,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { PatientService } from '../../services/patient.service';
 import { Router } from '@angular/router';
+import * as XLSX from 'xlsx';
 
 @Component({
   selector: 'app-patient-list',
@@ -296,5 +297,54 @@ export class PatientList implements OnInit {
       });
 
   }
+  // ==========================================
+// DOWNLOAD PATIENTS EXCEL
+// ==========================================
+
+downloadExcel(): void {
+
+  const data = this.filteredPatients.map((patient: any) => ({
+
+    ID: patient.id || '',
+    Name: patient.name || '',
+    Mobile: patient.mobile || '',
+    Email: patient.email || '',
+    Gender: patient.gender || '',
+    'Blood Group': patient.bloodGroup || '',
+    City: patient.city || '',
+    State: patient.state || ''
+
+  }));
+
+  // No data check
+  if (data.length === 0) {
+
+    alert('No patient data available to download');
+
+    return;
+  }
+
+  // Create worksheet
+  const worksheet: XLSX.WorkSheet =
+    XLSX.utils.json_to_sheet(data);
+
+  // Create workbook
+  const workbook: XLSX.WorkBook =
+    XLSX.utils.book_new();
+
+  // Add worksheet
+  XLSX.utils.book_append_sheet(
+    workbook,
+    worksheet,
+    'Patients'
+  );
+
+  // Download Excel
+  XLSX.writeFile(
+    workbook,
+    'Patient_List.xlsx'
+  );
+
+}
 
 }
