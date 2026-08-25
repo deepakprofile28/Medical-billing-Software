@@ -8,25 +8,19 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { PatientService } from '../../services/patient.service';
 import { Router } from '@angular/router';
-
 import * as XLSX from 'xlsx';
 import { forkJoin } from 'rxjs';
-
 
 @Component({
   selector: 'app-patient-list',
   standalone: true,
-
   imports: [
     CommonModule,
     FormsModule
   ],
-
   templateUrl: './patient-list.html',
   styleUrl: './patient-list.css'
 })
-
-
 export class PatientList implements OnInit {
 
   // ==========================================
@@ -34,13 +28,9 @@ export class PatientList implements OnInit {
   // ==========================================
 
   patients: any[] = [];
-
   filteredPatients: any[] = [];
-
   paginatedPatients: any[] = [];
-
   loading = false;
-
 
   // ==========================================
   // SEARCH
@@ -48,32 +38,31 @@ export class PatientList implements OnInit {
 
   searchText = '';
 
-
   // ==========================================
   // FILTERS
   // ==========================================
 
   selectedGender = '';
-
   selectedBloodGroup = '';
-
 
   // ==========================================
   // PAGINATION
   // ==========================================
 
   currentPage = 1;
-
   pageSize = 10;
-
   totalPages = 1;
-
   pages: number[] = [];
-
   startItem = 0;
-
   endItem = 0;
 
+  // ==========================================
+  // TOAST
+  // ==========================================
+
+  toastMessage = '';
+  toastType: 'success' | 'error' | 'warning' | 'info' = 'success';
+  showToastMessage = false;
 
   // ==========================================
   // CONSTRUCTOR
@@ -84,7 +73,6 @@ export class PatientList implements OnInit {
     private cdr: ChangeDetectorRef,
     private router: Router
   ) {}
-
 
   // ==========================================
   // ON INIT
@@ -97,9 +85,31 @@ export class PatientList implements OnInit {
     );
 
     this.loadPatients();
-
   }
 
+  // ==========================================
+  // TOAST MESSAGE
+  // ==========================================
+
+  showToast(
+    message: string,
+    type: 'success' | 'error' | 'warning' | 'info' = 'success'
+  ): void {
+
+    this.toastMessage = message;
+    this.toastType = type;
+    this.showToastMessage = true;
+
+    this.cdr.detectChanges();
+
+    setTimeout(() => {
+
+      this.showToastMessage = false;
+
+      this.cdr.detectChanges();
+
+    }, 3000);
+  }
 
   // ==========================================
   // GET ALL PATIENTS
@@ -112,7 +122,6 @@ export class PatientList implements OnInit {
     console.log(
       'Loading patients...'
     );
-
 
     this.patientService
       .getPatients()
@@ -129,28 +138,20 @@ export class PatientList implements OnInit {
             data
           );
 
+          this.patients = data || [];
 
-          this.patients =
-            data || [];
-
-
-          this.filteredPatients =
-            [...this.patients];
-
+          this.filteredPatients = [
+            ...this.patients
+          ];
 
           this.currentPage = 1;
 
-
           this.updatePagination();
-
 
           this.loading = false;
 
-
           this.cdr.detectChanges();
-
         },
-
 
         // ======================================
         // ERROR
@@ -163,28 +164,23 @@ export class PatientList implements OnInit {
             error
           );
 
-
           this.patients = [];
-
           this.filteredPatients = [];
-
           this.paginatedPatients = [];
-
 
           this.loading = false;
 
-
           this.updatePagination();
 
+          this.showToast(
+            'Failed to load patients',
+            'error'
+          );
 
           this.cdr.detectChanges();
-
         }
-
       });
-
   }
-
 
   // ==========================================
   // SEARCH + FILTER
@@ -197,18 +193,15 @@ export class PatientList implements OnInit {
         .trim()
         .toLowerCase();
 
-
     this.filteredPatients =
       this.patients.filter(
         (patient: any) => {
-
 
           // ====================================
           // SEARCH
           // ====================================
 
           const matchesSearch =
-
             !search ||
 
             String(patient.id || '')
@@ -235,13 +228,11 @@ export class PatientList implements OnInit {
               .toLowerCase()
               .includes(search);
 
-
           // ====================================
           // GENDER
           // ====================================
 
           const matchesGender =
-
             !this.selectedGender ||
 
             String(patient.gender || '')
@@ -249,20 +240,17 @@ export class PatientList implements OnInit {
             this.selectedGender
               .toLowerCase();
 
-
           // ====================================
           // BLOOD GROUP
           // ====================================
 
           const matchesBloodGroup =
-
             !this.selectedBloodGroup ||
 
             String(patient.bloodGroup || '')
               .toLowerCase() ===
             this.selectedBloodGroup
               .toLowerCase();
-
 
           // ====================================
           // FINAL RESULT
@@ -273,23 +261,18 @@ export class PatientList implements OnInit {
             matchesGender &&
             matchesBloodGroup
           );
-
         }
       );
-
 
     console.log(
       'Filtered Patients:',
       this.filteredPatients
     );
 
-
     this.currentPage = 1;
 
     this.updatePagination();
-
   }
-
 
   // ==========================================
   // CLEAR FILTERS
@@ -298,23 +281,17 @@ export class PatientList implements OnInit {
   clearFilters(): void {
 
     this.searchText = '';
-
     this.selectedGender = '';
-
     this.selectedBloodGroup = '';
 
-
-    this.filteredPatients =
-      [...this.patients];
-
+    this.filteredPatients = [
+      ...this.patients
+    ];
 
     this.currentPage = 1;
 
-
     this.updatePagination();
-
   }
-
 
   // ==========================================
   // ADD NEW PATIENT
@@ -326,13 +303,41 @@ export class PatientList implements OnInit {
       'Opening New Patient Registration'
     );
 
-
     this.router.navigate([
       '/patient-registration'
     ]);
-
   }
 
+  // ==========================================
+  // VIEW PATIENT
+  // ==========================================
+
+  viewPatient(patient: any): void {
+
+    if (!patient?.id) {
+
+      this.showToast(
+        'Patient ID not found',
+        'error'
+      );
+
+      return;
+    }
+
+    console.log(
+      'Viewing Patient ID:',
+      patient.id
+    );
+
+    this.router.navigate(
+      ['/patient-details'],
+      {
+        queryParams: {
+          id: patient.id
+        }
+      }
+    );
+  }
 
   // ==========================================
   // EDIT PATIENT
@@ -342,20 +347,18 @@ export class PatientList implements OnInit {
 
     if (!patient?.id) {
 
-      alert(
-        'Patient ID not found'
+      this.showToast(
+        'Patient ID not found',
+        'error'
       );
 
       return;
-
     }
-
 
     console.log(
       'Edit Patient ID:',
       patient.id
     );
-
 
     this.router.navigate(
       ['/patient-registration'],
@@ -365,9 +368,7 @@ export class PatientList implements OnInit {
         }
       }
     );
-
   }
-
 
   // ==========================================
   // DELETE SINGLE PATIENT
@@ -377,33 +378,26 @@ export class PatientList implements OnInit {
 
     if (!id) {
 
-      alert(
-        'Patient ID not found'
+      this.showToast(
+        'Patient ID not found',
+        'error'
       );
 
       return;
-
     }
 
-
-    const confirmed =
-      confirm(
-        'Are you sure you want to delete this patient?'
-      );
-
+    const confirmed = confirm(
+      'Are you sure you want to delete this patient?'
+    );
 
     if (!confirmed) {
-
       return;
-
     }
-
 
     console.log(
       'Deleting Patient ID:',
       id
     );
-
 
     this.patientService
       .deletePatient(id)
@@ -416,11 +410,13 @@ export class PatientList implements OnInit {
             response
           );
 
+          this.showToast(
+            'Patient deleted successfully',
+            'success'
+          );
 
           this.loadPatients();
-
         },
-
 
         error: (error) => {
 
@@ -429,17 +425,13 @@ export class PatientList implements OnInit {
             error
           );
 
-
-          alert(
-            'Failed to delete patient'
+          this.showToast(
+            'Failed to delete patient',
+            'error'
           );
-
         }
-
       });
-
   }
-
 
   // ==========================================
   // DELETE ALL PATIENTS
@@ -449,36 +441,28 @@ export class PatientList implements OnInit {
 
     if (this.patients.length === 0) {
 
-      alert(
-        'No patients available to delete'
+      this.showToast(
+        'No patients available to delete',
+        'warning'
       );
 
       return;
-
     }
 
-
-    const confirmed =
-      confirm(
-        `Are you sure you want to delete all ${this.patients.length} patients?\n\nThis action cannot be undone.`
-      );
-
+    const confirmed = confirm(
+      `Are you sure you want to delete all ${this.patients.length} patients?\n\nThis action cannot be undone.`
+    );
 
     if (!confirmed) {
-
       return;
-
     }
-
 
     console.log(
       'Deleting all patients:',
       this.patients.length
     );
 
-
     this.loading = true;
-
 
     const deleteRequests =
       this.patients.map(
@@ -486,7 +470,6 @@ export class PatientList implements OnInit {
           this.patientService
             .deletePatient(patient.id)
       );
-
 
     forkJoin(deleteRequests)
       .subscribe({
@@ -502,37 +485,25 @@ export class PatientList implements OnInit {
             responses
           );
 
-
           this.patients = [];
-
           this.filteredPatients = [];
-
           this.paginatedPatients = [];
 
-
           this.currentPage = 1;
-
           this.totalPages = 1;
-
           this.pages = [];
-
           this.startItem = 0;
-
           this.endItem = 0;
-
 
           this.loading = false;
 
-
           this.cdr.detectChanges();
 
-
-          alert(
-            'All patients deleted successfully'
+          this.showToast(
+            'All patients deleted successfully',
+            'success'
           );
-
         },
-
 
         // ====================================
         // ERROR
@@ -545,23 +516,17 @@ export class PatientList implements OnInit {
             error
           );
 
-
           this.loading = false;
 
-
-          alert(
-            'Failed to delete all patients'
+          this.showToast(
+            'Failed to delete all patients',
+            'error'
           );
 
-
           this.loadPatients();
-
         }
-
       });
-
   }
-
 
   // ==========================================
   // DOWNLOAD PATIENTS EXCEL
@@ -650,10 +615,8 @@ export class PatientList implements OnInit {
 
           'Policy Holder Name':
             patient.policyHolderName || ''
-
         })
       );
-
 
     // ========================================
     // NO DATA
@@ -661,14 +624,13 @@ export class PatientList implements OnInit {
 
     if (data.length === 0) {
 
-      alert(
-        'No patient data available to download'
+      this.showToast(
+        'No patient data available to download',
+        'warning'
       );
 
       return;
-
     }
-
 
     // ========================================
     // CREATE WORKSHEET
@@ -677,7 +639,6 @@ export class PatientList implements OnInit {
     const worksheet: XLSX.WorkSheet =
       XLSX.utils.json_to_sheet(data);
 
-
     // ========================================
     // CREATE WORKBOOK
     // ========================================
@@ -685,13 +646,11 @@ export class PatientList implements OnInit {
     const workbook: XLSX.WorkBook =
       XLSX.utils.book_new();
 
-
     XLSX.utils.book_append_sheet(
       workbook,
       worksheet,
       'Patients'
     );
-
 
     // ========================================
     // DOWNLOAD
@@ -701,9 +660,7 @@ export class PatientList implements OnInit {
       workbook,
       'Patient_List.xlsx'
     );
-
   }
-
 
   // ==========================================
   // IMPORT PATIENTS FROM EXCEL
@@ -714,17 +671,12 @@ export class PatientList implements OnInit {
     const file =
       event.target.files?.[0];
 
-
     if (!file) {
-
       return;
-
     }
-
 
     const reader =
       new FileReader();
-
 
     reader.onload =
       (e: any) => {
@@ -740,7 +692,6 @@ export class PatientList implements OnInit {
               e.target.result
             );
 
-
           const workbook =
             XLSX.read(
               data,
@@ -749,14 +700,11 @@ export class PatientList implements OnInit {
               }
             );
 
-
           const sheetName =
             workbook.SheetNames[0];
 
-
           const worksheet =
             workbook.Sheets[sheetName];
-
 
           const excelData: any[] =
             XLSX.utils.sheet_to_json(
@@ -766,12 +714,10 @@ export class PatientList implements OnInit {
               }
             );
 
-
           console.log(
             'Raw Excel Data:',
             excelData
           );
-
 
           // ==================================
           // EMPTY EXCEL CHECK
@@ -779,14 +725,13 @@ export class PatientList implements OnInit {
 
           if (!excelData.length) {
 
-            alert(
-              'Excel file is empty'
+            this.showToast(
+              'Excel file is empty',
+              'warning'
             );
 
             return;
-
           }
-
 
           console.log(
             'Excel Headers:',
@@ -795,14 +740,12 @@ export class PatientList implements OnInit {
             )
           );
 
-
           // ==================================
           // CONVERT EXCEL DATA
           // ==================================
 
           const patients =
             excelData
-
               .map(
                 (row: any) => {
 
@@ -823,7 +766,6 @@ export class PatientList implements OnInit {
                         ]
                       ),
 
-
                     mobile:
                       this.getExcelValue(
                         row,
@@ -835,7 +777,6 @@ export class PatientList implements OnInit {
                         ]
                       ),
 
-
                     email:
                       this.getExcelValue(
                         row,
@@ -845,7 +786,6 @@ export class PatientList implements OnInit {
                           'Email Address'
                         ]
                       ),
-
 
                     dob:
                       this.getExcelDateValue(
@@ -858,7 +798,6 @@ export class PatientList implements OnInit {
                         ]
                       ),
 
-
                     gender:
                       this.getExcelValue(
                         row,
@@ -867,7 +806,6 @@ export class PatientList implements OnInit {
                           'GENDER'
                         ]
                       ),
-
 
                     bloodGroup:
                       this.getExcelValue(
@@ -879,7 +817,6 @@ export class PatientList implements OnInit {
                         ]
                       ),
 
-
                     maritalStatus:
                       this.getExcelValue(
                         row,
@@ -889,7 +826,6 @@ export class PatientList implements OnInit {
                         ]
                       ),
 
-
                     occupation:
                       this.getExcelValue(
                         row,
@@ -898,7 +834,6 @@ export class PatientList implements OnInit {
                           'OCCUPATION'
                         ]
                       ),
-
 
                     aadhaar:
                       this.getExcelValue(
@@ -911,7 +846,6 @@ export class PatientList implements OnInit {
                         ]
                       ),
 
-
                     pan:
                       this.getExcelValue(
                         row,
@@ -921,7 +855,6 @@ export class PatientList implements OnInit {
                           'Pan Number'
                         ]
                       ),
-
 
                     // ==========================
                     // EMERGENCY CONTACT
@@ -938,7 +871,6 @@ export class PatientList implements OnInit {
                         ]
                       ),
 
-
                     emergencyName:
                       this.getExcelValue(
                         row,
@@ -948,7 +880,6 @@ export class PatientList implements OnInit {
                           'EmergencyName'
                         ]
                       ),
-
 
                     // ==========================
                     // ADDRESS DETAILS
@@ -964,7 +895,6 @@ export class PatientList implements OnInit {
                         ]
                       ),
 
-
                     address2:
                       this.getExcelValue(
                         row,
@@ -973,7 +903,6 @@ export class PatientList implements OnInit {
                           'Address2'
                         ]
                       ),
-
 
                     district:
                       this.getExcelValue(
@@ -984,7 +913,6 @@ export class PatientList implements OnInit {
                         ]
                       ),
 
-
                     city:
                       this.getExcelValue(
                         row,
@@ -993,7 +921,6 @@ export class PatientList implements OnInit {
                           'CITY'
                         ]
                       ),
-
 
                     state:
                       this.getExcelValue(
@@ -1004,7 +931,6 @@ export class PatientList implements OnInit {
                         ]
                       ),
 
-
                     country:
                       this.getExcelValue(
                         row,
@@ -1013,7 +939,6 @@ export class PatientList implements OnInit {
                           'COUNTRY'
                         ]
                       ) || 'India',
-
 
                     pincode:
                       this.getExcelValue(
@@ -1025,7 +950,6 @@ export class PatientList implements OnInit {
                           'Postal Code'
                         ]
                       ),
-
 
                     // ==========================
                     // MEDICAL DETAILS
@@ -1040,7 +964,6 @@ export class PatientList implements OnInit {
                         ]
                       ),
 
-
                     currentMedication:
                       this.getExcelValue(
                         row,
@@ -1051,7 +974,6 @@ export class PatientList implements OnInit {
                         ]
                       ),
 
-
                     allergies:
                       this.getExcelValue(
                         row,
@@ -1060,7 +982,6 @@ export class PatientList implements OnInit {
                           'ALLERGIES'
                         ]
                       ),
-
 
                     // ==========================
                     // INSURANCE DETAILS
@@ -1075,7 +996,6 @@ export class PatientList implements OnInit {
                         ]
                       ),
 
-
                     policyNumber:
                       this.getExcelValue(
                         row,
@@ -1084,7 +1004,6 @@ export class PatientList implements OnInit {
                           'PolicyNumber'
                         ]
                       ),
-
 
                     policyHolderName:
                       this.getExcelValue(
@@ -1095,21 +1014,16 @@ export class PatientList implements OnInit {
                           'Policy Holder'
                         ]
                       )
-
                   };
-
 
                   console.log(
                     'Converted Patient:',
                     patient
                   );
 
-
                   return patient;
-
                 }
               )
-
 
               // ==================================
               // REMOVE BLANK ROWS
@@ -1119,18 +1033,12 @@ export class PatientList implements OnInit {
                 (patient: any) => {
 
                   return (
-
                     patient.name ||
-
                     patient.mobile ||
-
                     patient.email
-
                   );
-
                 }
               );
-
 
           // ==================================
           // VALIDATION
@@ -1140,20 +1048,18 @@ export class PatientList implements OnInit {
             patients.length === 0
           ) {
 
-            alert(
-              'No valid patient data found in Excel.'
+            this.showToast(
+              'No valid patient data found in Excel.',
+              'warning'
             );
 
             return;
-
           }
-
 
           console.log(
             'Patients ready for upload:',
             patients
           );
-
 
           // ==================================
           // SAVE PATIENTS
@@ -1161,16 +1067,12 @@ export class PatientList implements OnInit {
 
           this.loading = true;
 
-
           const requests =
             patients.map(
               (patient: any) =>
-
                 this.patientService
                   .savePatient(patient)
-
             );
-
 
           forkJoin(requests)
             .subscribe({
@@ -1186,21 +1088,16 @@ export class PatientList implements OnInit {
                   responses
                 );
 
-
                 this.loading = false;
 
-
-                alert(
-                  `${patients.length} patients imported successfully`
+                this.showToast(
+                  `${patients.length} patients imported successfully`,
+                  'success'
                 );
 
-
                 // Refresh list
-
                 this.loadPatients();
-
               },
-
 
               // ==============================
               // ERROR
@@ -1213,20 +1110,16 @@ export class PatientList implements OnInit {
                   error
                 );
 
-
                 this.loading = false;
 
-
-                alert(
-                  'Failed to import patients'
+                this.showToast(
+                  'Failed to import patients',
+                  'error'
                 );
-
               }
-
             });
 
         }
-
 
         catch (error) {
 
@@ -1235,32 +1128,23 @@ export class PatientList implements OnInit {
             error
           );
 
-
           this.loading = false;
 
-
-          alert(
-            'Invalid Excel file'
+          this.showToast(
+            'Invalid Excel file',
+            'error'
           );
-
         }
-
       };
 
-
-    reader.readAsArrayBuffer(
-      file
-    );
-
+    reader.readAsArrayBuffer(file);
 
     // ========================================
     // ALLOW SAME FILE AGAIN
     // ========================================
 
     event.target.value = '';
-
   }
-
 
   // ==========================================
   // GET EXCEL VALUE
@@ -1274,7 +1158,6 @@ export class PatientList implements OnInit {
     const rowKeys =
       Object.keys(row);
 
-
     for (
       const header
       of possibleHeaders
@@ -1291,22 +1174,16 @@ export class PatientList implements OnInit {
               .toLowerCase()
         );
 
-
       if (matchingKey) {
 
         return String(
           row[matchingKey] ?? ''
         ).trim();
-
       }
-
     }
 
-
     return '';
-
   }
-
 
   // ==========================================
   // GET EXCEL DATE VALUE
@@ -1320,9 +1197,7 @@ export class PatientList implements OnInit {
     const rowKeys =
       Object.keys(row);
 
-
     let value: any = '';
-
 
     for (
       const header
@@ -1340,29 +1215,22 @@ export class PatientList implements OnInit {
               .toLowerCase()
         );
 
-
       if (matchingKey) {
 
         value =
           row[matchingKey];
 
         break;
-
       }
-
     }
-
 
     if (
       value === null ||
       value === undefined ||
       value === ''
     ) {
-
       return '';
-
     }
-
 
     // ========================================
     // EXCEL SERIAL DATE
@@ -1377,7 +1245,6 @@ export class PatientList implements OnInit {
           value
         );
 
-
       if (excelDate) {
 
         const month =
@@ -1385,19 +1252,14 @@ export class PatientList implements OnInit {
             excelDate.m
           ).padStart(2, '0');
 
-
         const day =
           String(
             excelDate.d
           ).padStart(2, '0');
 
-
         return `${excelDate.y}-${month}-${day}`;
-
       }
-
     }
-
 
     // ========================================
     // NORMAL DATE STRING
@@ -1405,7 +1267,6 @@ export class PatientList implements OnInit {
 
     const date =
       new Date(value);
-
 
     if (
       !isNaN(
@@ -1418,14 +1279,10 @@ export class PatientList implements OnInit {
           .toISOString()
           .split('T')[0]
       );
-
     }
 
-
     return String(value).trim();
-
   }
-
 
   // ==========================================
   // UPDATE PAGINATION
@@ -1439,15 +1296,11 @@ export class PatientList implements OnInit {
         this.pageSize
       );
 
-
     if (
       this.totalPages === 0
     ) {
-
       this.totalPages = 1;
-
     }
-
 
     if (
       this.currentPage >
@@ -1456,19 +1309,15 @@ export class PatientList implements OnInit {
 
       this.currentPage =
         this.totalPages;
-
     }
-
 
     const start =
       (this.currentPage - 1) *
       this.pageSize;
 
-
     const end =
       start +
       this.pageSize;
-
 
     // ========================================
     // CURRENT PAGE DATA
@@ -1480,7 +1329,6 @@ export class PatientList implements OnInit {
         end
       );
 
-
     // ========================================
     // PAGE NUMBERS
     // ========================================
@@ -1488,13 +1336,11 @@ export class PatientList implements OnInit {
     this.pages =
       Array.from(
         {
-          length:
-            this.totalPages
+          length: this.totalPages
         },
         (_, index) =>
           index + 1
       );
-
 
     // ========================================
     // ITEM COUNT
@@ -1505,27 +1351,20 @@ export class PatientList implements OnInit {
     ) {
 
       this.startItem = 0;
-
       this.endItem = 0;
 
-    }
-
-    else {
+    } else {
 
       this.startItem =
         start + 1;
-
 
       this.endItem =
         Math.min(
           end,
           this.filteredPatients.length
         );
-
     }
-
   }
-
 
   // ==========================================
   // NEXT PAGE
@@ -1541,11 +1380,8 @@ export class PatientList implements OnInit {
       this.currentPage++;
 
       this.updatePagination();
-
     }
-
   }
-
 
   // ==========================================
   // PREVIOUS PAGE
@@ -1560,11 +1396,8 @@ export class PatientList implements OnInit {
       this.currentPage--;
 
       this.updatePagination();
-
     }
-
   }
-
 
   // ==========================================
   // GO TO PAGE
@@ -1579,15 +1412,11 @@ export class PatientList implements OnInit {
       page <= this.totalPages
     ) {
 
-      this.currentPage =
-        page;
+      this.currentPage = page;
 
       this.updatePagination();
-
     }
-
   }
-
 
   // ==========================================
   // CHANGE PAGE SIZE
@@ -1598,7 +1427,5 @@ export class PatientList implements OnInit {
     this.currentPage = 1;
 
     this.updatePagination();
-
   }
-
 }

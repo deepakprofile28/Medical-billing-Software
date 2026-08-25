@@ -916,4 +916,45 @@ export class PatientRegistration
 
   }
 
+  saveDraft(): void {
+
+  console.log('Saving patient as draft...');
+
+  const patientData = {
+    ...this.patientForm.getRawValue(),
+    status: 'COMPLETED'
+  };
+
+  console.log('Draft Patient Data:', patientData);
+
+  this.patientService.savePatient(patientData).subscribe({
+
+    next: (response) => {
+
+      console.log(
+        'Draft saved successfully:',
+        response
+      );
+
+      alert('Patient draft saved successfully');
+
+      this.router.navigate([
+        '/patients'
+      ]);
+    },
+
+    error: (error) => {
+
+      console.error(
+        'Failed to save patient draft:',
+        error
+      );
+
+      alert(
+        'Failed to save patient draft'
+      );
+    }
+  });
+}
+
 }

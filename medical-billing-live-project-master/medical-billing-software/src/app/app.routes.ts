@@ -5,6 +5,7 @@ import { PatientRegistration } from './modules/patient/pages/patient-registratio
 import { AppCard } from './shared/components/app-card/app-card';
 import { PatientForm } from './modules/patient/components/patient-form/patient-form';
 import { PatientList } from './modules/patient/pages/patient-list/patient-list';
+import { PatientDetails } from './modules/patient/pages/patient-details/patient-details';
 
 export const routes: Routes = [
   // { path: 'patient-Registration', component: PatientLogin },
@@ -28,7 +29,11 @@ export const routes: Routes = [
     path: '',
     redirectTo: 'patients',
     pathMatch: 'full'
-  }
+  }, 
+  {
+    path: 'patient-details',
+    component: PatientDetails
+  },
 
 ];
 

@@ -1,0 +1,470 @@
+<div class="patient-details-page">
+
+  <!-- ========================================= -->
+  <!-- HEADER -->
+  <!-- ========================================= -->
+
+  <div class="page-header">
+
+    <div>
+
+      <h2>Patient Details</h2>
+
+      <p>
+        View complete patient information
+      </p>
+
+    </div>
+
+    <button
+      type="button"
+      class="back-btn"
+      (click)="backToPatients()">
+
+      ← Back to Patients
+
+    </button>
+
+  </div>
+
+
+  <!-- ========================================= -->
+  <!-- LOADING -->
+  <!-- ========================================= -->
+
+  <div
+    class="loading-container"
+    *ngIf="loading">
+
+    <div class="loader"></div>
+
+    <p>
+      Loading patient details...
+    </p>
+
+  </div>
+
+
+  <!-- ========================================= -->
+  <!-- PATIENT DETAILS -->
+  <!-- ========================================= -->
+
+  <div
+    class="details-container"
+    *ngIf="!loading && patient">
+
+
+    <!-- ===================================== -->
+    <!-- PATIENT HEADER CARD -->
+    <!-- ===================================== -->
+
+    <div class="patient-header-card">
+
+      <div class="patient-avatar">
+
+        {{ patient.name?.charAt(0)?.toUpperCase() || 'P' }}
+
+      </div>
+
+      <div class="patient-header-info">
+
+        <h3>
+          {{ patient.name || '--' }}
+        </h3>
+
+        <p>
+          Patient ID:
+          <strong>
+            {{ patient.id || '--' }}
+          </strong>
+        </p>
+
+      </div>
+
+      <button
+        type="button"
+        class="edit-btn"
+        (click)="editPatient()">
+
+        Edit Patient
+
+      </button>
+
+    </div>
+
+
+    <!-- ===================================== -->
+    <!-- PERSONAL INFORMATION -->
+    <!-- ===================================== -->
+
+    <div class="details-card">
+
+      <div class="section-title">
+
+        <h3>Personal Information</h3>
+
+      </div>
+
+      <div class="details-grid">
+
+        <div class="detail-item">
+
+          <span>Full Name</span>
+
+          <strong>
+            {{ patient.name || '--' }}
+          </strong>
+
+        </div>
+
+        <div class="detail-item">
+
+          <span>Mobile</span>
+
+          <strong>
+            {{ patient.mobile || '--' }}
+          </strong>
+
+        </div>
+
+        <div class="detail-item">
+
+          <span>Email</span>
+
+          <strong>
+            {{ patient.email || '--' }}
+          </strong>
+
+        </div>
+
+        <div class="detail-item">
+
+          <span>Date of Birth</span>
+
+          <strong>
+            {{ patient.dob || '--' }}
+          </strong>
+
+        </div>
+
+        <div class="detail-item">
+
+          <span>Gender</span>
+
+          <strong>
+            {{ patient.gender || '--' }}
+          </strong>
+
+        </div>
+
+        <div class="detail-item">
+
+          <span>Blood Group</span>
+
+          <strong>
+            {{ patient.bloodGroup || '--' }}
+          </strong>
+
+        </div>
+
+        <div class="detail-item">
+
+          <span>Marital Status</span>
+
+          <strong>
+            {{ patient.maritalStatus || '--' }}
+          </strong>
+
+        </div>
+
+        <div class="detail-item">
+
+          <span>Occupation</span>
+
+          <strong>
+            {{ patient.occupation || '--' }}
+          </strong>
+
+        </div>
+
+        <div class="detail-item">
+
+          <span>Aadhaar Number</span>
+
+          <strong>
+            {{ patient.aadhaar || '--' }}
+          </strong>
+
+        </div>
+
+        <div class="detail-item">
+
+          <span>PAN Number</span>
+
+          <strong>
+            {{ patient.pan || '--' }}
+          </strong>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <!-- ===================================== -->
+    <!-- EMERGENCY CONTACT -->
+    <!-- ===================================== -->
+
+    <div class="details-card">
+
+      <div class="section-title">
+
+        <h3>Emergency Contact</h3>
+
+      </div>
+
+      <div class="details-grid">
+
+        <div class="detail-item">
+
+          <span>Emergency Contact Name</span>
+
+          <strong>
+            {{ patient.emergencyName || '--' }}
+          </strong>
+
+        </div>
+
+        <div class="detail-item">
+
+          <span>Emergency Contact</span>
+
+          <strong>
+            {{ patient.emergencyContact || '--' }}
+          </strong>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <!-- ===================================== -->
+    <!-- ADDRESS INFORMATION -->
+    <!-- ===================================== -->
+
+    <div class="details-card">
+
+      <div class="section-title">
+
+        <h3>Address Information</h3>
+
+      </div>
+
+      <div class="details-grid">
+
+        <div class="detail-item full-width">
+
+          <span>Address 1</span>
+
+          <strong>
+            {{ patient.address1 || '--' }}
+          </strong>
+
+        </div>
+
+        <div class="detail-item full-width">
+
+          <span>Address 2</span>
+
+          <strong>
+            {{ patient.address2 || '--' }}
+          </strong>
+
+        </div>
+
+        <div class="detail-item">
+
+          <span>District</span>
+
+          <strong>
+            {{ patient.district || '--' }}
+          </strong>
+
+        </div>
+
+        <div class="detail-item">
+
+          <span>City</span>
+
+          <strong>
+            {{ patient.city || '--' }}
+          </strong>
+
+        </div>
+
+        <div class="detail-item">
+
+          <span>State</span>
+
+          <strong>
+            {{ patient.state || '--' }}
+          </strong>
+
+        </div>
+
+        <div class="detail-item">
+
+          <span>Country</span>
+
+          <strong>
+            {{ patient.country || '--' }}
+          </strong>
+
+        </div>
+
+        <div class="detail-item">
+
+          <span>Pincode</span>
+
+          <strong>
+            {{ patient.pincode || '--' }}
+          </strong>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <!-- ===================================== -->
+    <!-- MEDICAL INFORMATION -->
+    <!-- ===================================== -->
+
+    <div class="details-card">
+
+      <div class="section-title">
+
+        <h3>Medical Information</h3>
+
+      </div>
+
+      <div class="details-grid">
+
+        <div class="detail-item full-width">
+
+          <span>Medical History</span>
+
+          <strong>
+            {{ patient.medicalHistory || '--' }}
+          </strong>
+
+        </div>
+
+        <div class="detail-item full-width">
+
+          <span>Current Medication</span>
+
+          <strong>
+            {{ patient.currentMedication || '--' }}
+          </strong>
+
+        </div>
+
+        <div class="detail-item full-width">
+
+          <span>Allergies</span>
+
+          <strong>
+            {{ patient.allergies || '--' }}
+          </strong>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <!-- ===================================== -->
+    <!-- INSURANCE INFORMATION -->
+    <!-- ===================================== -->
+
+    <div class="details-card">
+
+      <div class="section-title">
+
+        <h3>Insurance Information</h3>
+
+      </div>
+
+      <div class="details-grid">
+
+        <div class="detail-item">
+
+          <span>Insurance Provider</span>
+
+          <strong>
+            {{ patient.insuranceProvider || '--' }}
+          </strong>
+
+        </div>
+
+        <div class="detail-item">
+
+          <span>Policy Number</span>
+
+          <strong>
+            {{ patient.policyNumber || '--' }}
+          </strong>
+
+        </div>
+
+        <div class="detail-item">
+
+          <span>Policy Holder Name</span>
+
+          <strong>
+            {{ patient.policyHolderName || '--' }}
+          </strong>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- ========================================= -->
+  <!-- NO PATIENT -->
+  <!-- ========================================= -->
+
+  <div
+    class="no-patient"
+    *ngIf="!loading && !patient">
+
+    <h3>
+      Patient not found
+    </h3>
+
+    <p>
+      Unable to load patient details.
+    </p>
+
+    <button
+      type="button"
+      class="back-btn"
+      (click)="backToPatients()">
+
+      ← Back to Patients
+
+    </button>
+
+  </div>
+
+</div>
