@@ -12,16 +12,21 @@ import { Router } from '@angular/router';
 import * as XLSX from 'xlsx';
 import { forkJoin } from 'rxjs';
 
+
 @Component({
   selector: 'app-patient-list',
   standalone: true,
+
   imports: [
     CommonModule,
     FormsModule
   ],
+
   templateUrl: './patient-list.html',
   styleUrl: './patient-list.css'
 })
+
+
 export class PatientList implements OnInit {
 
   // ==========================================
@@ -132,8 +137,6 @@ export class PatientList implements OnInit {
           this.filteredPatients =
             [...this.patients];
 
-
-          // Reset pagination
 
           this.currentPage = 1;
 
@@ -262,7 +265,7 @@ export class PatientList implements OnInit {
 
 
           // ====================================
-          // FINAL
+          // FINAL RESULT
           // ====================================
 
           return (
@@ -281,10 +284,7 @@ export class PatientList implements OnInit {
     );
 
 
-    // Reset to first page
-
     this.currentPage = 1;
-
 
     this.updatePagination();
 
@@ -370,7 +370,7 @@ export class PatientList implements OnInit {
 
 
   // ==========================================
-  // DELETE PATIENT
+  // DELETE SINGLE PATIENT
   // ==========================================
 
   deletePatient(id: number): void {
@@ -409,10 +409,6 @@ export class PatientList implements OnInit {
       .deletePatient(id)
       .subscribe({
 
-        // ====================================
-        // SUCCESS
-        // ====================================
-
         next: (response) => {
 
           console.log(
@@ -425,10 +421,6 @@ export class PatientList implements OnInit {
 
         },
 
-
-        // ====================================
-        // ERROR
-        // ====================================
 
         error: (error) => {
 
@@ -450,6 +442,128 @@ export class PatientList implements OnInit {
 
 
   // ==========================================
+  // DELETE ALL PATIENTS
+  // ==========================================
+
+  deleteAllPatients(): void {
+
+    if (this.patients.length === 0) {
+
+      alert(
+        'No patients available to delete'
+      );
+
+      return;
+
+    }
+
+
+    const confirmed =
+      confirm(
+        `Are you sure you want to delete all ${this.patients.length} patients?\n\nThis action cannot be undone.`
+      );
+
+
+    if (!confirmed) {
+
+      return;
+
+    }
+
+
+    console.log(
+      'Deleting all patients:',
+      this.patients.length
+    );
+
+
+    this.loading = true;
+
+
+    const deleteRequests =
+      this.patients.map(
+        (patient: any) =>
+          this.patientService
+            .deletePatient(patient.id)
+      );
+
+
+    forkJoin(deleteRequests)
+      .subscribe({
+
+        // ====================================
+        // SUCCESS
+        // ====================================
+
+        next: (responses) => {
+
+          console.log(
+            'All patients deleted successfully:',
+            responses
+          );
+
+
+          this.patients = [];
+
+          this.filteredPatients = [];
+
+          this.paginatedPatients = [];
+
+
+          this.currentPage = 1;
+
+          this.totalPages = 1;
+
+          this.pages = [];
+
+          this.startItem = 0;
+
+          this.endItem = 0;
+
+
+          this.loading = false;
+
+
+          this.cdr.detectChanges();
+
+
+          alert(
+            'All patients deleted successfully'
+          );
+
+        },
+
+
+        // ====================================
+        // ERROR
+        // ====================================
+
+        error: (error) => {
+
+          console.error(
+            'Failed to delete all patients:',
+            error
+          );
+
+
+          this.loading = false;
+
+
+          alert(
+            'Failed to delete all patients'
+          );
+
+
+          this.loadPatients();
+
+        }
+
+      });
+
+  }
+
+
+  // ==========================================
   // DOWNLOAD PATIENTS EXCEL
   // ==========================================
 
@@ -459,22 +573,83 @@ export class PatientList implements OnInit {
       this.filteredPatients.map(
         (patient: any) => ({
 
-          ID: patient.id || '',
+          ID:
+            patient.id || '',
 
-          Name: patient.name || '',
+          Name:
+            patient.name || '',
 
-          Mobile: patient.mobile || '',
+          Mobile:
+            patient.mobile || '',
 
-          Email: patient.email || '',
+          Email:
+            patient.email || '',
 
-          Gender: patient.gender || '',
+          'Date of Birth':
+            patient.dob || '',
+
+          Gender:
+            patient.gender || '',
 
           'Blood Group':
             patient.bloodGroup || '',
 
-          City: patient.city || '',
+          'Marital Status':
+            patient.maritalStatus || '',
 
-          State: patient.state || ''
+          Occupation:
+            patient.occupation || '',
+
+          'Aadhaar Number':
+            patient.aadhaar || '',
+
+          'PAN Number':
+            patient.pan || '',
+
+          'Emergency Contact':
+            patient.emergencyContact || '',
+
+          'Emergency Contact Name':
+            patient.emergencyName || '',
+
+          'Address 1':
+            patient.address1 || '',
+
+          'Address 2':
+            patient.address2 || '',
+
+          District:
+            patient.district || '',
+
+          City:
+            patient.city || '',
+
+          State:
+            patient.state || '',
+
+          Country:
+            patient.country || 'India',
+
+          Pincode:
+            patient.pincode || '',
+
+          'Medical History':
+            patient.medicalHistory || '',
+
+          'Current Medication':
+            patient.currentMedication || '',
+
+          Allergies:
+            patient.allergies || '',
+
+          'Insurance Provider':
+            patient.insuranceProvider || '',
+
+          'Policy Number':
+            patient.policyNumber || '',
+
+          'Policy Holder Name':
+            patient.policyHolderName || ''
 
         })
       );
@@ -529,235 +704,728 @@ export class PatientList implements OnInit {
 
   }
 
-// ==========================================
-// IMPORT PATIENTS FROM EXCEL
-// ==========================================
 
-importExcel(event: any): void {
+  // ==========================================
+  // IMPORT PATIENTS FROM EXCEL
+  // ==========================================
 
-  const file = event.target.files?.[0];
+  importExcel(event: any): void {
 
-  if (!file) {
-    return;
-  }
+    const file =
+      event.target.files?.[0];
 
-  const reader = new FileReader();
 
-  reader.onload = (e: any) => {
+    if (!file) {
 
-    try {
+      return;
 
-      const data = new Uint8Array(e.target.result);
+    }
 
-      const workbook = XLSX.read(data, {
-        type: 'array'
-      });
 
-      const sheetName = workbook.SheetNames[0];
+    const reader =
+      new FileReader();
 
-      const worksheet = workbook.Sheets[sheetName];
 
-      const excelData: any[] =
-        XLSX.utils.sheet_to_json(
-          worksheet,
-          {
-            defval: ''
+    reader.onload =
+      (e: any) => {
+
+        try {
+
+          // ==================================
+          // READ EXCEL
+          // ==================================
+
+          const data =
+            new Uint8Array(
+              e.target.result
+            );
+
+
+          const workbook =
+            XLSX.read(
+              data,
+              {
+                type: 'array'
+              }
+            );
+
+
+          const sheetName =
+            workbook.SheetNames[0];
+
+
+          const worksheet =
+            workbook.Sheets[sheetName];
+
+
+          const excelData: any[] =
+            XLSX.utils.sheet_to_json(
+              worksheet,
+              {
+                defval: ''
+              }
+            );
+
+
+          console.log(
+            'Raw Excel Data:',
+            excelData
+          );
+
+
+          // ==================================
+          // EMPTY EXCEL CHECK
+          // ==================================
+
+          if (!excelData.length) {
+
+            alert(
+              'Excel file is empty'
+            );
+
+            return;
+
           }
-        );
-
-      console.log('Raw Excel Data:', excelData);
-
-      // ======================================
-      // EMPTY EXCEL CHECK
-      // ======================================
-
-      if (!excelData.length) {
-
-        alert('Excel file is empty');
-
-        return;
-      }
-
-      // ======================================
-      // SHOW EXCEL HEADERS
-      // ======================================
-
-      console.log(
-        'Excel Headers:',
-        Object.keys(excelData[0])
-      );
 
 
-      // ======================================
-      // CONVERT EXCEL DATA
-      // ======================================
-
-      const patients = excelData
-        .map((row: any) => {
-
-          const patient = {
-
-            name: this.getExcelValue(
-              row,
-              ['Name', 'NAME', 'Patient Name', 'patientName']
-            ),
-
-            mobile: this.getExcelValue(
-              row,
-              ['Mobile', 'MOBILE', 'Mobile Number', 'Phone']
-            ),
-
-            email: this.getExcelValue(
-              row,
-              ['Email', 'EMAIL', 'Email Address']
-            ),
-
-            gender: this.getExcelValue(
-              row,
-              ['Gender', 'GENDER']
-            ),
-
-            bloodGroup: this.getExcelValue(
-              row,
-              ['Blood Group', 'BloodGroup', 'BLOOD GROUP']
-            ),
-
-            city: this.getExcelValue(
-              row,
-              ['City', 'CITY']
-            ),
-
-            state: this.getExcelValue(
-              row,
-              ['State', 'STATE']
+          console.log(
+            'Excel Headers:',
+            Object.keys(
+              excelData[0]
             )
+          );
 
-          };
+
+          // ==================================
+          // CONVERT EXCEL DATA
+          // ==================================
+
+          const patients =
+            excelData
+
+              .map(
+                (row: any) => {
+
+                  const patient = {
+
+                    // ==========================
+                    // PERSONAL DETAILS
+                    // ==========================
+
+                    name:
+                      this.getExcelValue(
+                        row,
+                        [
+                          'Name',
+                          'NAME',
+                          'Patient Name',
+                          'patientName'
+                        ]
+                      ),
+
+
+                    mobile:
+                      this.getExcelValue(
+                        row,
+                        [
+                          'Mobile',
+                          'MOBILE',
+                          'Mobile Number',
+                          'Phone'
+                        ]
+                      ),
+
+
+                    email:
+                      this.getExcelValue(
+                        row,
+                        [
+                          'Email',
+                          'EMAIL',
+                          'Email Address'
+                        ]
+                      ),
+
+
+                    dob:
+                      this.getExcelDateValue(
+                        row,
+                        [
+                          'Date of Birth',
+                          'DOB',
+                          'Date Of Birth',
+                          'dob'
+                        ]
+                      ),
+
+
+                    gender:
+                      this.getExcelValue(
+                        row,
+                        [
+                          'Gender',
+                          'GENDER'
+                        ]
+                      ),
+
+
+                    bloodGroup:
+                      this.getExcelValue(
+                        row,
+                        [
+                          'Blood Group',
+                          'BloodGroup',
+                          'BLOOD GROUP'
+                        ]
+                      ),
+
+
+                    maritalStatus:
+                      this.getExcelValue(
+                        row,
+                        [
+                          'Marital Status',
+                          'MaritalStatus'
+                        ]
+                      ),
+
+
+                    occupation:
+                      this.getExcelValue(
+                        row,
+                        [
+                          'Occupation',
+                          'OCCUPATION'
+                        ]
+                      ),
+
+
+                    aadhaar:
+                      this.getExcelValue(
+                        row,
+                        [
+                          'Aadhaar Number',
+                          'Aadhaar',
+                          'Aadhar Number',
+                          'Aadhar'
+                        ]
+                      ),
+
+
+                    pan:
+                      this.getExcelValue(
+                        row,
+                        [
+                          'PAN Number',
+                          'PAN',
+                          'Pan Number'
+                        ]
+                      ),
+
+
+                    // ==========================
+                    // EMERGENCY CONTACT
+                    // ==========================
+
+                    emergencyContact:
+                      this.getExcelValue(
+                        row,
+                        [
+                          'Emergency Contact',
+                          'Emergency Phone',
+                          'Emergency Contact Number',
+                          'EmergencyContact'
+                        ]
+                      ),
+
+
+                    emergencyName:
+                      this.getExcelValue(
+                        row,
+                        [
+                          'Emergency Contact Name',
+                          'Emergency Name',
+                          'EmergencyName'
+                        ]
+                      ),
+
+
+                    // ==========================
+                    // ADDRESS DETAILS
+                    // ==========================
+
+                    address1:
+                      this.getExcelValue(
+                        row,
+                        [
+                          'Address 1',
+                          'Address1',
+                          'Address'
+                        ]
+                      ),
+
+
+                    address2:
+                      this.getExcelValue(
+                        row,
+                        [
+                          'Address 2',
+                          'Address2'
+                        ]
+                      ),
+
+
+                    district:
+                      this.getExcelValue(
+                        row,
+                        [
+                          'District',
+                          'DISTRICT'
+                        ]
+                      ),
+
+
+                    city:
+                      this.getExcelValue(
+                        row,
+                        [
+                          'City',
+                          'CITY'
+                        ]
+                      ),
+
+
+                    state:
+                      this.getExcelValue(
+                        row,
+                        [
+                          'State',
+                          'STATE'
+                        ]
+                      ),
+
+
+                    country:
+                      this.getExcelValue(
+                        row,
+                        [
+                          'Country',
+                          'COUNTRY'
+                        ]
+                      ) || 'India',
+
+
+                    pincode:
+                      this.getExcelValue(
+                        row,
+                        [
+                          'Pincode',
+                          'PIN Code',
+                          'PIN',
+                          'Postal Code'
+                        ]
+                      ),
+
+
+                    // ==========================
+                    // MEDICAL DETAILS
+                    // ==========================
+
+                    medicalHistory:
+                      this.getExcelValue(
+                        row,
+                        [
+                          'Medical History',
+                          'MedicalHistory'
+                        ]
+                      ),
+
+
+                    currentMedication:
+                      this.getExcelValue(
+                        row,
+                        [
+                          'Current Medication',
+                          'CurrentMedication',
+                          'Medication'
+                        ]
+                      ),
+
+
+                    allergies:
+                      this.getExcelValue(
+                        row,
+                        [
+                          'Allergies',
+                          'ALLERGIES'
+                        ]
+                      ),
+
+
+                    // ==========================
+                    // INSURANCE DETAILS
+                    // ==========================
+
+                    insuranceProvider:
+                      this.getExcelValue(
+                        row,
+                        [
+                          'Insurance Provider',
+                          'InsuranceProvider'
+                        ]
+                      ),
+
+
+                    policyNumber:
+                      this.getExcelValue(
+                        row,
+                        [
+                          'Policy Number',
+                          'PolicyNumber'
+                        ]
+                      ),
+
+
+                    policyHolderName:
+                      this.getExcelValue(
+                        row,
+                        [
+                          'Policy Holder Name',
+                          'PolicyHolderName',
+                          'Policy Holder'
+                        ]
+                      )
+
+                  };
+
+
+                  console.log(
+                    'Converted Patient:',
+                    patient
+                  );
+
+
+                  return patient;
+
+                }
+              )
+
+
+              // ==================================
+              // REMOVE BLANK ROWS
+              // ==================================
+
+              .filter(
+                (patient: any) => {
+
+                  return (
+
+                    patient.name ||
+
+                    patient.mobile ||
+
+                    patient.email
+
+                  );
+
+                }
+              );
+
+
+          // ==================================
+          // VALIDATION
+          // ==================================
+
+          if (
+            patients.length === 0
+          ) {
+
+            alert(
+              'No valid patient data found in Excel.'
+            );
+
+            return;
+
+          }
+
 
           console.log(
-            'Converted Patient:',
-            patient
+            'Patients ready for upload:',
+            patients
           );
 
-          return patient;
 
-        })
-        .filter((patient: any) => {
+          // ==================================
+          // SAVE PATIENTS
+          // ==================================
 
-          // Don't save completely blank rows
-          return (
-            patient.name ||
-            patient.mobile ||
-            patient.email
-          );
-
-        });
+          this.loading = true;
 
 
-      // ======================================
-      // VALIDATION
-      // ======================================
+          const requests =
+            patients.map(
+              (patient: any) =>
 
-      if (patients.length === 0) {
+                this.patientService
+                  .savePatient(patient)
 
-        alert(
-          'No valid patient data found in Excel.'
-        );
-
-        return;
-      }
+            );
 
 
-      console.log(
-        'Patients ready for upload:',
-        patients
-      );
+          forkJoin(requests)
+            .subscribe({
+
+              // ==============================
+              // SUCCESS
+              // ==============================
+
+              next: (responses) => {
+
+                console.log(
+                  'Imported successfully:',
+                  responses
+                );
 
 
-      // ======================================
-      // SAVE PATIENTS
-      // ======================================
-
-      this.loading = true;
-
-      const requests = patients.map(
-        (patient: any) =>
-          this.patientService.savePatient(patient)
-      );
+                this.loading = false;
 
 
-      forkJoin(requests).subscribe({
-
-        // ====================================
-        // SUCCESS
-        // ====================================
-
-        next: (responses) => {
-
-          console.log(
-            'Imported successfully:',
-            responses
-          );
-
-          this.loading = false;
-
-          alert(
-            `${patients.length} patients imported successfully`
-          );
-
-          // Refresh list
-          this.loadPatients();
-
-        },
+                alert(
+                  `${patients.length} patients imported successfully`
+                );
 
 
-        // ====================================
-        // ERROR
-        // ====================================
+                // Refresh list
 
-        error: (error) => {
+                this.loadPatients();
+
+              },
+
+
+              // ==============================
+              // ERROR
+              // ==============================
+
+              error: (error) => {
+
+                console.error(
+                  'Excel import API failed:',
+                  error
+                );
+
+
+                this.loading = false;
+
+
+                alert(
+                  'Failed to import patients'
+                );
+
+              }
+
+            });
+
+        }
+
+
+        catch (error) {
 
           console.error(
-            'Excel import API failed:',
+            'Excel processing error:',
             error
           );
 
+
           this.loading = false;
 
+
           alert(
-            'Failed to import patients'
+            'Invalid Excel file'
           );
 
         }
 
-      });
+      };
+
+
+    reader.readAsArrayBuffer(
+      file
+    );
+
+
+    // ========================================
+    // ALLOW SAME FILE AGAIN
+    // ========================================
+
+    event.target.value = '';
+
+  }
+
+
+  // ==========================================
+  // GET EXCEL VALUE
+  // ==========================================
+
+  private getExcelValue(
+    row: any,
+    possibleHeaders: string[]
+  ): string {
+
+    const rowKeys =
+      Object.keys(row);
+
+
+    for (
+      const header
+      of possibleHeaders
+    ) {
+
+      const matchingKey =
+        rowKeys.find(
+          key =>
+            key
+              .trim()
+              .toLowerCase() ===
+            header
+              .trim()
+              .toLowerCase()
+        );
+
+
+      if (matchingKey) {
+
+        return String(
+          row[matchingKey] ?? ''
+        ).trim();
+
+      }
 
     }
 
-    catch (error) {
 
-      console.error(
-        'Excel processing error:',
-        error
-      );
+    return '';
 
-      this.loading = false;
+  }
 
-      alert(
-        'Invalid Excel file'
+
+  // ==========================================
+  // GET EXCEL DATE VALUE
+  // ==========================================
+
+  private getExcelDateValue(
+    row: any,
+    possibleHeaders: string[]
+  ): string {
+
+    const rowKeys =
+      Object.keys(row);
+
+
+    let value: any = '';
+
+
+    for (
+      const header
+      of possibleHeaders
+    ) {
+
+      const matchingKey =
+        rowKeys.find(
+          key =>
+            key
+              .trim()
+              .toLowerCase() ===
+            header
+              .trim()
+              .toLowerCase()
+        );
+
+
+      if (matchingKey) {
+
+        value =
+          row[matchingKey];
+
+        break;
+
+      }
+
+    }
+
+
+    if (
+      value === null ||
+      value === undefined ||
+      value === ''
+    ) {
+
+      return '';
+
+    }
+
+
+    // ========================================
+    // EXCEL SERIAL DATE
+    // ========================================
+
+    if (
+      typeof value === 'number'
+    ) {
+
+      const excelDate =
+        XLSX.SSF.parse_date_code(
+          value
+        );
+
+
+      if (excelDate) {
+
+        const month =
+          String(
+            excelDate.m
+          ).padStart(2, '0');
+
+
+        const day =
+          String(
+            excelDate.d
+          ).padStart(2, '0');
+
+
+        return `${excelDate.y}-${month}-${day}`;
+
+      }
+
+    }
+
+
+    // ========================================
+    // NORMAL DATE STRING
+    // ========================================
+
+    const date =
+      new Date(value);
+
+
+    if (
+      !isNaN(
+        date.getTime()
+      )
+    ) {
+
+      return (
+        date
+          .toISOString()
+          .split('T')[0]
       );
 
     }
 
-  };
 
+    return String(value).trim();
 
-  reader.readAsArrayBuffer(file);
+  }
 
-  // Allow same file selection again
-  event.target.value = '';
-
-}
 
   // ==========================================
   // UPDATE PAGINATION
@@ -772,7 +1440,9 @@ importExcel(event: any): void {
       );
 
 
-    if (this.totalPages === 0) {
+    if (
+      this.totalPages === 0
+    ) {
 
       this.totalPages = 1;
 
@@ -796,7 +1466,8 @@ importExcel(event: any): void {
 
 
     const end =
-      start + this.pageSize;
+      start +
+      this.pageSize;
 
 
     // ========================================
@@ -817,7 +1488,8 @@ importExcel(event: any): void {
     this.pages =
       Array.from(
         {
-          length: this.totalPages
+          length:
+            this.totalPages
         },
         (_, index) =>
           index + 1
@@ -898,14 +1570,17 @@ importExcel(event: any): void {
   // GO TO PAGE
   // ==========================================
 
-  goToPage(page: number): void {
+  goToPage(
+    page: number
+  ): void {
 
     if (
       page >= 1 &&
       page <= this.totalPages
     ) {
 
-      this.currentPage = page;
+      this.currentPage =
+        page;
 
       this.updatePagination();
 
@@ -925,40 +1600,5 @@ importExcel(event: any): void {
     this.updatePagination();
 
   }
-  // ==========================================
-// GET EXCEL VALUE
-// ==========================================
-
-private getExcelValue(
-  row: any,
-  possibleHeaders: string[]
-): string {
-
-  const rowKeys = Object.keys(row);
-
-  for (const header of possibleHeaders) {
-
-    const matchingKey = rowKeys.find(
-      key =>
-        key
-          .trim()
-          .toLowerCase() ===
-        header
-          .trim()
-          .toLowerCase()
-    );
-
-    if (matchingKey) {
-
-      return String(
-        row[matchingKey] ?? ''
-      ).trim();
-
-    }
-
-  }
-
-  return '';
-}
 
 }
