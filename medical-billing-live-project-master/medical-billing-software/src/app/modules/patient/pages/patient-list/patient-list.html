@@ -121,6 +121,22 @@
   ↓ Download Excel
 
 </button>
+<button
+  type="button"
+  class="import-excel-btn"
+  (click)="excelInput.click()">
+
+  ↑ Import Excel
+
+</button>
+
+<input
+  #excelInput
+  type="file"
+  accept=".xlsx,.xls"
+  hidden
+  (change)="importExcel($event)"
+/>
 
 </div>
 
@@ -134,97 +150,162 @@
 
   </div>
 
+<!-- ================= TABLE ================= -->
+<div
+  class="table-container"
+  *ngIf="!loading"
+>
 
-  <!-- ================= TABLE ================= -->
+  <table>
 
-  <div
-    class="table-container"
-    *ngIf="!loading">
+    <!-- FIXED HEADER -->
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Mobile</th>
+        <th>Email</th>
+        <th>Gender</th>
+        <th>Blood Group</th>
+        <th>City</th>
+        <th>State</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
 
-    <table>
+    <!-- SCROLLABLE DATA -->
+    <tbody>
 
-      <thead>
+      <tr
+        *ngFor="let patient of paginatedPatients"
+      >
+        <td>{{ patient.id || '--' }}</td>
 
-        <tr>
+        <td>{{ patient.name || '--' }}</td>
 
-          <th>ID</th>
-          <th>Name</th>
-          <th>Mobile</th>
-          <th>Email</th>
-          <th>Gender</th>
-          <th>Blood Group</th>
-          <th>City</th>
-          <th>State</th>
-          <th>Actions</th>
+        <td>{{ patient.mobile || '--' }}</td>
 
-        </tr>
+        <td>{{ patient.email || '--' }}</td>
 
-      </thead>
+        <td>{{ patient.gender || '--' }}</td>
 
+        <td>{{ patient.bloodGroup || '--' }}</td>
 
-<tbody>
+        <td>{{ patient.city || '--' }}</td>
 
-  <tr
-    *ngFor="let patient of filteredPatients">
+        <td>{{ patient.state || '--' }}</td>
 
-    <td>{{ patient.id || '--' }}</td>
+        <td class="actions">
 
-    <td>{{ patient.name || '--' }}</td>
+          <button
+            type="button"
+            class="edit-btn"
+            (click)="editPatient(patient)"
+          >
+            Edit
+          </button>
 
-    <td>{{ patient.mobile || '--' }}</td>
+          <button
+            type="button"
+            class="delete-btn"
+            (click)="deletePatient(patient.id)"
+          >
+            Delete
+          </button>
 
-    <td>{{ patient.email || '--' }}</td>
+        </td>
+      </tr>
 
-    <td>{{ patient.gender || '--' }}</td>
+      <!-- NO DATA -->
+      <tr
+        *ngIf="
+          !loading &&
+          paginatedPatients.length === 0
+        "
+      >
+        <td
+          colspan="9"
+          class="no-data"
+        >
+          No patients found.
+        </td>
+      </tr>
 
-    <td>{{ patient.bloodGroup || '--' }}</td>
+    </tbody>
 
-    <td>{{ patient.city || '--' }}</td>
+  </table>
 
-    <td>{{ patient.state || '--' }}</td>
-
-    <td class="actions">
-
-      <button
-        type="button"
-        class="edit-btn"
-        (click)="editPatient(patient)">
-        Edit
-      </button>
-
-      <button
-        type="button"
-        class="delete-btn"
-        (click)="deletePatient(patient.id)">
-        Delete
-      </button>
-
-    </td>
-
-  </tr>
+</div>
 
 
-  <!-- NO DATA -->
+<!-- ================= PAGINATION ================= -->
 
-  <tr
-    *ngIf="
-      !loading &&
-      filteredPatients.length === 0
-    ">
+<div
+  class="pagination-container"
+  *ngIf="!loading && filteredPatients.length > 0"
+>
 
-    <td
-      colspan="9"
-      class="no-data">
+  <!-- ITEMS PER PAGE -->
+  <div class="page-size">
 
-      No patients found.
+    <span>Items per page:</span>
 
-    </td>
+    <select
+      [(ngModel)]="pageSize"
+      (change)="changePageSize()"
+    >
+      <option [value]="5">5</option>
+      <option [value]="10">10</option>
+      <option [value]="20">20</option>
+      <option [value]="50">50</option>
+    </select>
 
-  </tr>
+  </div>
 
-</tbody>      
 
-    </table>
+  <!-- PAGE INFO -->
+  <div class="page-info">
+
+    {{ startItem }} -
+    {{ endItem }}
+    of
+    {{ filteredPatients.length }}
+
+  </div>
+
+
+  <!-- PAGINATION BUTTONS -->
+  <div class="pagination-buttons">
+
+    <button
+      type="button"
+      class="page-btn"
+      [disabled]="currentPage === 1"
+      (click)="previousPage()"
+    >
+      ‹
+    </button>
+
+
+    <button
+      type="button"
+      class="page-number"
+      *ngFor="let page of pages"
+      [class.active]="page === currentPage"
+      (click)="goToPage(page)"
+    >
+      {{ page }}
+    </button>
+
+
+    <button
+      type="button"
+      class="page-btn"
+      [disabled]="currentPage === totalPages"
+      (click)="nextPage()"
+    >
+      ›
+    </button>
 
   </div>
 

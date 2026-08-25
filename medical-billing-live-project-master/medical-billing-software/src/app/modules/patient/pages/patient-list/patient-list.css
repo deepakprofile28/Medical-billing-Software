@@ -4,7 +4,7 @@
 
 .patient-list-page {
   min-height: 100vh;
-  padding: 30px;
+  padding: 55px;
   background: #f5f7fb;
   box-sizing: border-box;
   font-family: Arial, Helvetica, sans-serif;
@@ -77,7 +77,7 @@
 
   padding: 10px 16px;
 
-  margin-bottom: 18px;
+  margin-bottom: 0px;
 
   background: #ffffff;
 
@@ -444,7 +444,7 @@ tbody tr:last-child td {
   display: flex;
   align-items: center;
   gap: 14px;
-  margin: 20px 0;
+  margin: 10px 0;
   padding: 16px 18px;
 
   background: #ffffff;
@@ -650,4 +650,259 @@ tbody tr:last-child td {
 
 .download-excel-btn:active {
   transform: scale(0.97);
+}
+
+.import-excel-btn {
+  height: 44px;
+  padding: 0 18px;
+
+  border: none;
+  border-radius: 8px;
+
+  background: #2563eb;
+  color: #ffffff;
+
+  font-size: 14px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition: all 0.2s ease;
+}
+
+.import-excel-btn:hover {
+  background: #1d4ed8;
+  transform: translateY(-1px);
+}
+
+.import-excel-btn:active {
+  transform: scale(0.97);
+}
+/* ==========================================
+   TABLE CONTAINER
+========================================== */
+
+.table-container {
+  width: 100%;
+  max-height: 500px;
+  height :48vh;
+  overflow-y: auto;
+  overflow-x: auto;
+
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+
+  background: #ffffff;
+}
+
+
+/* ==========================================
+   TABLE
+========================================== */
+
+.table-container table {
+  width: 100%;
+  min-width: 1000px;
+
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+
+/* ==========================================
+   FIXED HEADER
+========================================== */
+
+.table-container thead {
+  position: sticky;
+  top: 0;
+
+  z-index: 10;
+
+  background: #f8fafc;
+}
+
+
+.table-container th {
+  position: sticky;
+  top: 0;
+
+  padding: 14px 16px;
+
+  background: #f8fafc;
+
+  color: #374151;
+
+  font-size: 13px;
+  font-weight: 700;
+
+  text-align: left;
+
+  border-bottom: 1px solid #e5e7eb;
+
+  white-space: nowrap;
+}
+
+
+/* ==========================================
+   TABLE DATA
+========================================== */
+
+.table-container td {
+  padding: 13px 16px;
+
+  font-size: 13px;
+
+  color: #374151;
+
+  border-bottom: 1px solid #f1f5f9;
+
+  white-space: nowrap;
+}
+
+
+.table-container tbody tr:hover {
+  background: #f8fafc;
+}
+
+
+/* ==========================================
+   SCROLLBAR
+========================================== */
+
+.table-container::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.table-container::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 10px;
+}
+
+.table-container::-webkit-scrollbar-track {
+  background: #f8fafc;
+}
+/* ==========================================
+   PAGINATION
+========================================== */
+
+.pagination-container {
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  gap: 20px;
+
+  margin-top: 3px;
+
+  padding: 12px 16px;
+
+  background: #ffffff;
+
+  border: 1px solid #e5e7eb;
+
+  border-radius: 10px;
+
+  flex-wrap: wrap;
+}
+
+
+/* ITEMS PER PAGE */
+
+.page-size {
+  display: flex;
+
+  align-items: center;
+
+  gap: 8px;
+
+  color: #64748b;
+
+  font-size: 13px;
+}
+
+
+.page-size select {
+  padding: 7px 30px 7px 10px;
+
+  border: 1px solid #d1d5db;
+
+  border-radius: 6px;
+
+  background: #ffffff;
+
+  cursor: pointer;
+
+  outline: none;
+}
+
+
+/* PAGE INFO */
+
+.page-info {
+  font-size: 13px;
+
+  color: #64748b;
+
+  white-space: nowrap;
+}
+
+
+/* PAGINATION BUTTONS */
+
+.pagination-buttons {
+  display: flex;
+
+  align-items: center;
+
+  gap: 5px;
+}
+
+
+.page-btn,
+.page-number {
+  min-width: 34px;
+
+  height: 34px;
+
+  padding: 0 9px;
+
+  border: 1px solid #e2e8f0;
+
+  border-radius: 6px;
+
+  background: #ffffff;
+
+  color: #475569;
+
+  font-size: 13px;
+
+  cursor: pointer;
+
+  transition: 0.2s;
+}
+
+
+.page-btn:hover:not(:disabled),
+.page-number:hover {
+  background: #f1f5f9;
+}
+
+
+.page-number.active {
+  background: #2563eb;
+
+  color: #ffffff;
+
+  border-color: #2563eb;
+}
+
+
+.page-btn:disabled {
+  opacity: 0.4;
+
+  cursor: not-allowed;
 }
