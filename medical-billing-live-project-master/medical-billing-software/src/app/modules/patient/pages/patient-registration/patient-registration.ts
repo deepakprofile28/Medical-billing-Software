@@ -23,25 +23,18 @@ import {
   Router
 } from '@angular/router';
 
-
 @Component({
   selector: 'app-patient-registration',
-
   standalone: true,
-
   imports: [
     CommonModule,
     ReactiveFormsModule,
     PatientForm
   ],
-
   templateUrl: './patient-registration.html',
-
   styleUrl: './patient-registration.css'
 })
-export class PatientRegistration
-  implements OnInit, AfterViewInit {
-
+export class PatientRegistration implements OnInit, AfterViewInit {
 
   // =====================================================
   // STEP
@@ -53,7 +46,6 @@ export class PatientRegistration
 
   patientForm: FormGroup;
 
-
   // =====================================================
   // EDIT MODE
   // =====================================================
@@ -61,7 +53,6 @@ export class PatientRegistration
   isEditMode = false;
 
   editPatientId: number | null = null;
-
 
   // =====================================================
   // TOAST
@@ -72,7 +63,6 @@ export class PatientRegistration
   showToastType: 'success' | 'error' = 'success';
 
   showToastVisible = false;
-
 
   // =====================================================
   // PREVIEW CAROUSEL
@@ -85,18 +75,14 @@ export class PatientRegistration
   @ViewChild('previewPanel', { static: false })
   previewPanel!: ElementRef<HTMLElement>;
 
-
   // =====================================================
   // CONSTRUCTOR
   // =====================================================
 
   constructor(
     private fb: FormBuilder,
-
     private patientService: PatientService,
-
     private router: Router,
-
     private route: ActivatedRoute
   ) {
 
@@ -109,68 +95,41 @@ export class PatientRegistration
       // ---------------- PERSONAL ----------------
 
       name: [''],
-
       mobile: [''],
-
       email: [''],
-
       dob: [''],
-
       gender: [''],
-
       bloodGroup: [''],
-
       maritalStatus: [''],
-
       occupation: [''],
-
       aadhaar: [''],
-
       pan: [''],
-
       emergencyContact: [''],
-
       emergencyName: [''],
-
 
       // ---------------- ADDRESS ----------------
 
       address1: [''],
-
       address2: [''],
-
       district: [''],
-
       city: [''],
-
       state: [''],
-
       country: ['India'],
-
       pincode: [''],
-
 
       // ---------------- MEDICAL ----------------
 
       medicalHistory: [''],
-
       currentMedication: [''],
-
       allergies: [''],
-
 
       // ---------------- INSURANCE ----------------
 
       insuranceProvider: [''],
-
       policyNumber: [''],
-
       policyHolderName: ['']
-
     });
-
   }
-
 
   // =====================================================
   // ON INIT
@@ -183,9 +142,7 @@ export class PatientRegistration
     );
 
     this.loadPatientForEdit();
-
   }
-
 
   // =====================================================
   // LOAD PATIENT FOR EDIT
@@ -200,9 +157,7 @@ export class PatientRegistration
         params
       );
 
-
       const id = params['id'];
-
 
       // =================================================
       // NEW PATIENT
@@ -219,9 +174,7 @@ export class PatientRegistration
         this.editPatientId = null;
 
         return;
-
       }
-
 
       // =================================================
       // EDIT MODE
@@ -231,7 +184,6 @@ export class PatientRegistration
 
       this.editPatientId = Number(id);
 
-
       console.log(
         'EDIT MODE'
       );
@@ -240,7 +192,6 @@ export class PatientRegistration
         'Edit Patient ID:',
         this.editPatientId
       );
-
 
       // =================================================
       // GET PATIENT BY ID
@@ -261,7 +212,6 @@ export class PatientRegistration
               response
             );
 
-
             // =========================================
             // HANDLE RESPONSE
             // =========================================
@@ -271,12 +221,10 @@ export class PatientRegistration
                 ? response.data
                 : response;
 
-
             console.log(
               'Patient object used for patch:',
               patient
             );
-
 
             if (!patient) {
 
@@ -290,17 +238,13 @@ export class PatientRegistration
               );
 
               return;
-
             }
-
 
             // =========================================
             // FORMAT DOB
             // =========================================
 
-            let dobValue =
-              patient.dob || '';
-
+            let dobValue = patient.dob || '';
 
             if (dobValue) {
 
@@ -309,14 +253,14 @@ export class PatientRegistration
                 const date =
                   new Date(dobValue);
 
-
-                if (!isNaN(date.getTime())) {
+                if (
+                  !isNaN(date.getTime())
+                ) {
 
                   dobValue =
                     date
                       .toISOString()
                       .split('T')[0];
-
                 }
 
               } catch (error) {
@@ -325,11 +269,8 @@ export class PatientRegistration
                   'DOB conversion failed:',
                   error
                 );
-
               }
-
             }
-
 
             // =========================================
             // PATCH ALL FORM FIELDS
@@ -375,7 +316,6 @@ export class PatientRegistration
               emergencyName:
                 patient.emergencyName ?? '',
 
-
               // ---------------- ADDRESS ----------------
 
               address1:
@@ -399,7 +339,6 @@ export class PatientRegistration
               pincode:
                 patient.pincode ?? '',
 
-
               // ---------------- MEDICAL ----------------
 
               medicalHistory:
@@ -411,7 +350,6 @@ export class PatientRegistration
               allergies:
                 patient.allergies ?? '',
 
-
               // ---------------- INSURANCE ----------------
 
               insuranceProvider:
@@ -422,16 +360,13 @@ export class PatientRegistration
 
               policyHolderName:
                 patient.policyHolderName ?? ''
-
             });
-
 
             // =========================================
             // CALCULATE AGE
             // =========================================
 
             this.calculatePatientAge();
-
 
             // =========================================
             // DEBUG
@@ -451,35 +386,27 @@ export class PatientRegistration
               'EDIT PATIENT ID:',
               this.editPatientId
             );
-
           },
-
 
           // =============================================
           // ERROR
           // =============================================
 
-          error: (error) => {
+          error: (error: any) => {
 
             console.error(
               'Failed to load patient:',
               error
             );
 
-
             this.showToast(
               'Failed to load patient details',
               'error'
             );
-
           }
-
         });
-
     });
-
   }
-
 
   // =====================================================
   // CALCULATE AGE
@@ -492,15 +419,12 @@ export class PatientRegistration
         .get('dob')
         ?.value;
 
-
     if (!dob) {
 
       this.patientAge = 0;
 
       return;
-
     }
-
 
     const birthDate =
       new Date(dob);
@@ -508,37 +432,28 @@ export class PatientRegistration
     const today =
       new Date();
 
-
     let age =
       today.getFullYear() -
       birthDate.getFullYear();
-
 
     const monthDifference =
       today.getMonth() -
       birthDate.getMonth();
 
-
     if (
-
       monthDifference < 0 ||
-
       (
         monthDifference === 0 &&
-        today.getDate() < birthDate.getDate()
+        today.getDate() <
+        birthDate.getDate()
       )
-
     ) {
 
       age--;
-
     }
 
-
     this.patientAge = age;
-
   }
-
 
   // =====================================================
   // AFTER VIEW INIT
@@ -553,9 +468,7 @@ export class PatientRegistration
       );
 
     }, 100);
-
   }
-
 
   // =====================================================
   // TOAST
@@ -574,17 +487,13 @@ export class PatientRegistration
 
     this.showToastVisible =
       true;
-
   }
-
 
   closeToast(): void {
 
     this.showToastVisible =
       false;
-
   }
-
 
   // =====================================================
   // PREVIEW
@@ -595,28 +504,23 @@ export class PatientRegistration
     if (index < 0) {
 
       index = 0;
-
     }
 
-
-    if (index >= this.totalPreviews) {
+    if (
+      index >= this.totalPreviews
+    ) {
 
       index =
         this.totalPreviews - 1;
-
     }
-
 
     this.previewIndex =
       index;
 
-
     this.scrollToPreview(
       index
     );
-
   }
-
 
   nextPreview(): void {
 
@@ -626,13 +530,10 @@ export class PatientRegistration
         this.totalPreviews - 1
       );
 
-
     this.goToPreview(
       next
     );
-
   }
-
 
   prevPreview(): void {
 
@@ -642,13 +543,10 @@ export class PatientRegistration
         0
       );
 
-
     this.goToPreview(
       previous
     );
-
   }
-
 
   private scrollToPreview(
     index: number
@@ -660,17 +558,13 @@ export class PatientRegistration
         this.previewPanel
           ?.nativeElement;
 
-
       if (!panel) {
 
         return;
-
       }
-
 
       const slideWidth =
         panel.clientWidth;
-
 
       panel.scrollTo({
 
@@ -679,22 +573,16 @@ export class PatientRegistration
 
         behavior:
           'smooth'
-
       });
 
-    }
-
-    catch (error) {
+    } catch (error) {
 
       console.warn(
         'Preview scroll failed:',
         error
       );
-
     }
-
   }
-
 
   // =====================================================
   // NEXT STEP
@@ -702,7 +590,9 @@ export class PatientRegistration
 
   nextStep(): void {
 
-    if (this.currentStep < 5) {
+    if (
+      this.currentStep < 5
+    ) {
 
       this.currentStep++;
 
@@ -710,15 +600,11 @@ export class PatientRegistration
         this.currentStep - 1
       );
 
-    }
-    else {
+    } else {
 
       this.savePatient();
-
     }
-
   }
-
 
   // =====================================================
   // PREVIOUS STEP
@@ -726,18 +612,17 @@ export class PatientRegistration
 
   previousStep(): void {
 
-    if (this.currentStep > 1) {
+    if (
+      this.currentStep > 1
+    ) {
 
       this.currentStep--;
 
       this.goToPreview(
         this.currentStep - 1
       );
-
     }
-
   }
-
 
   // =====================================================
   // SAVE / UPDATE PATIENT
@@ -745,33 +630,39 @@ export class PatientRegistration
 
   savePatient(): void {
 
-    const patientData =
-      this.patientForm.getRawValue();
+    // =================================================
+    // PREPARE PATIENT DATA
+    // =================================================
 
+    const patientData = {
+
+      ...this.patientForm.getRawValue(),
+
+      // Empty DOB → null
+      dob:
+        this.patientForm
+          .get('dob')
+          ?.value || null
+    };
 
     console.log(
       'Patient Data:',
       patientData
     );
 
-
     // =================================================
     // UPDATE EXISTING PATIENT
     // =================================================
 
     if (
-
       this.isEditMode &&
-
       this.editPatientId !== null
-
     ) {
 
       console.log(
         'Updating Patient ID:',
         this.editPatientId
       );
-
 
       this.patientService
         .updatePatient(
@@ -784,19 +675,17 @@ export class PatientRegistration
           // UPDATE SUCCESS
           // =========================================
 
-          next: (response) => {
+          next: (response: any) => {
 
             console.log(
               'Patient updated successfully:',
               response
             );
 
-
             this.showToast(
               'Patient updated successfully',
               'success'
             );
-
 
             setTimeout(() => {
 
@@ -805,36 +694,28 @@ export class PatientRegistration
               ]);
 
             }, 1000);
-
           },
-
 
           // =========================================
           // UPDATE ERROR
           // =========================================
 
-          error: (error) => {
+          error: (error: any) => {
 
             console.error(
               'Patient update failed:',
               error
             );
 
-
             this.showToast(
               'Failed to update patient',
               'error'
             );
-
           }
-
         });
 
-
       return;
-
     }
-
 
     // =================================================
     // CREATE NEW PATIENT
@@ -844,7 +725,6 @@ export class PatientRegistration
       'Creating new patient'
     );
 
-
     this.patientService
       .savePatient(patientData)
       .subscribe({
@@ -853,19 +733,17 @@ export class PatientRegistration
         // CREATE SUCCESS
         // =============================================
 
-        next: (response) => {
+        next: (response: any) => {
 
           console.log(
             'Patient saved successfully:',
             response
           );
 
-
           this.showToast(
             'Patient saved successfully',
             'success'
           );
-
 
           // Reset form
 
@@ -873,14 +751,13 @@ export class PatientRegistration
 
             country:
               'India'
-
           });
 
+          this.currentStep =
+            1;
 
-          this.currentStep = 1;
-
-          this.previewIndex = 0;
-
+          this.previewIndex =
+            0;
 
           setTimeout(() => {
 
@@ -889,72 +766,126 @@ export class PatientRegistration
             ]);
 
           }, 1000);
-
         },
-
 
         // =============================================
         // CREATE ERROR
         // =============================================
 
-        error: (error) => {
+        error: (error: any) => {
 
           console.error(
             'Patient save failed:',
             error
           );
 
-
           this.showToast(
             'Failed to save patient',
             'error'
           );
-
         }
-
       });
-
   }
+
+  // =====================================================
+  // SAVE PATIENT AS DRAFT
+  // =====================================================
 
   saveDraft(): void {
 
-  console.log('Saving patient as draft...');
+    console.log(
+      'Saving patient as draft...'
+    );
 
-  const patientData = {
-    ...this.patientForm.getRawValue(),
-    status: 'COMPLETED'
-  };
+    // =================================================
+    // PREPARE DRAFT DATA
+    // =================================================
 
-  console.log('Draft Patient Data:', patientData);
+    const patientData = {
 
-  this.patientService.savePatient(patientData).subscribe({
+      ...this.patientForm.getRawValue(),
 
-    next: (response) => {
+      // =================================================
+      // IMPORTANT:
+      // Empty DOB must be null instead of ""
+      // Backend LocalDate accepts null
+      // =================================================
 
-      console.log(
-        'Draft saved successfully:',
-        response
-      );
+      dob:
+        this.patientForm
+          .get('dob')
+          ?.value || null
+    };
 
-      alert('Patient draft saved successfully');
+    console.log(
+      'Draft Patient Data:',
+      patientData
+    );
 
-      this.router.navigate([
-        '/patients'
-      ]);
-    },
+    console.log(
+      'Draft DOB:',
+      patientData.dob
+    );
 
-    error: (error) => {
+    // =================================================
+    // SAVE DRAFT API
+    // =================================================
 
-      console.error(
-        'Failed to save patient draft:',
-        error
-      );
+    this.patientService
+      .saveDraft(patientData)
+      .subscribe({
 
-      alert(
-        'Failed to save patient draft'
-      );
-    }
-  });
-}
+        // =============================================
+        // SUCCESS
+        // =============================================
 
+        next: (response: any) => {
+
+          console.log(
+            'Draft saved successfully:',
+            response
+          );
+
+          this.showToast(
+            'Patient draft saved successfully',
+            'success'
+          );
+
+          setTimeout(() => {
+
+            this.router.navigate([
+              '/patients'
+            ]);
+
+          }, 1000);
+        },
+
+        // =============================================
+        // ERROR
+        // =============================================
+
+        error: (error: any) => {
+
+          console.error(
+            'Failed to save patient draft:',
+            error
+          );
+
+          console.error(
+            'Draft Error Status:',
+            error?.status
+          );
+
+          console.error(
+            'Draft Error Body:',
+            error?.error
+          );
+
+          this.showToast(
+            'Failed to save patient draft',
+            'error'
+          );
+        }
+      });
+  }
 }

@@ -30,7 +30,15 @@ export class PatientList implements OnInit {
   patients: any[] = [];
   filteredPatients: any[] = [];
   paginatedPatients: any[] = [];
+
   loading = false;
+
+  // ==========================================
+  // DRAFT DATA
+  // ==========================================
+
+  draftPatients: any[] = [];
+  showDraftPopup = false;
 
   // ==========================================
   // SEARCH
@@ -52,7 +60,9 @@ export class PatientList implements OnInit {
   currentPage = 1;
   pageSize = 10;
   totalPages = 1;
+
   pages: number[] = [];
+
   startItem = 0;
   endItem = 0;
 
@@ -61,7 +71,13 @@ export class PatientList implements OnInit {
   // ==========================================
 
   toastMessage = '';
-  toastType: 'success' | 'error' | 'warning' | 'info' = 'success';
+
+  toastType:
+    | 'success'
+    | 'error'
+    | 'warning'
+    | 'info' = 'success';
+
   showToastMessage = false;
 
   // ==========================================
@@ -93,7 +109,11 @@ export class PatientList implements OnInit {
 
   showToast(
     message: string,
-    type: 'success' | 'error' | 'warning' | 'info' = 'success'
+    type:
+      | 'success'
+      | 'error'
+      | 'warning'
+      | 'info' = 'success'
   ): void {
 
     this.toastMessage = message;
@@ -112,7 +132,7 @@ export class PatientList implements OnInit {
   }
 
   // ==========================================
-  // GET ALL PATIENTS
+  // LOAD PATIENTS
   // ==========================================
 
   loadPatients(): void {
@@ -120,29 +140,67 @@ export class PatientList implements OnInit {
     this.loading = true;
 
     console.log(
-      'Loading patients...'
+      'Loading approved patients...'
     );
+
+    // ========================================
+    // GET ALL PATIENTS
+    // ========================================
 
     this.patientService
       .getPatients()
       .subscribe({
 
-        // ======================================
+        // ====================================
         // SUCCESS
-        // ======================================
+        // ====================================
 
-        next: (data) => {
+        next: (data: any[]) => {
 
           console.log(
-            'Patients API response:',
+            'All Patients API response:',
             data
           );
 
-          this.patients = data || [];
+          const allPatients = data || [];
+
+          // ==================================
+          // APPROVED PATIENTS ONLY
+          // ==================================
+
+          this.patients =
+            allPatients.filter(
+              (patient: any) =>
+                String(
+                  patient?.status || ''
+                )
+                  .trim()
+                  .toUpperCase() === 'APPROVED'
+            );
+
+          console.log(
+            'Approved Patients:',
+            this.patients
+          );
+
+          // ==================================
+          // LOAD DRAFT PATIENTS
+          // SEPARATE API CALL
+          // ==================================
+
+          this.loadDraftPatients();
+
+          // ==================================
+          // FILTERED DATA
+          // ==================================
 
           this.filteredPatients = [
             ...this.patients
           ];
+
+          // ==================================
+          // RESET PAGINATION
+          // ==================================
 
           this.currentPage = 1;
 
@@ -153,11 +211,11 @@ export class PatientList implements OnInit {
           this.cdr.detectChanges();
         },
 
-        // ======================================
+        // ====================================
         // ERROR
-        // ======================================
+        // ====================================
 
-        error: (error) => {
+        error: (error: any) => {
 
           console.error(
             'Failed to load patients:',
@@ -168,17 +226,396 @@ export class PatientList implements OnInit {
           this.filteredPatients = [];
           this.paginatedPatients = [];
 
+          this.currentPage = 1;
+
           this.loading = false;
 
           this.updatePagination();
+
+          this.cdr.detectChanges();
 
           this.showToast(
             'Failed to load patients',
             'error'
           );
+        }
+
+      });
+  }
+
+  // ==========================================
+  // LOAD DRAFT PATIENTS
+  // SEPARATE DRAFT API
+  // ==========================================
+
+  loadDraftPatients(): void {
+
+    console.log(
+      'Loading draft patients...'
+    );
+
+    this.patientService
+      .getDraftPatients()
+      .subscribe({
+
+        // ====================================
+        // SUCCESS
+        // ====================================
+
+        next: (response: any[]) => {
+
+          console.log(
+            'Draft Patients API response:',
+            response
+          );
+
+          this.draftPatients =
+            response || [];
+
+          console.log(
+            'Draft Patients:',
+            this.draftPatients
+          );
+
+          console.log(
+            'Draft Patients Count:',
+            this.draftPatients.length
+          );
+
+          this.cdr.detectChanges();
+        },
+
+        // ====================================
+        // ERROR
+        // ====================================
+
+        error: (error: any) => {
+
+          console.error(
+            'Failed to load draft patients:',
+            error
+          );
+
+          this.draftPatients = [];
+
+          this.cdr.detectChanges();
+
+          this.showToast(
+            'Failed to load draft patients',
+            'error'
+          );
+        }
+
+      });
+  }
+
+  // ==========================================
+  // OPEN DRAFT POPUP
+  // ==========================================
+
+  openDraftPopup(): void {
+
+    console.log(
+      'Opening Draft Popup'
+    );
+
+    // Refresh drafts before opening popup
+    this.loadDraftPatients();
+
+    this.showDraftPopup = true;
+
+    this.cdr.detectChanges();
+  }
+
+  // ==========================================
+  // CLOSE DRAFT POPUP
+  // ==========================================
+
+  closeDraftPopup(): void {
+
+    console.log(
+      'Closing Draft Popup'
+    );
+
+    this.showDraftPopup = false;
+
+    this.cdr.detectChanges();
+  }
+
+  // ==========================================
+  // EDIT DRAFT
+  // ==========================================
+
+  editDraft(draft: any): void {
+
+    if (!draft?.id) {
+
+      this.showToast(
+        'Draft ID not found',
+        'error'
+      );
+
+      return;
+    }
+
+    console.log(
+      'Editing Draft ID:',
+      draft.id
+    );
+
+    // Close popup
+    this.showDraftPopup = false;
+
+    // Navigate to registration page
+    this.router.navigate(
+      ['/patient-registration'],
+      {
+        queryParams: {
+          id: draft.id
+        }
+      }
+    );
+  }
+
+  // ==========================================
+  // APPROVE DRAFT
+  // ==========================================
+
+  approveDraft(id: number): void {
+
+    // ========================================
+    // VALIDATE ID
+    // ========================================
+
+    if (!id) {
+
+      this.showToast(
+        'Draft ID not found',
+        'error'
+      );
+
+      return;
+    }
+
+    // ========================================
+    // CONFIRMATION
+    // ========================================
+
+    const confirmed = window.confirm(
+      'Are you sure you want to approve this draft?'
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    console.log(
+      'Approving Draft ID:',
+      id
+    );
+
+    // ========================================
+    // SHOW LOADING
+    // ========================================
+
+    this.loading = true;
+
+    this.cdr.detectChanges();
+
+    // ========================================
+    // APPROVE DRAFT API
+    // ========================================
+
+    this.patientService
+      .approvePatient(id)
+      .subscribe({
+
+        // ====================================
+        // SUCCESS
+        // ====================================
+
+        next: (response: any) => {
+
+          console.log(
+            'Draft approved successfully:',
+            response
+          );
+
+          // ==================================
+          // REMOVE FROM LOCAL DRAFT LIST
+          // ==================================
+
+          this.draftPatients =
+            this.draftPatients.filter(
+              (patient: any) =>
+                Number(patient?.id) !==
+                Number(id)
+            );
+
+          // ==================================
+          // CLOSE POPUP
+          // ==================================
+
+          this.closeDraftPopup();
+
+          // ==================================
+          // STOP LOADING
+          // ==================================
+
+          this.loading = false;
+
+          // ==================================
+          // SUCCESS MESSAGE
+          // ==================================
+
+          this.showToast(
+            'Patient draft approved successfully',
+            'success'
+          );
+
+          // ==================================
+          // RELOAD PATIENTS + DRAFTS
+          // ==================================
+
+          this.loadPatients();
+        },
+
+        // ====================================
+        // ERROR
+        // ====================================
+
+        error: (error: any) => {
+
+          console.error(
+            'Failed to approve draft:',
+            error
+          );
+
+          this.loading = false;
+
+          const errorMessage =
+            error?.error?.message ||
+            'Failed to approve draft';
+
+          this.showToast(
+            errorMessage,
+            'error'
+          );
 
           this.cdr.detectChanges();
         }
+
+      });
+  }
+
+  // ==========================================
+  // REMOVE DRAFT
+  // ==========================================
+
+  removeDraft(id: number): void {
+
+    // ========================================
+    // VALIDATE ID
+    // ========================================
+
+    if (!id) {
+
+      this.showToast(
+        'Draft ID not found',
+        'error'
+      );
+
+      return;
+    }
+
+    // ========================================
+    // CONFIRMATION
+    // ========================================
+
+    const confirmed = window.confirm(
+      'Are you sure you want to remove this draft?'
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    console.log(
+      'Removing Draft ID:',
+      id
+    );
+
+    this.loading = true;
+
+    this.cdr.detectChanges();
+
+    // ========================================
+    // DELETE DRAFT API
+    // ========================================
+
+    this.patientService
+      .deleteDraft(id)
+      .subscribe({
+
+        // ====================================
+        // SUCCESS
+        // ====================================
+
+        next: (response: any) => {
+
+          console.log(
+            'Draft removed successfully:',
+            response
+          );
+
+          // ==================================
+          // REMOVE LOCAL DRAFT
+          // ==================================
+
+          this.draftPatients =
+            this.draftPatients.filter(
+              (patient: any) =>
+                Number(patient?.id) !==
+                Number(id)
+            );
+
+          // ==================================
+          // SUCCESS MESSAGE
+          // ==================================
+
+          this.showToast(
+            'Draft removed successfully',
+            'success'
+          );
+
+          // ==================================
+          // RELOAD DATA
+          // ==================================
+
+          this.loadPatients();
+        },
+
+        // ====================================
+        // ERROR
+        // ====================================
+
+        error: (error: any) => {
+
+          console.error(
+            'Failed to remove draft:',
+            error
+          );
+
+          this.loading = false;
+
+          this.showToast(
+            'Failed to remove draft',
+            'error'
+          );
+
+          this.cdr.detectChanges();
+        }
+
       });
   }
 
@@ -197,64 +634,80 @@ export class PatientList implements OnInit {
       this.patients.filter(
         (patient: any) => {
 
-          // ====================================
+          // ==================================
           // SEARCH
-          // ====================================
+          // ==================================
 
           const matchesSearch =
             !search ||
 
-            String(patient.id || '')
+            String(
+              patient?.id || ''
+            )
               .toLowerCase()
               .includes(search) ||
 
-            String(patient.name || '')
+            String(
+              patient?.name || ''
+            )
               .toLowerCase()
               .includes(search) ||
 
-            String(patient.mobile || '')
+            String(
+              patient?.mobile || ''
+            )
               .toLowerCase()
               .includes(search) ||
 
-            String(patient.email || '')
+            String(
+              patient?.email || ''
+            )
               .toLowerCase()
               .includes(search) ||
 
-            String(patient.city || '')
+            String(
+              patient?.city || ''
+            )
               .toLowerCase()
               .includes(search) ||
 
-            String(patient.state || '')
+            String(
+              patient?.state || ''
+            )
               .toLowerCase()
               .includes(search);
 
-          // ====================================
+          // ==================================
           // GENDER
-          // ====================================
+          // ==================================
 
           const matchesGender =
             !this.selectedGender ||
 
-            String(patient.gender || '')
+            String(
+              patient?.gender || ''
+            )
               .toLowerCase() ===
             this.selectedGender
               .toLowerCase();
 
-          // ====================================
+          // ==================================
           // BLOOD GROUP
-          // ====================================
+          // ==================================
 
           const matchesBloodGroup =
             !this.selectedBloodGroup ||
 
-            String(patient.bloodGroup || '')
+            String(
+              patient?.bloodGroup || ''
+            )
               .toLowerCase() ===
             this.selectedBloodGroup
               .toLowerCase();
 
-          // ====================================
+          // ==================================
           // FINAL RESULT
-          // ====================================
+          // ==================================
 
           return (
             matchesSearch &&
@@ -281,7 +734,9 @@ export class PatientList implements OnInit {
   clearFilters(): void {
 
     this.searchText = '';
+
     this.selectedGender = '';
+
     this.selectedBloodGroup = '';
 
     this.filteredPatients = [
@@ -386,7 +841,7 @@ export class PatientList implements OnInit {
       return;
     }
 
-    const confirmed = confirm(
+    const confirmed = window.confirm(
       'Are you sure you want to delete this patient?'
     );
 
@@ -399,11 +854,17 @@ export class PatientList implements OnInit {
       id
     );
 
+    this.loading = true;
+
     this.patientService
       .deletePatient(id)
       .subscribe({
 
-        next: (response) => {
+        // ====================================
+        // SUCCESS
+        // ====================================
+
+        next: (response: any) => {
 
           console.log(
             'Patient deleted successfully:',
@@ -418,18 +879,27 @@ export class PatientList implements OnInit {
           this.loadPatients();
         },
 
-        error: (error) => {
+        // ====================================
+        // ERROR
+        // ====================================
+
+        error: (error: any) => {
 
           console.error(
             'Failed to delete patient:',
             error
           );
 
+          this.loading = false;
+
           this.showToast(
             'Failed to delete patient',
             'error'
           );
+
+          this.cdr.detectChanges();
         }
+
       });
   }
 
@@ -449,7 +919,7 @@ export class PatientList implements OnInit {
       return;
     }
 
-    const confirmed = confirm(
+    const confirmed = window.confirm(
       `Are you sure you want to delete all ${this.patients.length} patients?\n\nThis action cannot be undone.`
     );
 
@@ -478,7 +948,7 @@ export class PatientList implements OnInit {
         // SUCCESS
         // ====================================
 
-        next: (responses) => {
+        next: (responses: any[]) => {
 
           console.log(
             'All patients deleted successfully:',
@@ -486,13 +956,19 @@ export class PatientList implements OnInit {
           );
 
           this.patients = [];
+
           this.filteredPatients = [];
+
           this.paginatedPatients = [];
 
           this.currentPage = 1;
+
           this.totalPages = 1;
+
           this.pages = [];
+
           this.startItem = 0;
+
           this.endItem = 0;
 
           this.loading = false;
@@ -503,13 +979,16 @@ export class PatientList implements OnInit {
             'All patients deleted successfully',
             'success'
           );
+
+          // Refresh drafts also
+          this.loadDraftPatients();
         },
 
         // ====================================
         // ERROR
         // ====================================
 
-        error: (error) => {
+        error: (error: any) => {
 
           console.error(
             'Failed to delete all patients:',
@@ -525,6 +1004,7 @@ export class PatientList implements OnInit {
 
           this.loadPatients();
         }
+
       });
   }
 
@@ -539,82 +1019,83 @@ export class PatientList implements OnInit {
         (patient: any) => ({
 
           ID:
-            patient.id || '',
+            patient?.id || '',
 
           Name:
-            patient.name || '',
+            patient?.name || '',
 
           Mobile:
-            patient.mobile || '',
+            patient?.mobile || '',
 
           Email:
-            patient.email || '',
+            patient?.email || '',
 
           'Date of Birth':
-            patient.dob || '',
+            patient?.dob || '',
 
           Gender:
-            patient.gender || '',
+            patient?.gender || '',
 
           'Blood Group':
-            patient.bloodGroup || '',
+            patient?.bloodGroup || '',
 
           'Marital Status':
-            patient.maritalStatus || '',
+            patient?.maritalStatus || '',
 
           Occupation:
-            patient.occupation || '',
+            patient?.occupation || '',
 
           'Aadhaar Number':
-            patient.aadhaar || '',
+            patient?.aadhaar || '',
 
           'PAN Number':
-            patient.pan || '',
+            patient?.pan || '',
 
           'Emergency Contact':
-            patient.emergencyContact || '',
+            patient?.emergencyContact || '',
 
           'Emergency Contact Name':
-            patient.emergencyName || '',
+            patient?.emergencyName || '',
 
           'Address 1':
-            patient.address1 || '',
+            patient?.address1 || '',
 
           'Address 2':
-            patient.address2 || '',
+            patient?.address2 || '',
 
           District:
-            patient.district || '',
+            patient?.district || '',
 
           City:
-            patient.city || '',
+            patient?.city || '',
 
           State:
-            patient.state || '',
+            patient?.state || '',
 
           Country:
-            patient.country || 'India',
+            patient?.country || 'India',
 
           Pincode:
-            patient.pincode || '',
+            patient?.pincode || '',
 
           'Medical History':
-            patient.medicalHistory || '',
+            patient?.medicalHistory || '',
 
           'Current Medication':
-            patient.currentMedication || '',
+            patient?.currentMedication || '',
 
           Allergies:
-            patient.allergies || '',
+            patient?.allergies || '',
 
           'Insurance Provider':
-            patient.insuranceProvider || '',
+            patient?.insuranceProvider || '',
 
           'Policy Number':
-            patient.policyNumber || '',
+            patient?.policyNumber || '',
 
           'Policy Holder Name':
-            patient.policyHolderName || ''
+            patient?.policyHolderName || ''
+
         })
       );
 
@@ -746,14 +1227,13 @@ export class PatientList implements OnInit {
 
           const patients =
             excelData
+
               .map(
                 (row: any) => {
 
                   const patient = {
 
-                    // ==========================
                     // PERSONAL DETAILS
-                    // ==========================
 
                     name:
                       this.getExcelValue(
@@ -856,9 +1336,7 @@ export class PatientList implements OnInit {
                         ]
                       ),
 
-                    // ==========================
                     // EMERGENCY CONTACT
-                    // ==========================
 
                     emergencyContact:
                       this.getExcelValue(
@@ -881,9 +1359,7 @@ export class PatientList implements OnInit {
                         ]
                       ),
 
-                    // ==========================
                     // ADDRESS DETAILS
-                    // ==========================
 
                     address1:
                       this.getExcelValue(
@@ -951,9 +1427,7 @@ export class PatientList implements OnInit {
                         ]
                       ),
 
-                    // ==========================
                     // MEDICAL DETAILS
-                    // ==========================
 
                     medicalHistory:
                       this.getExcelValue(
@@ -983,9 +1457,7 @@ export class PatientList implements OnInit {
                         ]
                       ),
 
-                    // ==========================
                     // INSURANCE DETAILS
-                    // ==========================
 
                     insuranceProvider:
                       this.getExcelValue(
@@ -1025,28 +1497,20 @@ export class PatientList implements OnInit {
                 }
               )
 
-              // ==================================
               // REMOVE BLANK ROWS
-              // ==================================
 
               .filter(
-                (patient: any) => {
-
-                  return (
-                    patient.name ||
-                    patient.mobile ||
-                    patient.email
-                  );
-                }
+                (patient: any) =>
+                  patient?.name ||
+                  patient?.mobile ||
+                  patient?.email
               );
 
           // ==================================
           // VALIDATION
           // ==================================
 
-          if (
-            patients.length === 0
-          ) {
+          if (patients.length === 0) {
 
             this.showToast(
               'No valid patient data found in Excel.',
@@ -1081,7 +1545,7 @@ export class PatientList implements OnInit {
               // SUCCESS
               // ==============================
 
-              next: (responses) => {
+              next: (responses: any[]) => {
 
                 console.log(
                   'Imported successfully:',
@@ -1095,7 +1559,6 @@ export class PatientList implements OnInit {
                   'success'
                 );
 
-                // Refresh list
                 this.loadPatients();
               },
 
@@ -1103,7 +1566,7 @@ export class PatientList implements OnInit {
               // ERROR
               // ==============================
 
-              error: (error) => {
+              error: (error: any) => {
 
                 console.error(
                   'Excel import API failed:',
@@ -1117,11 +1580,10 @@ export class PatientList implements OnInit {
                   'error'
                 );
               }
+
             });
 
-        }
-
-        catch (error) {
+        } catch (error) {
 
           console.error(
             'Excel processing error:',
@@ -1139,10 +1601,7 @@ export class PatientList implements OnInit {
 
     reader.readAsArrayBuffer(file);
 
-    // ========================================
-    // ALLOW SAME FILE AGAIN
-    // ========================================
-
+    // Allow same file again
     event.target.value = '';
   }
 
@@ -1159,13 +1618,12 @@ export class PatientList implements OnInit {
       Object.keys(row);
 
     for (
-      const header
-      of possibleHeaders
+      const header of possibleHeaders
     ) {
 
       const matchingKey =
         rowKeys.find(
-          key =>
+          (key: string) =>
             key
               .trim()
               .toLowerCase() ===
@@ -1200,13 +1658,12 @@ export class PatientList implements OnInit {
     let value: any = '';
 
     for (
-      const header
-      of possibleHeaders
+      const header of possibleHeaders
     ) {
 
       const matchingKey =
         rowKeys.find(
-          key =>
+          (key: string) =>
             key
               .trim()
               .toLowerCase() ===
@@ -1224,11 +1681,16 @@ export class PatientList implements OnInit {
       }
     }
 
+    // ========================================
+    // EMPTY VALUE
+    // ========================================
+
     if (
       value === null ||
       value === undefined ||
       value === ''
     ) {
+
       return '';
     }
 
@@ -1274,14 +1736,14 @@ export class PatientList implements OnInit {
       )
     ) {
 
-      return (
-        date
-          .toISOString()
-          .split('T')[0]
-      );
+      return date
+        .toISOString()
+        .split('T')[0];
     }
 
-    return String(value).trim();
+    return String(
+      value
+    ).trim();
   }
 
   // ==========================================
@@ -1299,6 +1761,7 @@ export class PatientList implements OnInit {
     if (
       this.totalPages === 0
     ) {
+
       this.totalPages = 1;
     }
 
@@ -1316,8 +1779,7 @@ export class PatientList implements OnInit {
       this.pageSize;
 
     const end =
-      start +
-      this.pageSize;
+      start + this.pageSize;
 
     // ========================================
     // CURRENT PAGE DATA
@@ -1336,7 +1798,8 @@ export class PatientList implements OnInit {
     this.pages =
       Array.from(
         {
-          length: this.totalPages
+          length:
+            this.totalPages
         },
         (_, index) =>
           index + 1
@@ -1351,6 +1814,7 @@ export class PatientList implements OnInit {
     ) {
 
       this.startItem = 0;
+
       this.endItem = 0;
 
     } else {
@@ -1428,4 +1892,5 @@ export class PatientList implements OnInit {
 
     this.updatePagination();
   }
+
 }

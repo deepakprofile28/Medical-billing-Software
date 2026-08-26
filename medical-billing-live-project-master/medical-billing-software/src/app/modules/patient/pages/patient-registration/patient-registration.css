@@ -902,3 +902,335 @@
   }
 
 }
+
+/* Registration visual refresh */
+:root {
+  --registration-ink: #18313b;
+  --registration-muted: #6c7f82;
+  --registration-teal: #147d78;
+  --registration-teal-dark: #0d625e;
+  --registration-mint: #e8f4f1;
+  --registration-line: #d9e7e4;
+  --registration-surface: #ffffff;
+}
+
+.patient-page {
+  position: relative;
+  isolation: isolate;
+  min-height: 100vh;
+  height: auto;
+  overflow-y: auto;
+  background:
+    radial-gradient(circle at 8% 6%, rgba(20, 125, 120, 0.12), transparent 26%),
+    linear-gradient(135deg, #f5faf9 0%, #eef3f7 100%);
+  color: var(--registration-ink);
+}
+
+.patient-container {
+  max-width: 1180px;
+}
+
+.page-header {
+  padding: 4px 2px 8px;
+}
+
+.page-header h2 {
+  color: var(--registration-ink);
+  font-size: 28px;
+  letter-spacing: -0.6px;
+}
+
+.page-header p {
+  color: var(--registration-muted);
+}
+
+.draft-btn {
+  border-color: #b6ddd7;
+  border-radius: 11px;
+  background: var(--registration-mint);
+  color: var(--registration-teal-dark);
+  box-shadow: 0 5px 14px rgba(20, 125, 120, 0.08);
+}
+
+.draft-btn:hover {
+  border-color: #8fcac2;
+  background: #d8eeea;
+  box-shadow: 0 8px 18px rgba(20, 125, 120, 0.14);
+}
+
+.stepper-section {
+  padding: 8px 22px;
+  border: 1px solid rgba(217, 231, 228, 0.9);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.86);
+  box-shadow: 0 8px 24px rgba(24, 49, 59, 0.07);
+  backdrop-filter: blur(10px);
+}
+
+.step-circle {
+  background: #e5eeee;
+  color: #648084;
+}
+
+.step-circle i {
+  font-size: 15px;
+  line-height: 1;
+}
+
+.step.active .step-circle {
+  background: var(--registration-teal);
+  box-shadow: 0 0 0 5px rgba(20, 125, 120, 0.12);
+}
+
+.step span {
+  color: #607578;
+}
+
+.step.active span {
+  color: var(--registration-teal-dark);
+}
+
+.step-line {
+  background: var(--registration-line);
+}
+
+.content-section {
+  grid-template-columns: 300px 1fr;
+  gap: 20px;
+}
+
+.preview-card,
+.form-card {
+  border: 1px solid rgba(217, 231, 228, 0.95);
+  border-radius: 17px;
+  box-shadow: 0 10px 28px rgba(24, 49, 59, 0.08);
+}
+
+.preview-card {
+  padding: 18px 20px;
+}
+
+.avatar {
+  background: linear-gradient(145deg, #1c938b, #126c68);
+  box-shadow: 0 8px 18px rgba(20, 125, 120, 0.2);
+}
+
+.preview-card > h3,
+.card-header h2 {
+  color: var(--registration-ink);
+}
+
+.preview-card > p,
+.card-header p {
+  color: var(--registration-muted);
+}
+
+.preview-card h4 {
+  color: #35545a;
+}
+
+.preview-card h4::before {
+  background: var(--registration-teal);
+}
+
+.preview-card hr {
+  border-top-color: var(--registration-line);
+}
+
+.preview-item {
+  min-height: 34px;
+  border-bottom: 1px dashed #e4eeec;
+}
+
+.preview-item:last-child {
+  border-bottom: 0;
+}
+
+.preview-item span {
+  color: #668084;
+}
+
+.preview-item strong {
+  color: var(--registration-ink);
+}
+
+.status {
+  background: #e6f6ed;
+  color: #187044;
+}
+
+.patient-id {
+  background: var(--registration-mint);
+  color: var(--registration-teal-dark);
+}
+
+.next-preview {
+  background: var(--registration-teal);
+  border-color: var(--registration-teal);
+}
+
+.next-preview:hover {
+  background: var(--registration-teal-dark);
+}
+
+.form-card {
+  padding: 24px;
+}
+
+.card-header {
+  padding-bottom: 14px;
+  border-bottom: 1px solid #e5efed;
+}
+
+.form-grid {
+  gap: 18px 16px;
+}
+
+.form-group {
+  gap: 7px;
+}
+
+.form-group label {
+  color: #35545a;
+  font-size: 12px;
+  font-weight: 650;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  border-color: #cfe0dd;
+  border-radius: 10px;
+  background: #fbfdfd;
+  color: var(--registration-ink);
+}
+
+.form-group input:hover,
+.form-group select:hover,
+.form-group textarea:hover {
+  border-color: #9fc4bf;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  border-color: var(--registration-teal);
+  box-shadow: 0 0 0 3px rgba(20, 125, 120, 0.12);
+  background: #ffffff;
+}
+
+.btn-secondary,
+.btn-primary {
+  border-radius: 10px;
+  font-weight: 650;
+}
+
+.btn-secondary {
+  border-color: #cfe0dd;
+  color: #35545a;
+}
+
+.btn-secondary:hover:not(:disabled) {
+  border-color: #9fc4bf;
+  background: #f1f8f6;
+}
+
+.btn-primary {
+  background: var(--registration-teal);
+  border-color: var(--registration-teal);
+  box-shadow: 0 5px 14px rgba(20, 125, 120, 0.16);
+}
+
+.btn-primary:hover {
+  background: var(--registration-teal-dark);
+  border-color: var(--registration-teal-dark);
+  box-shadow: 0 8px 18px rgba(20, 125, 120, 0.22);
+}
+
+.review-section {
+  border-color: var(--registration-line);
+  border-radius: 12px;
+  background: #f6fbfa;
+}
+
+@media (max-width: 650px) {
+  .page-header {
+    gap: 14px;
+  }
+
+  .page-header h2 {
+    font-size: 24px;
+  }
+
+  .draft-btn {
+    width: 100%;
+  }
+
+  .stepper-section {
+    padding: 8px 14px;
+  }
+
+  .form-card {
+    padding: 18px;
+  }
+}
+
+.footer-actions .btn-secondary,
+.footer-actions .btn-primary {
+  appearance: none;
+  -webkit-appearance: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 1;
+  text-shadow: none;
+}
+
+.footer-actions .btn-secondary {
+  background: #ffffff !important;
+  border: 1px solid #9fc4bf !important;
+  color: #24545a !important;
+}
+
+.footer-actions .btn-secondary:hover:not(:disabled) {
+  background: #e7f3f0 !important;
+  border-color: #147d78 !important;
+  color: #0d625e !important;
+}
+
+.footer-actions .btn-secondary:disabled {
+  background: #edf2f2 !important;
+  border-color: #d5e0df !important;
+  color: #8b9b9d !important;
+  opacity: 1;
+}
+
+.footer-actions .btn-primary {
+  background: #147d78 !important;
+  border: 1px solid #147d78 !important;
+  color: #ffffff !important;
+}
+
+.footer-actions .btn-primary:hover {
+  background: #0d625e !important;
+  border-color: #0d625e !important;
+  color: #ffffff !important;
+}
+
+.draft-btn {
+  background: #dff2ee !important;
+  border: 1px solid #8fcac2 !important;
+  color: #0d625e !important;
+}
+
+.preview-control-btn.previous-preview {
+  background: #ffffff !important;
+  border: 1px solid #9fc4bf !important;
+  color: #24545a !important;
+}
+
+.preview-control-btn.next-preview {
+  background: #147d78 !important;
+  border: 1px solid #147d78 !important;
+  color: #ffffff !important;
+}
