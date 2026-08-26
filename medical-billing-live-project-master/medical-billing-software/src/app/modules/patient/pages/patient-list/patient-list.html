@@ -31,7 +31,8 @@
           type="button"
           class="delete-all-btn"
           (click)="deleteAllPatients()"
-          [disabled]="patients.length === 0"
+          [disabled]="patients.length === 0 || deletingAll"
+          [attr.aria-busy]="deletingAll"
           title="Delete all patients">
 
           <span class="trash-icon">
@@ -54,7 +55,7 @@
             </svg>
           </span>
 
-          <span>Delete All</span>
+          <span>{{ deletingAll ? 'Deleting...' : 'Delete All' }}</span>
 
         </button>
 
@@ -743,6 +744,43 @@
       <!-- BODY -->
       <div class="draft-modal-body">
 
+        <div
+          class="draft-bulk-toolbar"
+          *ngIf="draftPatients.length > 0">
+
+          <label class="draft-select-all">
+            <input
+              type="checkbox"
+              [checked]="areAllDraftsSelected()"
+              (change)="toggleAllDrafts()">
+            <span>Select all drafts</span>
+          </label>
+
+          <span class="draft-selected-count">
+            {{ selectedDraftIds.size }} selected
+          </span>
+
+          <div class="draft-bulk-actions">
+            <button
+              type="button"
+              class="draft-bulk-approve"
+              [disabled]="selectedDraftIds.size === 0"
+              (click)="bulkApproveDrafts()">
+              <i class="bi bi-check2-all" aria-hidden="true"></i>
+              Bulk Approve
+            </button>
+
+            <button
+              type="button"
+              class="draft-bulk-delete"
+              [disabled]="selectedDraftIds.size === 0"
+              (click)="bulkDeleteDrafts()">
+              <i class="bi bi-trash3" aria-hidden="true"></i>
+              Bulk Delete
+            </button>
+          </div>
+        </div>
+
 
         <!-- NO DRAFT -->
         <div
@@ -772,6 +810,13 @@
           <div
             class="draft-item"
             *ngFor="let draft of draftPatients">
+
+            <input
+              class="draft-checkbox"
+              type="checkbox"
+              [checked]="isDraftSelected(draft.id)"
+              (change)="toggleDraftSelection(draft.id)"
+              [attr.aria-label]="'Select ' + (draft.name || 'patient draft')">
 
 
             <!-- PATIENT INFO -->

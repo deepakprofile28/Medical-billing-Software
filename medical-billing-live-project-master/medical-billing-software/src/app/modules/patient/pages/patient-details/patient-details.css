@@ -626,3 +626,126 @@
   }
 
 }
+
+/* Two-column details layout */
+.patient-details-page {
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at 8% 4%, rgba(20, 125, 120, 0.1), transparent 25%),
+    linear-gradient(135deg, #f5faf9 0%, #eef3f7 100%);
+}
+
+.page-header,
+.patient-header-card,
+.details-card,
+.no-patient,
+.loading-container {
+  border-color: #d9e7e4;
+  box-shadow: 0 8px 24px rgba(24, 49, 59, 0.07);
+}
+
+.page-header h2,
+.patient-header-info h3,
+.section-title h3,
+.detail-item strong {
+  color: #18313b;
+}
+
+.page-header p,
+.patient-header-info p,
+.detail-item span {
+  color: #6c7f82;
+}
+
+.back-btn,
+.edit-btn {
+  border-radius: 10px;
+  transition: all 0.2s ease;
+}
+
+.back-btn:hover,
+.edit-btn:hover {
+  transform: translateY(-1px);
+}
+
+.patient-header-card {
+  background: linear-gradient(135deg, #ffffff 0%, #eef8f5 100%);
+}
+
+.patient-avatar {
+  background: linear-gradient(145deg, #1c938b, #126c68);
+  box-shadow: 0 8px 18px rgba(20, 125, 120, 0.2);
+}
+
+.patient-header-info strong {
+  color: #147d78;
+}
+
+.details-container {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: start;
+  gap: 16px;
+}
+
+.patient-header-card {
+  grid-column: 1 / -1;
+}
+
+.details-card:nth-child(4) {
+  grid-column: 1 / -1;
+}
+
+.section-title {
+  background: #f5faf9;
+  border-bottom-color: #dfecea;
+}
+
+.section-title h3::before {
+  background: #147d78;
+}
+
+.detail-item {
+  min-height: 64px;
+  border-bottom-color: #e5efed;
+}
+
+.details-card:nth-child(2) .detail-item strong,
+.details-card:nth-child(3) .detail-item strong,
+.details-card:nth-child(6) .detail-item strong {
+  display: inline-flex;
+  width: fit-content;
+  max-width: 100%;
+  padding: 5px 9px;
+  border-radius: 7px;
+  background: #f0f7f5;
+  color: #24545a;
+}
+
+.details-card:nth-child(5) .detail-item.full-width strong {
+  background: #f5faf9;
+  border-color: #d9e7e4;
+  color: #486367;
+}
+
+.edit-btn {
+  border-color: #b6ddd7;
+  background: #dff2ee;
+  color: #0d625e;
+}
+
+.edit-btn:hover {
+  border-color: #8fcac2;
+  background: #ccebe5;
+  box-shadow: 0 6px 14px rgba(20, 125, 120, 0.14);
+}
+
+@media (max-width: 900px) {
+  .details-container {
+    grid-template-columns: 1fr;
+  }
+
+  .details-card:nth-child(4) {
+    grid-column: auto;
+  }
+}

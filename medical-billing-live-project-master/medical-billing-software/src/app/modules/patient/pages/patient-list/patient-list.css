@@ -515,7 +515,16 @@
 }
 
 .table-container tbody tr {
+  cursor: pointer;
   transition: background 0.18s ease;
+}
+
+.table-container tbody td {
+  cursor: pointer;
+}
+
+.table-container tbody td * {
+  cursor: pointer;
 }
 
 .table-container tbody tr:hover {
@@ -1097,6 +1106,77 @@
   padding: 18px 22px 22px;
 }
 
+.draft-bulk-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+  padding: 10px 12px;
+  border: 1px solid #e6eaf1;
+  border-radius: 10px;
+  background: #f8fafc;
+}
+
+.draft-select-all {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #445267;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.draft-checkbox,
+.draft-select-all input {
+  width: 16px;
+  height: 16px;
+  accent-color: #3563d8;
+  cursor: pointer;
+}
+
+.draft-selected-count {
+  color: #7b8496;
+  font-size: 12px;
+}
+
+.draft-bulk-actions {
+  display: flex;
+  gap: 7px;
+  margin-left: auto;
+}
+
+.draft-bulk-approve,
+.draft-bulk-delete {
+  min-height: 32px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 10px;
+  border-radius: 7px;
+  font-size: 12px;
+  font-weight: 650;
+  cursor: pointer;
+}
+
+.draft-bulk-approve {
+  border: 1px solid #bfe3cc;
+  background: #e8f7ee;
+  color: #217346;
+}
+
+.draft-bulk-delete {
+  border: 1px solid #f3d5d5;
+  background: #fff5f5;
+  color: #d64545;
+}
+
+.draft-bulk-approve:disabled,
+.draft-bulk-delete:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
 .draft-list {
   display: grid;
   gap: 10px;
@@ -1110,6 +1190,11 @@
   background: #ffffff;
   border: 1px solid #e6eaf1;
   border-radius: 10px;
+}
+
+.draft-item:has(.draft-checkbox:checked) {
+  border-color: #9bb5ed;
+  background: #f7f9ff;
 }
 
 .draft-info {
@@ -1242,8 +1327,28 @@
     gap: 12px;
   }
 
+  .draft-bulk-toolbar {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .draft-bulk-actions {
+    width: 100%;
+    margin-left: 24px;
+  }
+
+  .draft-bulk-approve,
+  .draft-bulk-delete {
+    flex: 1;
+    justify-content: center;
+  }
+
+  .draft-checkbox {
+    margin-top: 2px;
+  }
+
   .draft-status {
-    margin-left: 50px;
+    margin-left: 52px;
   }
 
   .draft-actions {
