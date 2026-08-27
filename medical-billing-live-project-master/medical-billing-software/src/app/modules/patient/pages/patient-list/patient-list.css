@@ -547,6 +547,207 @@
   font-weight: 600;
 }
 
+.patient-name-link {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #202938;
+  font: inherit;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+}
+
+.patient-name-link:hover {
+  color: #3563d8;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.patient-preview-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1100;
+  display: flex;
+  justify-content: flex-end;
+  background: rgba(23, 32, 51, 0.42);
+}
+
+.patient-preview-panel {
+  width: min(560px, 52vw);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: #ffffff;
+  box-shadow: -14px 0 38px rgba(20, 35, 70, 0.18);
+  animation: patient-preview-slide-in 0.24s ease-out;
+}
+
+@keyframes patient-preview-slide-in {
+  from {
+    transform: translateX(24px);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.patient-preview-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 22px 24px;
+  border-bottom: 1px solid #e6eaf1;
+  background: linear-gradient(135deg, #f7f9ff, #ffffff);
+}
+
+.patient-preview-heading {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.patient-preview-avatar {
+  width: 46px;
+  height: 46px;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 13px;
+  background: linear-gradient(145deg, #547be0, #3563d8);
+  color: #ffffff;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.patient-preview-heading h3,
+.patient-preview-heading p {
+  margin: 0;
+}
+
+.patient-preview-heading h3 {
+  overflow: hidden;
+  color: #172033;
+  font-size: 18px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.patient-preview-heading p {
+  margin-top: 4px;
+  color: #7b8496;
+  font-size: 12px;
+}
+
+.patient-preview-close {
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #e1e6ef;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #697386;
+  cursor: pointer;
+}
+
+.patient-preview-close:hover {
+  background: #f5f7fb;
+  color: #172033;
+}
+
+.patient-preview-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px 24px;
+}
+
+.patient-preview-section {
+  margin-bottom: 18px;
+  padding: 16px;
+  border: 1px solid #e6eaf1;
+  border-radius: 12px;
+  background: #fbfcff;
+}
+
+.patient-preview-section h4 {
+  margin: 0 0 14px;
+  color: #273246;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.patient-preview-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px 18px;
+}
+
+.patient-preview-grid > div {
+  min-width: 0;
+}
+
+.patient-preview-grid .preview-wide {
+  grid-column: 1 / -1;
+}
+
+.patient-preview-grid span,
+.patient-preview-grid strong {
+  display: block;
+}
+
+.patient-preview-grid span {
+  margin-bottom: 4px;
+  color: #8a93a5;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+}
+
+.patient-preview-grid strong {
+  overflow-wrap: anywhere;
+  color: #303a4c;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.45;
+}
+
+.patient-preview-footer {
+  padding: 16px 24px;
+  border-top: 1px solid #e6eaf1;
+  background: #ffffff;
+}
+
+.patient-preview-edit {
+  width: 100%;
+  height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 1px solid #3563d8;
+  border-radius: 9px;
+  background: #3563d8;
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 650;
+  cursor: pointer;
+}
+
+.patient-preview-edit:hover {
+  background: #294fbd;
+  border-color: #294fbd;
+}
+
 
 /* =========================================================
    BLOOD GROUP BADGE
@@ -1032,6 +1233,7 @@
   position: fixed;
   inset: 0;
   z-index: 1000;
+  overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1043,6 +1245,7 @@
   width: min(760px, 100%);
   max-height: min(680px, calc(100vh - 48px));
   overflow: hidden;
+  overscroll-behavior: contain;
   background: #ffffff;
   border: 1px solid #e5e9f1;
   border-radius: 16px;
@@ -1313,6 +1516,21 @@
 }
 
 @media (max-width: 600px) {
+  .patient-preview-panel {
+    width: 100%;
+  }
+
+  .patient-preview-header,
+  .patient-preview-body,
+  .patient-preview-footer {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  .patient-preview-grid {
+    grid-template-columns: 1fr;
+  }
+
   .draft-overlay {
     padding: 14px;
   }

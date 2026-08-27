@@ -6,10 +6,19 @@ import {
 
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { PatientService } from '../../services/patient.service';
 import { Router } from '@angular/router';
 import * as XLSX from 'xlsx';
-import { catchError, forkJoin, of } from 'rxjs';
+
+import {
+  catchError,
+  forkJoin,
+  of
+} from 'rxjs';
+
+import {
+  PatientService,
+  Patient
+} from '../../../services/patient.service';
 
 @Component({
   selector: 'app-patient-list',
@@ -27,9 +36,9 @@ export class PatientList implements OnInit {
   // PATIENT DATA
   // ==========================================
 
-  patients: any[] = [];
-  filteredPatients: any[] = [];
-  paginatedPatients: any[] = [];
+  patients: Patient[] = [];
+  filteredPatients: Patient[] = [];
+  paginatedPatients: Patient[] = [];
 
   loading = false;
   deletingAll = false;
@@ -38,9 +47,15 @@ export class PatientList implements OnInit {
   // DRAFT DATA
   // ==========================================
 
-  draftPatients: any[] = [];
+  draftPatients: Patient[] = [];
+
   showDraftPopup = false;
+
   selectedDraftIds = new Set<number>();
+
+  selectedPatient: Patient | null = null;
+
+  showPatientPreview = false;
 
   // ==========================================
   // SEARCH
@@ -60,12 +75,15 @@ export class PatientList implements OnInit {
   // ==========================================
 
   currentPage = 1;
+
   pageSize = 10;
+
   totalPages = 1;
 
   pages: number[] = [];
 
   startItem = 0;
+
   endItem = 0;
 
   // ==========================================
@@ -119,7 +137,9 @@ export class PatientList implements OnInit {
   ): void {
 
     this.toastMessage = message;
+
     this.toastType = type;
+
     this.showToastMessage = true;
 
     this.cdr.detectChanges();
@@ -134,7 +154,7 @@ export class PatientList implements OnInit {
   }
 
   // ==========================================
-  // LOAD PATIENTS
+  // LOAD APPROVED PATIENTS
   // ==========================================
 
   loadPatients(): void {
@@ -145,26 +165,23 @@ export class PatientList implements OnInit {
       'Loading approved patients...'
     );
 
-    // ========================================
-    // GET ALL PATIENTS
-    // ========================================
-
     this.patientService
-      .getPatients()
+      .getAllPatients()
       .subscribe({
 
         // ====================================
         // SUCCESS
         // ====================================
 
-        next: (data: any[]) => {
+        next: (data: Patient[]) => {
 
           console.log(
             'All Patients API response:',
             data
           );
 
-          const allPatients = data || [];
+          const allPatients =
+            data || [];
 
           // ==================================
           // APPROVED PATIENTS ONLY
@@ -172,25 +189,19 @@ export class PatientList implements OnInit {
 
           this.patients =
             allPatients.filter(
-              (patient: any) =>
+              (patient: Patient) =>
                 String(
                   patient?.status || ''
                 )
                   .trim()
-                  .toUpperCase() === 'APPROVED'
+                  .toUpperCase() ===
+                'APPROVED'
             );
 
           console.log(
             'Approved Patients:',
             this.patients
           );
-
-          // ==================================
-          // LOAD DRAFT PATIENTS
-          // SEPARATE API CALL
-          // ==================================
-
-          this.loadDraftPatients();
 
           // ==================================
           // FILTERED DATA
@@ -211,6 +222,12 @@ export class PatientList implements OnInit {
           this.loading = false;
 
           this.cdr.detectChanges();
+
+          // ==================================
+          // LOAD DRAFT PATIENTS
+          // ==================================
+
+          this.loadDraftPatients();
         },
 
         // ====================================
@@ -225,14 +242,16 @@ export class PatientList implements OnInit {
           );
 
           this.patients = [];
+
           this.filteredPatients = [];
+
           this.paginatedPatients = [];
 
           this.currentPage = 1;
 
-          this.loading = false;
-
           this.updatePagination();
+
+          this.loading = false;
 
           this.cdr.detectChanges();
 
@@ -241,13 +260,11 @@ export class PatientList implements OnInit {
             'error'
           );
         }
-
       });
   }
 
   // ==========================================
   // LOAD DRAFT PATIENTS
-  // SEPARATE DRAFT API
   // ==========================================
 
   loadDraftPatients(): void {
@@ -264,7 +281,7 @@ export class PatientList implements OnInit {
         // SUCCESS
         // ====================================
 
-        next: (response: any[]) => {
+        next: (response: Patient[]) => {
 
           console.log(
             'Draft Patients API response:',
@@ -307,7 +324,6 @@ export class PatientList implements OnInit {
             'error'
           );
         }
-
       });
   }
 
@@ -321,10 +337,11 @@ export class PatientList implements OnInit {
       'Opening Draft Popup'
     );
 
-    // Refresh drafts before opening popup
     this.loadDraftPatients();
 
     this.showDraftPopup = true;
+
+    document.body.style.overflow = 'hidden';
 
     this.cdr.detectChanges();
   }
@@ -340,114 +357,257 @@ export class PatientList implements OnInit {
     );
 
     this.showDraftPopup = false;
+
+    document.body.style.overflow = '';
+
     this.selectedDraftIds.clear();
 
     this.cdr.detectChanges();
   }
 
+  // ==========================================
+  // CHECK DRAFT SELECTED
+  // ==========================================
+
   isDraftSelected(id: number): boolean {
-    return this.selectedDraftIds.has(Number(id));
+
+    return this.selectedDraftIds.has(
+      Number(id)
+    );
   }
+
+  // ==========================================
+  // TOGGLE DRAFT SELECTION
+  // ==========================================
 
   toggleDraftSelection(id: number): void {
+
     const draftId = Number(id);
 
-    if (this.selectedDraftIds.has(draftId)) {
-      this.selectedDraftIds.delete(draftId);
+    if (
+      this.selectedDraftIds.has(
+        draftId
+      )
+    ) {
+
+      this.selectedDraftIds.delete(
+        draftId
+      );
+
     } else {
-      this.selectedDraftIds.add(draftId);
+
+      this.selectedDraftIds.add(
+        draftId
+      );
     }
   }
+
+  // ==========================================
+  // CHECK ALL DRAFTS SELECTED
+  // ==========================================
 
   areAllDraftsSelected(): boolean {
-    return this.draftPatients.length > 0 &&
+
+    return (
+      this.draftPatients.length > 0 &&
       this.draftPatients.every(
-        (draft: any) => this.selectedDraftIds.has(Number(draft.id))
-      );
+        (draft: Patient) =>
+          this.selectedDraftIds.has(
+            Number(draft.id)
+          )
+      )
+    );
   }
+
+  // ==========================================
+  // TOGGLE ALL DRAFTS
+  // ==========================================
 
   toggleAllDrafts(): void {
-    if (this.areAllDraftsSelected()) {
+
+    if (
+      this.areAllDraftsSelected()
+    ) {
+
       this.selectedDraftIds.clear();
+
       return;
     }
 
-    this.draftPatients.forEach((draft: any) => {
-      this.selectedDraftIds.add(Number(draft.id));
-    });
+    this.draftPatients.forEach(
+      (draft: Patient) => {
+
+        if (draft.id !== undefined) {
+
+          this.selectedDraftIds.add(
+            Number(draft.id)
+          );
+        }
+      }
+    );
   }
+
+  // ==========================================
+  // BULK APPROVE DRAFTS
+  // ==========================================
 
   bulkApproveDrafts(): void {
-    const selectedIds = Array.from(this.selectedDraftIds);
 
-    if (selectedIds.length === 0) {
-      this.showToast('Select at least one draft', 'warning');
+    const selectedIds =
+      Array.from(
+        this.selectedDraftIds
+      );
+
+    if (
+      selectedIds.length === 0
+    ) {
+
+      this.showToast(
+        'Select at least one draft',
+        'warning'
+      );
+
       return;
     }
 
-    if (!window.confirm(`Approve ${selectedIds.length} selected draft(s)?`)) {
+    if (
+      !window.confirm(
+        `Approve ${selectedIds.length} selected draft(s)?`
+      )
+    ) {
+
       return;
     }
 
     this.loading = true;
-    forkJoin(
-      selectedIds.map((id: number) => this.patientService.approvePatient(id))
-    ).subscribe({
-      next: () => {
-        this.closeDraftPopup();
-        this.loading = false;
-        this.showToast('Selected drafts approved successfully', 'success');
-        this.loadPatients();
-      },
-      error: (error: any) => {
-        this.loading = false;
-        this.showToast(
-          error?.error?.message || 'Failed to approve selected drafts',
-          'error'
-        );
-        this.cdr.detectChanges();
-      }
-    });
+
+    const requests =
+      selectedIds.map(
+        (id: number) =>
+          this.patientService
+            .approvePatient(id)
+      );
+
+    forkJoin(requests)
+      .subscribe({
+
+        next: () => {
+
+          this.closeDraftPopup();
+
+          this.loading = false;
+
+          this.showToast(
+            'Selected drafts approved successfully',
+            'success'
+          );
+
+          this.loadPatients();
+        },
+
+        error: (error: any) => {
+
+          console.error(
+            'Failed to approve selected drafts:',
+            error
+          );
+
+          this.loading = false;
+
+          this.showToast(
+            error?.error?.message ||
+              'Failed to approve selected drafts',
+            'error'
+          );
+
+          this.cdr.detectChanges();
+        }
+      });
   }
 
-  bulkDeleteDrafts(): void {
-    const selectedIds = Array.from(this.selectedDraftIds);
+  // ==========================================
+  // BULK DELETE DRAFTS
+  // ==========================================
 
-    if (selectedIds.length === 0) {
-      this.showToast('Select at least one draft', 'warning');
+  bulkDeleteDrafts(): void {
+
+    const selectedIds =
+      Array.from(
+        this.selectedDraftIds
+      );
+
+    if (
+      selectedIds.length === 0
+    ) {
+
+      this.showToast(
+        'Select at least one draft',
+        'warning'
+      );
+
       return;
     }
 
-    if (!window.confirm(`Delete ${selectedIds.length} selected draft(s)?`)) {
+    if (
+      !window.confirm(
+        `Delete ${selectedIds.length} selected draft(s)?`
+      )
+    ) {
+
       return;
     }
 
     this.loading = true;
-    forkJoin(
-      selectedIds.map((id: number) => this.patientService.deleteDraft(id))
-    ).subscribe({
-      next: () => {
-        this.closeDraftPopup();
-        this.loading = false;
-        this.showToast('Selected drafts deleted successfully', 'success');
-        this.loadDraftPatients();
-      },
-      error: (error: any) => {
-        this.loading = false;
-        this.showToast(
-          error?.error?.message || 'Failed to delete selected drafts',
-          'error'
-        );
-        this.cdr.detectChanges();
-      }
-    });
+
+    const requests =
+      selectedIds.map(
+        (id: number) =>
+          this.patientService
+            .deleteDraft(id)
+      );
+
+    forkJoin(requests)
+      .subscribe({
+
+        next: () => {
+
+          this.closeDraftPopup();
+
+          this.loading = false;
+
+          this.showToast(
+            'Selected drafts deleted successfully',
+            'success'
+          );
+
+          this.loadDraftPatients();
+        },
+
+        error: (error: any) => {
+
+          console.error(
+            'Failed to delete selected drafts:',
+            error
+          );
+
+          this.loading = false;
+
+          this.showToast(
+            error?.error?.message ||
+              'Failed to delete selected drafts',
+            'error'
+          );
+
+          this.cdr.detectChanges();
+        }
+      });
   }
 
   // ==========================================
   // EDIT DRAFT
   // ==========================================
 
-  editDraft(draft: any): void {
+  editDraft(draft: Patient): void {
 
     if (!draft?.id) {
 
@@ -464,10 +624,8 @@ export class PatientList implements OnInit {
       draft.id
     );
 
-    // Close popup
-    this.showDraftPopup = false;
+    this.closeDraftPopup();
 
-    // Navigate to registration page
     this.router.navigate(
       ['/patient-registration'],
       {
@@ -484,10 +642,6 @@ export class PatientList implements OnInit {
 
   approveDraft(id: number): void {
 
-    // ========================================
-    // VALIDATE ID
-    // ========================================
-
     if (!id) {
 
       this.showToast(
@@ -498,13 +652,10 @@ export class PatientList implements OnInit {
       return;
     }
 
-    // ========================================
-    // CONFIRMATION
-    // ========================================
-
-    const confirmed = window.confirm(
-      'Are you sure you want to approve this draft?'
-    );
+    const confirmed =
+      window.confirm(
+        'Are you sure you want to approve this draft?'
+      );
 
     if (!confirmed) {
       return;
@@ -515,75 +666,41 @@ export class PatientList implements OnInit {
       id
     );
 
-    // ========================================
-    // SHOW LOADING
-    // ========================================
-
     this.loading = true;
 
     this.cdr.detectChanges();
-
-    // ========================================
-    // APPROVE DRAFT API
-    // ========================================
 
     this.patientService
       .approvePatient(id)
       .subscribe({
 
-        // ====================================
-        // SUCCESS
-        // ====================================
-
-        next: (response: any) => {
+        next: (response: Patient) => {
 
           console.log(
             'Draft approved successfully:',
             response
           );
 
-          // ==================================
           // REMOVE FROM LOCAL DRAFT LIST
-          // ==================================
-
           this.draftPatients =
             this.draftPatients.filter(
-              (patient: any) =>
+              (patient: Patient) =>
                 Number(patient?.id) !==
                 Number(id)
             );
 
-          // ==================================
-          // CLOSE POPUP
-          // ==================================
-
           this.closeDraftPopup();
 
-          // ==================================
-          // STOP LOADING
-          // ==================================
-
           this.loading = false;
-
-          // ==================================
-          // SUCCESS MESSAGE
-          // ==================================
 
           this.showToast(
             'Patient draft approved successfully',
             'success'
           );
 
-          // ==================================
-          // RELOAD PATIENTS + DRAFTS
-          // ==================================
-
+          // RELOAD PATIENTS
           this.loadPatients();
         },
-
-        // ====================================
-        // ERROR
-        // ====================================
 
         error: (error: any) => {
 
@@ -605,7 +722,6 @@ export class PatientList implements OnInit {
 
           this.cdr.detectChanges();
         }
-
       });
   }
 
@@ -614,10 +730,6 @@ export class PatientList implements OnInit {
   // ==========================================
 
   removeDraft(id: number): void {
-
-    // ========================================
-    // VALIDATE ID
-    // ========================================
 
     if (!id) {
 
@@ -629,13 +741,10 @@ export class PatientList implements OnInit {
       return;
     }
 
-    // ========================================
-    // CONFIRMATION
-    // ========================================
-
-    const confirmed = window.confirm(
-      'Are you sure you want to remove this draft?'
-    );
+    const confirmed =
+      window.confirm(
+        'Are you sure you want to remove this draft?'
+      );
 
     if (!confirmed) {
       return;
@@ -650,55 +759,34 @@ export class PatientList implements OnInit {
 
     this.cdr.detectChanges();
 
-    // ========================================
-    // DELETE DRAFT API
-    // ========================================
-
     this.patientService
       .deleteDraft(id)
       .subscribe({
 
-        // ====================================
-        // SUCCESS
-        // ====================================
-
-        next: (response: any) => {
+        next: (response: string) => {
 
           console.log(
             'Draft removed successfully:',
             response
           );
 
-          // ==================================
           // REMOVE LOCAL DRAFT
-          // ==================================
-
           this.draftPatients =
             this.draftPatients.filter(
-              (patient: any) =>
+              (patient: Patient) =>
                 Number(patient?.id) !==
                 Number(id)
             );
 
-          // ==================================
-          // SUCCESS MESSAGE
-          // ==================================
+          this.loading = false;
 
           this.showToast(
             'Draft removed successfully',
             'success'
           );
 
-          // ==================================
-          // RELOAD DATA
-          // ==================================
-
           this.loadPatients();
         },
-
-        // ====================================
-        // ERROR
-        // ====================================
 
         error: (error: any) => {
 
@@ -707,14 +795,15 @@ export class PatientList implements OnInit {
             error
           );
 
+          this.loading = false;
+
           this.showToast(
             'Failed to remove draft',
             'error'
           );
 
           this.cdr.detectChanges();
-        },
-
+        }
       });
   }
 
@@ -731,7 +820,7 @@ export class PatientList implements OnInit {
 
     this.filteredPatients =
       this.patients.filter(
-        (patient: any) => {
+        (patient: Patient) => {
 
           // ==================================
           // SEARCH
@@ -804,10 +893,6 @@ export class PatientList implements OnInit {
             this.selectedBloodGroup
               .toLowerCase();
 
-          // ==================================
-          // FINAL RESULT
-          // ==================================
-
           return (
             matchesSearch &&
             matchesGender &&
@@ -866,7 +951,7 @@ export class PatientList implements OnInit {
   // VIEW PATIENT
   // ==========================================
 
-  viewPatient(patient: any): void {
+  viewPatient(patient: Patient): void {
 
     if (!patient?.id) {
 
@@ -894,10 +979,49 @@ export class PatientList implements OnInit {
   }
 
   // ==========================================
+  // OPEN PATIENT PREVIEW
+  // ==========================================
+
+  openPatientPreview(
+    patient: Patient
+  ): void {
+
+    if (!patient?.id) {
+
+      this.showToast(
+        'Patient ID not found',
+        'error'
+      );
+
+      return;
+    }
+
+    this.selectedPatient =
+      patient;
+
+    this.showPatientPreview = true;
+
+    this.cdr.detectChanges();
+  }
+
+  // ==========================================
+  // CLOSE PATIENT PREVIEW
+  // ==========================================
+
+  closePatientPreview(): void {
+
+    this.showPatientPreview = false;
+
+    this.selectedPatient = null;
+
+    this.cdr.detectChanges();
+  }
+
+  // ==========================================
   // EDIT PATIENT
   // ==========================================
 
-  editPatient(patient: any): void {
+  editPatient(patient: Patient): void {
 
     if (!patient?.id) {
 
@@ -940,9 +1064,10 @@ export class PatientList implements OnInit {
       return;
     }
 
-    const confirmed = window.confirm(
-      'Are you sure you want to delete this patient?'
-    );
+    const confirmed =
+      window.confirm(
+        'Are you sure you want to delete this patient?'
+      );
 
     if (!confirmed) {
       return;
@@ -953,34 +1078,39 @@ export class PatientList implements OnInit {
       id
     );
 
+    this.loading = true;
+
     this.patientService
       .deletePatient(id)
       .subscribe({
 
-        // ====================================
-        // SUCCESS
-        // ====================================
-
-        next: (response: any) => {
+        next: (response: string) => {
 
           console.log(
             'Patient deleted successfully:',
             response
           );
 
-          this.patients = this.patients.filter(
-            (patient: any) => Number(patient?.id) !== Number(id)
-          );
+          // REMOVE FROM PATIENT LIST
+          this.patients =
+            this.patients.filter(
+              (patient: Patient) =>
+                Number(patient?.id) !==
+                Number(id)
+            );
 
-          this.filteredPatients = this.filteredPatients.filter(
-            (patient: any) => Number(patient?.id) !== Number(id)
-          );
+          // REMOVE FROM FILTERED LIST
+          this.filteredPatients =
+            this.filteredPatients.filter(
+              (patient: Patient) =>
+                Number(patient?.id) !==
+                Number(id)
+            );
 
-          this.paginatedPatients = this.paginatedPatients.filter(
-            (patient: any) => Number(patient?.id) !== Number(id)
-          );
-
+          // UPDATE PAGINATION
           this.updatePagination();
+
+          this.loading = false;
 
           this.showToast(
             'Patient deleted successfully',
@@ -990,16 +1120,14 @@ export class PatientList implements OnInit {
           this.cdr.detectChanges();
         },
 
-        // ====================================
-        // ERROR
-        // ====================================
-
         error: (error: any) => {
 
           console.error(
             'Failed to delete patient:',
             error
           );
+
+          this.loading = false;
 
           this.showToast(
             'Failed to delete patient',
@@ -1008,7 +1136,6 @@ export class PatientList implements OnInit {
 
           this.cdr.detectChanges();
         }
-
       });
   }
 
@@ -1018,7 +1145,9 @@ export class PatientList implements OnInit {
 
   deleteAllPatients(): void {
 
-    if (this.patients.length === 0) {
+    if (
+      this.patients.length === 0
+    ) {
 
       this.showToast(
         'No patients available to delete',
@@ -1028,9 +1157,10 @@ export class PatientList implements OnInit {
       return;
     }
 
-    const confirmed = window.confirm(
-      `Are you sure you want to delete all ${this.patients.length} patients?\n\nThis action cannot be undone.`
-    );
+    const confirmed =
+      window.confirm(
+        `Are you sure you want to delete all ${this.patients.length} patients?\n\nThis action cannot be undone.`
+      );
 
     if (!confirmed) {
       return;
@@ -1042,20 +1172,25 @@ export class PatientList implements OnInit {
     );
 
     this.loading = true;
+
     this.deletingAll = true;
 
     const deleteRequests =
       this.patients.map(
-        (patient: any) =>
+        (patient: Patient) =>
+
           this.patientService
-            .deletePatient(patient.id)
+            .deletePatient(
+              Number(patient.id)
+            )
             .pipe(
-              catchError((error: any) =>
-                of({
-                  failed: true,
-                  id: patient.id,
-                  error
-                })
+              catchError(
+                (error: any) =>
+                  of({
+                    failed: true,
+                    id: patient.id,
+                    error
+                  })
               )
             )
       );
@@ -1069,40 +1204,65 @@ export class PatientList implements OnInit {
 
         next: (responses: any[]) => {
 
-          const failedIds = responses
-            .filter((response: any) => response?.failed)
-            .map((response: any) => Number(response.id));
+          const failedIds =
+            responses
+              .filter(
+                (response: any) =>
+                  response?.failed
+              )
+              .map(
+                (response: any) =>
+                  Number(response.id)
+              );
 
-          const deletedIds = this.patients
-            .map((patient: any) => Number(patient.id))
-            .filter((id: number) => !failedIds.includes(id));
+          const deletedIds =
+            this.patients
+              .map(
+                (patient: Patient) =>
+                  Number(patient.id)
+              )
+              .filter(
+                (id: number) =>
+                  !failedIds.includes(id)
+              );
 
           console.log(
-            'All patients deleted successfully:',
+            'Delete all responses:',
             responses
           );
 
-          this.patients = this.patients.filter(
-            (patient: any) => !deletedIds.includes(Number(patient.id))
-          );
+          // REMOVE SUCCESSFULLY DELETED
+          this.patients =
+            this.patients.filter(
+              (patient: Patient) =>
+                !deletedIds.includes(
+                  Number(patient.id)
+                )
+            );
 
-          this.filteredPatients = this.filteredPatients.filter(
-            (patient: any) => !deletedIds.includes(Number(patient.id))
-          );
+          this.filteredPatients =
+            this.filteredPatients.filter(
+              (patient: Patient) =>
+                !deletedIds.includes(
+                  Number(patient.id)
+                )
+            );
 
           this.updatePagination();
-
-          this.cdr.detectChanges();
 
           this.showToast(
             failedIds.length === 0
               ? 'All patients deleted successfully'
               : `${deletedIds.length} patients deleted. ${failedIds.length} could not be deleted.`,
-            failedIds.length === 0 ? 'success' : 'warning'
+            failedIds.length === 0
+              ? 'success'
+              : 'warning'
           );
 
-          // Refresh drafts also
+          // REFRESH DRAFTS
           this.loadDraftPatients();
+
+          this.cdr.detectChanges();
         },
 
         // ====================================
@@ -1117,6 +1277,7 @@ export class PatientList implements OnInit {
           );
 
           this.loading = false;
+
           this.deletingAll = false;
 
           this.showToast(
@@ -1127,12 +1288,18 @@ export class PatientList implements OnInit {
           this.loadPatients();
         },
 
+        // ====================================
+        // COMPLETE
+        // ====================================
+
         complete: () => {
+
           this.loading = false;
+
           this.deletingAll = false;
+
           this.cdr.detectChanges();
         }
-
       });
   }
 
@@ -1144,7 +1311,7 @@ export class PatientList implements OnInit {
 
     const data =
       this.filteredPatients.map(
-        (patient: any) => ({
+        (patient: Patient) => ({
 
           ID:
             patient?.id || '',
@@ -1223,7 +1390,6 @@ export class PatientList implements OnInit {
 
           'Policy Holder Name':
             patient?.policyHolderName || ''
-
         })
       );
 
@@ -1332,7 +1498,9 @@ export class PatientList implements OnInit {
           // EMPTY EXCEL CHECK
           // ==================================
 
-          if (!excelData.length) {
+          if (
+            !excelData.length
+          ) {
 
             this.showToast(
               'Excel file is empty',
@@ -1342,24 +1510,16 @@ export class PatientList implements OnInit {
             return;
           }
 
-          console.log(
-            'Excel Headers:',
-            Object.keys(
-              excelData[0]
-            )
-          );
-
           // ==================================
           // CONVERT EXCEL DATA
           // ==================================
 
-          const patients =
+          const patients: Patient[] =
             excelData
-
               .map(
                 (row: any) => {
 
-                  const patient = {
+                  const patient: Patient = {
 
                     // PERSONAL DETAILS
 
@@ -1616,29 +1776,25 @@ export class PatientList implements OnInit {
                       )
                   };
 
-                  console.log(
-                    'Converted Patient:',
-                    patient
-                  );
-
                   return patient;
                 }
               )
 
               // REMOVE BLANK ROWS
-
               .filter(
-                (patient: any) =>
-                  patient?.name ||
-                  patient?.mobile ||
-                  patient?.email
+                (patient: Patient) =>
+                  patient.name ||
+                  patient.mobile ||
+                  patient.email
               );
 
           // ==================================
           // VALIDATION
           // ==================================
 
-          if (patients.length === 0) {
+          if (
+            patients.length === 0
+          ) {
 
             this.showToast(
               'No valid patient data found in Excel.',
@@ -1661,7 +1817,7 @@ export class PatientList implements OnInit {
 
           const requests =
             patients.map(
-              (patient: any) =>
+              (patient: Patient) =>
                 this.patientService
                   .savePatient(patient)
             );
@@ -1673,7 +1829,9 @@ export class PatientList implements OnInit {
               // SUCCESS
               // ==============================
 
-              next: (responses: any[]) => {
+              next: (
+                responses: Patient[]
+              ) => {
 
                 console.log(
                   'Imported successfully:',
@@ -1708,7 +1866,6 @@ export class PatientList implements OnInit {
                   'error'
                 );
               }
-
             });
 
         } catch (error) {
@@ -1926,8 +2083,7 @@ export class PatientList implements OnInit {
     this.pages =
       Array.from(
         {
-          length:
-            this.totalPages
+          length: this.totalPages
         },
         (_, index) =>
           index + 1
@@ -2020,5 +2176,4 @@ export class PatientList implements OnInit {
 
     this.updatePagination();
   }
-
 }

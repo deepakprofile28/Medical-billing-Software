@@ -12,7 +12,7 @@ export const routes: Routes = [
   // { path: '', redirectTo: 'PatientRegistration', pathMatch: 'full' },
 
 
-  // { path: 'login', component: Login },
+  { path: 'login', component: Login },
   //  { path: 'PatientRegistration', component: PatientRegistration },
   //     { path: 'Appcard', component: AppCard },
   {

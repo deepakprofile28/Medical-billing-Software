@@ -368,7 +368,13 @@
 
           <!-- NAME -->
           <td class="patient-name">
-            {{ patient.name || '--' }}
+            <button
+              type="button"
+              class="patient-name-link"
+              (click)="openPatientPreview(patient)"
+              [attr.aria-label]="'View details for ' + (patient.name || 'patient')">
+              {{ patient.name || '--' }}
+            </button>
           </td>
 
 
@@ -913,6 +919,83 @@
 
     </div>
 
+  </div>
+
+  <!-- ================= PATIENT PREVIEW ================= -->
+  <div
+    class="patient-preview-overlay"
+    *ngIf="showPatientPreview"
+    (click)="closePatientPreview()">
+
+    <aside
+      class="patient-preview-panel"
+      (click)="$event.stopPropagation()">
+
+      <div class="patient-preview-header">
+        <div class="patient-preview-heading">
+          <div class="patient-preview-avatar">
+            {{ selectedPatient?.name?.charAt(0)?.toUpperCase() || 'P' }}
+          </div>
+          <div>
+            <h3>{{ selectedPatient?.name || 'Patient Details' }}</h3>
+            <p>ID: {{ selectedPatient?.id || '--' }}</p>
+          </div>
+        </div>
+
+        <button
+          type="button"
+          class="patient-preview-close"
+          (click)="closePatientPreview()"
+          aria-label="Close patient details">
+          <i class="bi bi-x-lg" aria-hidden="true"></i>
+        </button>
+      </div>
+
+      <div class="patient-preview-body">
+        <section class="patient-preview-section">
+          <h4>Personal Information</h4>
+          <div class="patient-preview-grid">
+            <div><span>Mobile</span><strong>{{ selectedPatient?.mobile || '--' }}</strong></div>
+            <div><span>Email</span><strong>{{ selectedPatient?.email || '--' }}</strong></div>
+            <div><span>Gender</span><strong>{{ selectedPatient?.gender || '--' }}</strong></div>
+            <div><span>Blood Group</span><strong>{{ selectedPatient?.bloodGroup || '--' }}</strong></div>
+            <div><span>Date of Birth</span><strong>{{ selectedPatient?.dob || '--' }}</strong></div>
+            <div><span>Status</span><strong>{{ selectedPatient?.status || '--' }}</strong></div>
+          </div>
+        </section>
+
+        <section class="patient-preview-section">
+          <h4>Address</h4>
+          <div class="patient-preview-grid">
+            <div class="preview-wide"><span>Address</span><strong>{{ selectedPatient?.address1 || '--' }}</strong></div>
+            <div><span>City</span><strong>{{ selectedPatient?.city || '--' }}</strong></div>
+            <div><span>State</span><strong>{{ selectedPatient?.state || '--' }}</strong></div>
+            <div><span>Country</span><strong>{{ selectedPatient?.country || '--' }}</strong></div>
+            <div><span>Pincode</span><strong>{{ selectedPatient?.pincode || '--' }}</strong></div>
+          </div>
+        </section>
+
+        <section class="patient-preview-section">
+          <h4>Medical & Insurance</h4>
+          <div class="patient-preview-grid">
+            <div class="preview-wide"><span>Medical History</span><strong>{{ selectedPatient?.medicalHistory || '--' }}</strong></div>
+            <div class="preview-wide"><span>Current Medication</span><strong>{{ selectedPatient?.currentMedication || '--' }}</strong></div>
+            <div><span>Provider</span><strong>{{ selectedPatient?.insuranceProvider || '--' }}</strong></div>
+            <div><span>Policy Number</span><strong>{{ selectedPatient?.policyNumber || '--' }}</strong></div>
+          </div>
+        </section>
+      </div>
+
+      <div class="patient-preview-footer">
+        <button
+          type="button"
+          class="patient-preview-edit"
+          (click)="editPatient(selectedPatient)">
+          <i class="bi bi-pencil" aria-hidden="true"></i>
+          Edit Patient
+        </button>
+      </div>
+    </aside>
   </div>
 
 </div>

@@ -7,7 +7,7 @@ import {
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 
-import { PatientService } from '../../services/patient.service';
+import { PatientService } from '../../../services/patient.service';
 
 @Component({
   selector: 'app-patient-details',

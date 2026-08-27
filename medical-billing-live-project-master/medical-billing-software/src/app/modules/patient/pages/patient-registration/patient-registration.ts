@@ -16,7 +16,7 @@ import {
 
 import { PatientForm } from '../../components/patient-form/patient-form';
 
-import { PatientService } from '../../services/patient.service';
+import { PatientService } from '../../../services/patient.service';
 
 import {
   ActivatedRoute,
