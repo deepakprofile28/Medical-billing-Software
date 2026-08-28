@@ -659,6 +659,64 @@
 
               </div>
 
+              <div class="custom-registration-section" *ngIf="customColumns.length > 0">
+                <div class="card-header">
+                  <h2>Custom Information</h2>
+                  <p>Enter additional patient details</p>
+                </div>
+
+                <div class="form-grid">
+                  <div class="form-group" *ngFor="let column of customColumns">
+                    <label [for]="column.key">{{ column.label }}</label>
+
+                    <input
+                      *ngIf="column.inputType === 'text'"
+                      [id]="column.key"
+                      type="text"
+                      [formControlName]="column.key"
+                      [placeholder]="'Enter ' + column.label" />
+
+                    <select
+                      *ngIf="column.inputType === 'dropdown'"
+                      [id]="column.key"
+                      [formControlName]="column.key">
+                      <option value="">Select {{ column.label }}</option>
+                      <option *ngFor="let option of column.options" [value]="option">
+                        {{ option }}
+                      </option>
+                    </select>
+
+                    <div
+                      *ngIf="column.inputType === 'multi-select'"
+                      class="custom-multi-select">
+                      <button
+                        type="button"
+                        class="custom-multi-select-trigger"
+                        [class.open]="customSelectOpen[column.key]"
+                        (click)="toggleCustomSelect(column.key)"
+                        [attr.aria-expanded]="customSelectOpen[column.key]">
+                        <span>{{ getCustomSelectedText(column.key) }}</span>
+                        <i class="bi bi-chevron-down" aria-hidden="true"></i>
+                      </button>
+
+                      <div
+                        class="custom-multi-select-menu"
+                        *ngIf="customSelectOpen[column.key]">
+                        <label
+                          class="custom-multi-select-option"
+                          *ngFor="let option of column.options">
+                          <input
+                            type="checkbox"
+                            [checked]="isCustomOptionSelected(column.key, option)"
+                            (change)="toggleCustomOption(column.key, option)" />
+                          <span>{{ option }}</span>
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
             </div>
 
           </form>

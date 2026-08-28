@@ -40,6 +40,367 @@ export class PatientList implements OnInit {
   filteredPatients: Patient[] = [];
   paginatedPatients: Patient[] = [];
 
+  get todayPatientsCount(): number {
+    return this.patients.filter((patient) => this.isPatientCreatedToday(patient)).length;
+  }
+
+  todayOnly = false;
+
+  readonly columnOptions = [
+    { key: 'id', label: 'ID', default: true },
+    { key: 'name', label: 'Name', default: true },
+    { key: 'mobile', label: 'Mobile', default: true },
+    { key: 'email', label: 'Email', default: true },
+    { key: 'gender', label: 'Gender', default: true },
+    { key: 'bloodGroup', label: 'Blood Group', default: true },
+    { key: 'city', label: 'City', default: true },
+    { key: 'state', label: 'State', default: true },
+    { key: 'status', label: 'Status', default: true },
+    { key: 'createdDate', label: 'Created Date', default: true },
+    { key: 'dob', label: 'Date of Birth', default: false },
+    { key: 'maritalStatus', label: 'Marital Status', default: false },
+    { key: 'occupation', label: 'Occupation', default: false },
+    { key: 'aadhaar', label: 'Aadhaar', default: false },
+    { key: 'pan', label: 'PAN', default: false },
+    { key: 'emergencyContact', label: 'Emergency Contact', default: false },
+    { key: 'emergencyName', label: 'Emergency Name', default: false },
+    { key: 'address1', label: 'Address', default: false },
+    { key: 'address2', label: 'Address 2', default: false },
+    { key: 'district', label: 'District', default: false },
+    { key: 'country', label: 'Country', default: false },
+    { key: 'pincode', label: 'Pincode', default: false },
+    { key: 'medicalHistory', label: 'Medical History', default: false },
+    { key: 'currentMedication', label: 'Current Medication', default: false },
+    { key: 'allergies', label: 'Allergies', default: false },
+    { key: 'insuranceProvider', label: 'Insurance Provider', default: false },
+    { key: 'policyNumber', label: 'Policy Number', default: false },
+    { key: 'policyHolderName', label: 'Policy Holder', default: false }
+  ];
+
+  private readonly columnStorageKey = 'patient-list-visible-columns';
+  private readonly customColumnStorageKey = 'patient-list-custom-columns';
+
+  visibleColumns: Record<string, boolean> = {};
+  userColumnOptions: Array<{
+    key: string;
+    label: string;
+    inputType: 'text' | 'dropdown' | 'multi-select';
+    options: string[];
+    default: false;
+  }> = [];
+
+  showCustomColumnForm = false;
+  editingCustomColumnKey: string | null = null;
+  customColumnLabel = '';
+  customColumnInputType: 'text' | 'dropdown' | 'multi-select' = 'text';
+  customColumnOptionValues: string[] = [''];
+  draggedCustomColumnKey: string | null = null;
+
+  constructor(
+    private patientService: PatientService,
+    private cdr: ChangeDetectorRef,
+    private router: Router
+  ) {
+    this.loadCustomColumns();
+    this.loadColumnSelection();
+  }
+
+  isColumnVisible(column: string): boolean {
+    return this.visibleColumns[column] === true;
+  }
+
+  toggleColumn(column: string): void {
+    this.visibleColumns[column] = !this.visibleColumns[column];
+    this.saveColumnSelection();
+  }
+
+  openCustomColumnForm(): void {
+    this.editingCustomColumnKey = null;
+    this.customColumnOptionValues = [''];
+    this.showCustomColumnForm = true;
+  }
+
+  editCustomColumn(column: {
+    key: string;
+    label: string;
+    inputType?: string;
+    options?: string[];
+  }): void {
+    this.editingCustomColumnKey = column.key;
+    this.customColumnLabel = column.label;
+    this.customColumnInputType = column.inputType === 'dropdown' ||
+      column.inputType === 'multi-select'
+      ? column.inputType
+      : 'text';
+    this.customColumnOptionValues = column.options?.length
+      ? [...column.options]
+      : [''];
+    this.showCustomColumnForm = true;
+  }
+
+  addCustomColumnOption(): void {
+    this.customColumnOptionValues.push('');
+  }
+
+  handleCustomColumnOptionKeydown(
+    event: KeyboardEvent,
+    optionIndex: number
+  ): void {
+    if (event.key !== 'Enter') {
+      return;
+    }
+
+    event.preventDefault();
+
+    if (optionIndex === this.customColumnOptionValues.length - 1) {
+      this.addCustomColumnOption();
+    }
+
+    setTimeout(() => {
+      document
+        .getElementById(`custom-column-option-${optionIndex + 1}`)
+        ?.focus();
+    });
+  }
+
+  removeCustomColumnOption(index: number): void {
+    if (this.customColumnOptionValues.length === 1) {
+      this.customColumnOptionValues[0] = '';
+      return;
+    }
+
+    this.customColumnOptionValues.splice(index, 1);
+  }
+
+  removeCustomColumn(column: { key: string }): void {
+    this.userColumnOptions = this.userColumnOptions.filter(
+      (item) => item.key !== column.key
+    );
+    delete this.visibleColumns[column.key];
+    this.saveCustomColumns();
+    this.saveColumnSelection();
+
+    if (this.editingCustomColumnKey === column.key) {
+      this.cancelCustomColumnForm();
+    }
+  }
+
+  startCustomColumnDrag(columnKey: string): void {
+    this.draggedCustomColumnKey = columnKey;
+  }
+
+  dropCustomColumn(targetColumnKey: string): void {
+    if (!this.draggedCustomColumnKey || this.draggedCustomColumnKey === targetColumnKey) {
+      this.draggedCustomColumnKey = null;
+      return;
+    }
+
+    const draggedIndex = this.userColumnOptions.findIndex(
+      (column) => column.key === this.draggedCustomColumnKey
+    );
+    const targetIndex = this.userColumnOptions.findIndex(
+      (column) => column.key === targetColumnKey
+    );
+
+    if (draggedIndex < 0 || targetIndex < 0) {
+      this.draggedCustomColumnKey = null;
+      return;
+    }
+
+    const [column] = this.userColumnOptions.splice(draggedIndex, 1);
+    this.userColumnOptions.splice(targetIndex, 0, column);
+    this.draggedCustomColumnKey = null;
+    this.saveCustomColumns();
+  }
+
+  cancelCustomColumnForm(): void {
+    this.showCustomColumnForm = false;
+    this.editingCustomColumnKey = null;
+    this.customColumnLabel = '';
+    this.customColumnInputType = 'text';
+    this.customColumnOptionValues = [''];
+  }
+
+  addCustomColumn(): void {
+    const label = this.customColumnLabel.trim();
+
+    if (!label) {
+      return;
+    }
+
+    const options = this.getCustomColumnOptions();
+    const existingColumn = this.userColumnOptions.find(
+      (column) => column.key === this.editingCustomColumnKey
+    );
+
+    if (existingColumn) {
+      existingColumn.label = label;
+      existingColumn.inputType = this.customColumnInputType;
+      existingColumn.options = options;
+    } else {
+      const key = `custom_${Date.now()}`;
+      this.userColumnOptions.push({
+        key,
+        label,
+        inputType: this.customColumnInputType,
+        options,
+        default: false
+      });
+      this.visibleColumns[key] = true;
+    }
+
+    this.saveCustomColumns();
+    this.saveColumnSelection();
+    this.cancelCustomColumnForm();
+  }
+
+  private getCustomColumnOptions(): string[] {
+    if (this.customColumnInputType === 'text') {
+      return [];
+    }
+
+    return this.customColumnOptionValues
+      .map((option) => option.trim())
+      .filter(Boolean);
+  }
+
+  get allSelectableColumns(): Array<{
+    key: string;
+    label: string;
+    default: boolean;
+    inputType?: string;
+    options?: string[];
+  }> {
+    return [...this.columnOptions, ...this.userColumnOptions];
+  }
+
+  get userColumnValues(): typeof this.userColumnOptions {
+    return this.userColumnOptions;
+  }
+
+  getCustomColumnValue(
+    patient: Patient,
+    column: typeof this.userColumnOptions[number]
+  ): string {
+    const patientValues = patient as Patient & Record<string, unknown>;
+    const value = patientValues[column.key];
+
+    if (Array.isArray(value)) {
+      return value.length > 0 ? value.join(', ') : '--';
+    }
+
+    return value === null || value === undefined || value === ''
+      ? '--'
+      : String(value);
+  }
+
+  resetColumnSelection(): void {
+    this.visibleColumns = Object.fromEntries(
+      this.allSelectableColumns.map((column) => [column.key, column.default])
+    );
+    this.saveColumnSelection();
+  }
+
+  get customColumnOptions(): typeof this.columnOptions {
+    return this.columnOptions.filter((column) => !column.default);
+  }
+
+  private loadColumnSelection(): void {
+    const storedColumns = localStorage.getItem(this.columnStorageKey);
+
+    if (!storedColumns) {
+      this.resetColumnSelection();
+      return;
+    }
+
+    try {
+      const parsedColumns = JSON.parse(storedColumns) as Record<string, boolean>;
+
+      this.visibleColumns = Object.fromEntries(
+        this.allSelectableColumns.map((column) => [
+          column.key,
+          parsedColumns[column.key] === undefined
+            ? column.default
+            : parsedColumns[column.key] === true
+        ])
+      );
+    } catch {
+      this.resetColumnSelection();
+    }
+  }
+
+  private loadCustomColumns(): void {
+    const storedColumns = localStorage.getItem(this.customColumnStorageKey);
+
+    if (!storedColumns) {
+      return;
+    }
+
+    try {
+      const parsedColumns = JSON.parse(storedColumns) as Array<{
+        key: string;
+        label: string;
+        inputType?: 'text' | 'dropdown' | 'multi-select';
+        options?: string[];
+      }>;
+
+      this.userColumnOptions = parsedColumns
+        .filter((column) => column.key && column.label)
+        .map((column) => ({
+          ...column,
+          inputType: column.inputType || 'text',
+          options: column.options || [],
+          default: false as false
+        }));
+    } catch {
+      this.userColumnOptions = [];
+    }
+  }
+
+  private saveCustomColumns(): void {
+    localStorage.setItem(
+      this.customColumnStorageKey,
+      JSON.stringify(this.userColumnOptions)
+    );
+  }
+
+  private saveColumnSelection(): void {
+    localStorage.setItem(
+      this.columnStorageKey,
+      JSON.stringify(this.visibleColumns)
+    );
+  }
+
+  get visibleColumnCount(): number {
+    return this.allSelectableColumns.filter(
+      (column) => this.isColumnVisible(column.key)
+    ).length;
+  }
+
+  private isPatientCreatedToday(patient: Patient): boolean {
+    if (!patient.createdDate) {
+      return false;
+    }
+
+    const today = new Date();
+    const createdDate = new Date(patient.createdDate);
+
+    return !Number.isNaN(createdDate.getTime()) &&
+      createdDate.getFullYear() === today.getFullYear() &&
+      createdDate.getMonth() === today.getMonth() &&
+      createdDate.getDate() === today.getDate();
+  }
+
+  showTodayPatients(): void {
+    this.todayOnly = !this.todayOnly;
+    this.applyFilters();
+  }
+
+  showAllPatients(): void {
+    this.todayOnly = false;
+    this.applyFilters();
+  }
+
   loading = false;
   deletingAll = false;
 
@@ -103,12 +464,6 @@ export class PatientList implements OnInit {
   // ==========================================
   // CONSTRUCTOR
   // ==========================================
-
-  constructor(
-    private patientService: PatientService,
-    private cdr: ChangeDetectorRef,
-    private router: Router
-  ) {}
 
   // ==========================================
   // ON INIT
@@ -368,40 +723,32 @@ export class PatientList implements OnInit {
   // ==========================================
   // CHECK DRAFT SELECTED
   // ==========================================
-
-  isDraftSelected(id: number): boolean {
-
-    return this.selectedDraftIds.has(
-      Number(id)
-    );
+isDraftSelected(id: number | undefined): boolean {
+  if (id === undefined || id === null) {
+    return false;
   }
 
+  return this.selectedDraftIds.has(
+    Number(id)
+  );
+}
   // ==========================================
   // TOGGLE DRAFT SELECTION
   // ==========================================
+toggleDraftSelection(id: number | undefined): void {
 
-  toggleDraftSelection(id: number): void {
-
-    const draftId = Number(id);
-
-    if (
-      this.selectedDraftIds.has(
-        draftId
-      )
-    ) {
-
-      this.selectedDraftIds.delete(
-        draftId
-      );
-
-    } else {
-
-      this.selectedDraftIds.add(
-        draftId
-      );
-    }
+  if (id === undefined || id === null) {
+    return;
   }
 
+  const draftId = Number(id);
+
+  if (this.selectedDraftIds.has(draftId)) {
+    this.selectedDraftIds.delete(draftId);
+  } else {
+    this.selectedDraftIds.add(draftId);
+  }
+}
   // ==========================================
   // CHECK ALL DRAFTS SELECTED
   // ==========================================
@@ -639,175 +986,159 @@ export class PatientList implements OnInit {
   // ==========================================
   // APPROVE DRAFT
   // ==========================================
+approveDraft(id: number | undefined): void {
 
-  approveDraft(id: number): void {
-
-    if (!id) {
-
-      this.showToast(
-        'Draft ID not found',
-        'error'
-      );
-
-      return;
-    }
-
-    const confirmed =
-      window.confirm(
-        'Are you sure you want to approve this draft?'
-      );
-
-    if (!confirmed) {
-      return;
-    }
-
-    console.log(
-      'Approving Draft ID:',
-      id
+  if (id === undefined || id === null) {
+    this.showToast(
+      'Draft ID not found',
+      'error'
     );
-
-    this.loading = true;
-
-    this.cdr.detectChanges();
-
-    this.patientService
-      .approvePatient(id)
-      .subscribe({
-
-        next: (response: Patient) => {
-
-          console.log(
-            'Draft approved successfully:',
-            response
-          );
-
-          // REMOVE FROM LOCAL DRAFT LIST
-          this.draftPatients =
-            this.draftPatients.filter(
-              (patient: Patient) =>
-                Number(patient?.id) !==
-                Number(id)
-            );
-
-          this.closeDraftPopup();
-
-          this.loading = false;
-
-          this.showToast(
-            'Patient draft approved successfully',
-            'success'
-          );
-
-          // RELOAD PATIENTS
-          this.loadPatients();
-        },
-
-        error: (error: any) => {
-
-          console.error(
-            'Failed to approve draft:',
-            error
-          );
-
-          this.loading = false;
-
-          const errorMessage =
-            error?.error?.message ||
-            'Failed to approve draft';
-
-          this.showToast(
-            errorMessage,
-            'error'
-          );
-
-          this.cdr.detectChanges();
-        }
-      });
+    return;
   }
 
+  const confirmed = window.confirm(
+    'Are you sure you want to approve this draft?'
+  );
+
+  if (!confirmed) {
+    return;
+  }
+
+  console.log(
+    'Approving Draft ID:',
+    id
+  );
+
+  this.loading = true;
+  this.cdr.detectChanges();
+
+  this.patientService
+    .approvePatient(id)
+    .subscribe({
+
+      next: (response: any) => {
+
+        console.log(
+          'Draft approved successfully:',
+          response
+        );
+
+        this.draftPatients =
+          this.draftPatients.filter(
+            (patient: any) =>
+              Number(patient?.id) !== Number(id)
+          );
+
+        this.closeDraftPopup();
+
+        this.loading = false;
+
+        this.showToast(
+          'Patient draft approved successfully',
+          'success'
+        );
+
+        this.loadPatients();
+      },
+
+      error: (error: any) => {
+
+        console.error(
+          'Failed to approve draft:',
+          error
+        );
+
+        this.loading = false;
+
+        const errorMessage =
+          error?.error?.message ||
+          'Failed to approve draft';
+
+        this.showToast(
+          errorMessage,
+          'error'
+        );
+
+        this.cdr.detectChanges();
+      }
+    });
+}
   // ==========================================
   // REMOVE DRAFT
   // ==========================================
+removeDraft(id: number | undefined): void {
 
-  removeDraft(id: number): void {
-
-    if (!id) {
-
-      this.showToast(
-        'Draft ID not found',
-        'error'
-      );
-
-      return;
-    }
-
-    const confirmed =
-      window.confirm(
-        'Are you sure you want to remove this draft?'
-      );
-
-    if (!confirmed) {
-      return;
-    }
-
-    console.log(
-      'Removing Draft ID:',
-      id
+  if (id === undefined || id === null) {
+    this.showToast(
+      'Draft ID not found',
+      'error'
     );
-
-    this.loading = true;
-
-    this.cdr.detectChanges();
-
-    this.patientService
-      .deleteDraft(id)
-      .subscribe({
-
-        next: (response: string) => {
-
-          console.log(
-            'Draft removed successfully:',
-            response
-          );
-
-          // REMOVE LOCAL DRAFT
-          this.draftPatients =
-            this.draftPatients.filter(
-              (patient: Patient) =>
-                Number(patient?.id) !==
-                Number(id)
-            );
-
-          this.loading = false;
-
-          this.showToast(
-            'Draft removed successfully',
-            'success'
-          );
-
-          this.loadPatients();
-        },
-
-        error: (error: any) => {
-
-          console.error(
-            'Failed to remove draft:',
-            error
-          );
-
-          this.loading = false;
-
-          this.showToast(
-            'Failed to remove draft',
-            'error'
-          );
-
-          this.cdr.detectChanges();
-        }
-      });
+    return;
   }
 
-  // ==========================================
+  const confirmed = window.confirm(
+    'Are you sure you want to remove this draft?'
+  );
+
+  if (!confirmed) {
+    return;
+  }
+
+  console.log(
+    'Removing Draft ID:',
+    id
+  );
+
+  this.loading = true;
+  this.cdr.detectChanges();
+
+  this.patientService
+    .deleteDraft(id)
+    .subscribe({
+
+      next: (response: any) => {
+
+        console.log(
+          'Draft removed successfully:',
+          response
+        );
+
+        this.draftPatients =
+          this.draftPatients.filter(
+            (patient: any) =>
+              Number(patient?.id) !== Number(id)
+          );
+
+        this.loading = false;
+
+        this.showToast(
+          'Draft removed successfully',
+          'success'
+        );
+
+        this.loadPatients();
+      },
+
+      error: (error: any) => {
+
+        console.error(
+          'Failed to remove draft:',
+          error
+        );
+
+        this.loading = false;
+
+        this.showToast(
+          'Failed to remove draft',
+          'error'
+        );
+
+        this.cdr.detectChanges();
+      }
+    });
+}
+
+// ==========================================
   // SEARCH + FILTER
   // ==========================================
 
@@ -893,10 +1224,15 @@ export class PatientList implements OnInit {
             this.selectedBloodGroup
               .toLowerCase();
 
+          const matchesToday =
+            !this.todayOnly ||
+            this.isPatientCreatedToday(patient);
+
           return (
             matchesSearch &&
             matchesGender &&
-            matchesBloodGroup
+            matchesBloodGroup &&
+            matchesToday
           );
         }
       );
@@ -922,6 +1258,8 @@ export class PatientList implements OnInit {
     this.selectedGender = '';
 
     this.selectedBloodGroup = '';
+
+    this.todayOnly = false;
 
     this.filteredPatients = [
       ...this.patients
@@ -1000,6 +1338,7 @@ export class PatientList implements OnInit {
       patient;
 
     this.showPatientPreview = true;
+    document.body.style.overflow = 'hidden';
 
     this.cdr.detectChanges();
   }
@@ -1013,6 +1352,7 @@ export class PatientList implements OnInit {
     this.showPatientPreview = false;
 
     this.selectedPatient = null;
+    document.body.style.overflow = '';
 
     this.cdr.detectChanges();
   }
@@ -1051,94 +1391,50 @@ export class PatientList implements OnInit {
   // ==========================================
   // DELETE SINGLE PATIENT
   // ==========================================
+deletePatient(id: number | undefined): void {
 
-  deletePatient(id: number): void {
-
-    if (!id) {
-
-      this.showToast(
-        'Patient ID not found',
-        'error'
-      );
-
-      return;
-    }
-
-    const confirmed =
-      window.confirm(
-        'Are you sure you want to delete this patient?'
-      );
-
-    if (!confirmed) {
-      return;
-    }
-
-    console.log(
-      'Deleting Patient ID:',
-      id
-    );
-
-    this.loading = true;
-
-    this.patientService
-      .deletePatient(id)
-      .subscribe({
-
-        next: (response: string) => {
-
-          console.log(
-            'Patient deleted successfully:',
-            response
-          );
-
-          // REMOVE FROM PATIENT LIST
-          this.patients =
-            this.patients.filter(
-              (patient: Patient) =>
-                Number(patient?.id) !==
-                Number(id)
-            );
-
-          // REMOVE FROM FILTERED LIST
-          this.filteredPatients =
-            this.filteredPatients.filter(
-              (patient: Patient) =>
-                Number(patient?.id) !==
-                Number(id)
-            );
-
-          // UPDATE PAGINATION
-          this.updatePagination();
-
-          this.loading = false;
-
-          this.showToast(
-            'Patient deleted successfully',
-            'success'
-          );
-
-          this.cdr.detectChanges();
-        },
-
-        error: (error: any) => {
-
-          console.error(
-            'Failed to delete patient:',
-            error
-          );
-
-          this.loading = false;
-
-          this.showToast(
-            'Failed to delete patient',
-            'error'
-          );
-
-          this.cdr.detectChanges();
-        }
-      });
+  if (!id) {
+    this.showToast('Patient ID not found', 'error');
+    return;
   }
 
+  if (!window.confirm('Are you sure you want to delete this patient?')) {
+    return;
+  }
+
+  this.loading = true;
+
+  this.patientService.deletePatient(id).subscribe({
+
+    next: () => {
+
+      // Remove immediately from UI
+      this.patients = this.patients.filter(p => p.id !== id);
+      this.filteredPatients = this.filteredPatients.filter(p => p.id !== id);
+
+      // Refresh pagination
+      this.updatePagination();
+
+      this.loading = false;
+
+      this.showToast('Patient deleted successfully', 'success');
+
+      // Force Angular UI refresh
+      this.cdr.detectChanges();
+
+      // Optional: reload from backend (recommended)
+      this.loadPatients();
+    },
+
+    error: (err) => {
+      console.error(err);
+      this.loading = false;
+      this.showToast('Failed to delete patient', 'error');
+    }
+
+  });
+
+}
   // ==========================================
   // DELETE ALL PATIENTS
   // ==========================================
@@ -1286,6 +1582,8 @@ export class PatientList implements OnInit {
           );
 
           this.loadPatients();
+          this.updatePagination();
+          this.cdr.detectChanges();
         },
 
         // ====================================

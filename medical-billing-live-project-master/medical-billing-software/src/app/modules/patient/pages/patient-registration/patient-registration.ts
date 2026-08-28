@@ -46,6 +46,15 @@ export class PatientRegistration implements OnInit, AfterViewInit {
 
   patientForm: FormGroup;
 
+  customColumns: Array<{
+    key: string;
+    label: string;
+    inputType: 'text' | 'dropdown' | 'multi-select';
+    options: string[];
+  }> = [];
+
+  customSelectOpen: Record<string, boolean> = {};
+
   // =====================================================
   // EDIT MODE
   // =====================================================
@@ -129,6 +138,75 @@ export class PatientRegistration implements OnInit, AfterViewInit {
       policyNumber: [''],
       policyHolderName: ['']
     });
+
+    this.loadCustomColumns();
+  }
+
+  private loadCustomColumns(): void {
+    const storedColumns = localStorage.getItem('patient-list-custom-columns');
+
+    if (!storedColumns) {
+      return;
+    }
+
+    try {
+      const parsedColumns = JSON.parse(storedColumns) as Array<{
+        key: string;
+        label: string;
+        inputType?: 'text' | 'dropdown' | 'multi-select';
+        options?: string[];
+      }>;
+
+      this.customColumns = parsedColumns
+        .filter((column) => column.key && column.label)
+        .map((column) => ({
+          key: column.key,
+          label: column.label,
+          inputType: column.inputType || 'text',
+          options: column.options || []
+        }));
+
+      this.customColumns.forEach((column) => {
+        this.patientForm.addControl(
+          column.key,
+          this.fb.control(column.inputType === 'multi-select' ? [] : '')
+        );
+      });
+    } catch {
+      this.customColumns = [];
+    }
+  }
+
+  toggleCustomSelect(columnKey: string): void {
+    this.customSelectOpen[columnKey] = !this.customSelectOpen[columnKey];
+  }
+
+  isCustomOptionSelected(columnKey: string, option: string): boolean {
+    const selectedValues = this.patientForm.get(columnKey)?.value;
+    return Array.isArray(selectedValues) && selectedValues.includes(option);
+  }
+
+  toggleCustomOption(columnKey: string, option: string): void {
+    const control = this.patientForm.get(columnKey);
+    const selectedValues = Array.isArray(control?.value)
+      ? [...control.value]
+      : [];
+    const optionIndex = selectedValues.indexOf(option);
+
+    if (optionIndex >= 0) {
+      selectedValues.splice(optionIndex, 1);
+    } else {
+      selectedValues.push(option);
+    }
+
+    control?.setValue(selectedValues);
+  }
+
+  getCustomSelectedText(columnKey: string): string {
+    const selectedValues = this.patientForm.get(columnKey)?.value;
+    return Array.isArray(selectedValues) && selectedValues.length > 0
+      ? selectedValues.join(', ')
+      : 'Select options';
   }
 
   // =====================================================

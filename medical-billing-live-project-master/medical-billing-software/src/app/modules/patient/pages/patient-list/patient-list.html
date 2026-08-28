@@ -13,13 +13,39 @@
         </div>
 
         <div class="patient-summary">
-          <span class="summary-label">
-            Total Patients
-          </span>
+          <button
+            type="button"
+            class="total-summary-control"
+            [class.active]="!todayOnly"
+            (click)="showAllPatients()"
+            [attr.aria-pressed]="!todayOnly"
+            title="Show all patients">
+            <span class="summary-label">
+              Total Patients
+            </span>
 
-          <span class="summary-value">
-            {{ patients.length }}
-          </span>
+            <span class="summary-value">
+              {{ patients.length }}
+            </span>
+          </button>
+
+          <span class="summary-divider" aria-hidden="true"></span>
+
+          <button
+            type="button"
+            class="today-summary-control"
+            [class.active]="todayOnly"
+            (click)="showTodayPatients()"
+            [attr.aria-pressed]="todayOnly"
+            title="Show today's patients">
+            <span class="summary-label">
+              Today Patients
+            </span>
+
+            <span class="summary-value summary-value-today">
+              {{ todayPatientsCount }}
+            </span>
+          </button>
         </div>
 
       </div>
@@ -304,6 +330,128 @@
       (change)="importExcel($event)"
     />
 
+    <!-- CUSTOM COLUMNS -->
+    <details class="columns-menu">
+      <summary class="columns-menu-button">
+        <i class="bi bi-layout-three-columns" aria-hidden="true"></i>
+        <span>Columns</span>
+      </summary>
+
+      <div class="columns-menu-panel">
+        <div class="columns-menu-heading">
+          <span>Select columns</span>
+          <button type="button" (click)="resetColumnSelection()">Reset</button>
+        </div>
+
+        <label
+          *ngFor="let column of allSelectableColumns"
+          class="column-option"
+          [class.draggable-column]="!column.default"
+          [class.dragging-column]="draggedCustomColumnKey === column.key"
+          [draggable]="!column.default"
+          (dragstart)="!column.default && startCustomColumnDrag(column.key)"
+          (dragover)="$event.preventDefault()"
+          (drop)="!column.default && dropCustomColumn(column.key)">
+          <input
+            type="checkbox"
+            [checked]="isColumnVisible(column.key)"
+            (change)="toggleColumn(column.key)" />
+          <span>{{ column.label }}</span>
+
+          <ng-container *ngIf="!column.default">
+            <i
+              class="bi bi-grip-vertical column-drag-handle"
+              aria-hidden="true"
+              title="Drag to set position"></i>
+            <button
+              type="button"
+              class="column-action-button"
+              (click)="$event.preventDefault(); $event.stopPropagation(); editCustomColumn(column)"
+              [attr.aria-label]="'Edit ' + column.label"
+              title="Edit column">
+              <i class="bi bi-pencil" aria-hidden="true"></i>
+            </button>
+            <button
+              type="button"
+              class="column-action-button column-remove-button"
+              (click)="$event.preventDefault(); $event.stopPropagation(); removeCustomColumn(column)"
+              [attr.aria-label]="'Remove ' + column.label"
+              title="Remove column">
+              <i class="bi bi-trash3" aria-hidden="true"></i>
+            </button>
+          </ng-container>
+        </label>
+
+        <button
+          type="button"
+          class="add-column-button"
+          (click)="openCustomColumnForm()">
+          <i class="bi bi-plus-circle" aria-hidden="true"></i>
+          <span>Add custom column</span>
+        </button>
+
+        <div class="custom-column-form" *ngIf="showCustomColumnForm">
+          <label for="custom-column-label">Column name</label>
+          <input
+            id="custom-column-label"
+            type="text"
+            [(ngModel)]="customColumnLabel"
+            placeholder="Enter column name" />
+
+          <label for="custom-column-input-type">Input type</label>
+          <select
+            id="custom-column-input-type"
+            [(ngModel)]="customColumnInputType">
+            <option value="text">Text</option>
+            <option value="dropdown">Dropdown</option>
+            <option value="multi-select">Multi Select</option>
+          </select>
+
+          <ng-container *ngIf="customColumnInputType !== 'text'">
+            <label for="custom-column-options">Options</label>
+            <div class="custom-column-options-list">
+              <div
+                class="custom-column-option-row"
+                *ngFor="let option of customColumnOptionValues; let optionIndex = index">
+                <input
+                  [id]="'custom-column-option-' + optionIndex"
+                  type="text"
+                  [(ngModel)]="customColumnOptionValues[optionIndex]"
+                  (keydown)="handleCustomColumnOptionKeydown($event, optionIndex)"
+                  [placeholder]="'Option ' + (optionIndex + 1)" />
+                <button
+                  type="button"
+                  class="custom-column-option-remove"
+                  (click)="removeCustomColumnOption(optionIndex)"
+                  [attr.aria-label]="'Remove option ' + (optionIndex + 1)"
+                  title="Remove option">
+                  <i class="bi bi-dash-circle" aria-hidden="true"></i>
+                </button>
+              </div>
+              <button
+                type="button"
+                class="custom-column-option-add"
+                (click)="addCustomColumnOption()">
+                <i class="bi bi-plus-circle" aria-hidden="true"></i>
+                <span>Add option</span>
+              </button>
+            </div>
+          </ng-container>
+
+          <div class="custom-column-form-actions">
+            <button type="button" (click)="cancelCustomColumnForm()">Cancel</button>
+            <button
+              type="button"
+              class="save-custom-column"
+              [disabled]="!customColumnLabel.trim()"
+              (click)="addCustomColumn()">
+              {{ editingCustomColumnKey ? 'Save changes' : 'Add column' }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </details>
+
   </div>
 
 
@@ -333,16 +481,24 @@
 
         <tr>
 
-          <th>ID</th>
-          <th>Name</th>
-          <th>Mobile</th>
-          <th>Email</th>
-          <th>Gender</th>
-          <th>Blood Group</th>
-          <th>City</th>
-          <th>State</th>
-          <th>Status</th>
-          <th>Created Date</th>
+          <th *ngIf="isColumnVisible('id')">ID</th>
+          <th *ngIf="isColumnVisible('name')">Name</th>
+          <th *ngIf="isColumnVisible('mobile')">Mobile</th>
+          <th *ngIf="isColumnVisible('email')">Email</th>
+          <th *ngIf="isColumnVisible('gender')">Gender</th>
+          <th *ngIf="isColumnVisible('bloodGroup')">Blood Group</th>
+          <th *ngIf="isColumnVisible('city')">City</th>
+          <th *ngIf="isColumnVisible('state')">State</th>
+          <th *ngIf="isColumnVisible('status')">Status</th>
+          <th *ngIf="isColumnVisible('createdDate')">Created Date</th>
+
+          <ng-container *ngFor="let column of customColumnOptions">
+            <th *ngIf="isColumnVisible(column.key)">{{ column.label }}</th>
+          </ng-container>
+
+          <th *ngFor="let column of userColumnValues" [hidden]="!isColumnVisible(column.key)">
+            {{ column.label }}
+          </th>
 
           <th class="actions-header">
             Actions
@@ -361,13 +517,13 @@
           *ngFor="let patient of paginatedPatients">
 
           <!-- ID -->
-          <td class="patient-id">
+          <td *ngIf="isColumnVisible('id')" class="patient-id">
             {{ patient.id || '--' }}
           </td>
 
 
           <!-- NAME -->
-          <td class="patient-name">
+          <td *ngIf="isColumnVisible('name')" class="patient-name">
             <button
               type="button"
               class="patient-name-link"
@@ -379,19 +535,19 @@
 
 
           <!-- MOBILE -->
-          <td>
+          <td *ngIf="isColumnVisible('mobile')">
             {{ patient.mobile || '--' }}
           </td>
 
 
           <!-- EMAIL -->
-          <td>
+          <td *ngIf="isColumnVisible('email')">
             {{ patient.email || '--' }}
           </td>
 
 
           <!-- GENDER -->
-          <td class="gender-cell">
+          <td *ngIf="isColumnVisible('gender')" class="gender-cell">
             <span
               class="gender-value"
               [class.male]="patient.gender === 'Male'"
@@ -403,7 +559,7 @@
 
 
           <!-- BLOOD GROUP -->
-          <td>
+          <td *ngIf="isColumnVisible('bloodGroup')">
 
             <span
               class="blood-badge"
@@ -421,19 +577,19 @@
 
 
           <!-- CITY -->
-          <td>
+          <td *ngIf="isColumnVisible('city')">
             {{ patient.city || '--' }}
           </td>
 
 
           <!-- STATE -->
-          <td>
+          <td *ngIf="isColumnVisible('state')">
             {{ patient.state || '--' }}
           </td>
 
 
           <!-- STATUS -->
-          <td>
+          <td *ngIf="isColumnVisible('status')">
 
             <span
               class="status-badge"
@@ -448,7 +604,7 @@
 
 
           <!-- CREATED DATE -->
-          <td>
+          <td *ngIf="isColumnVisible('createdDate')">
 
             {{
               patient.createdDate
@@ -456,6 +612,35 @@
                 : '--'
             }}
 
+          </td>
+
+          <ng-container *ngFor="let column of customColumnOptions">
+            <td *ngIf="isColumnVisible(column.key)">
+              <ng-container [ngSwitch]="column.key">
+                <span *ngSwitchCase="'dob'">{{ patient.dob || '--' }}</span>
+                <span *ngSwitchCase="'maritalStatus'">{{ patient.maritalStatus || '--' }}</span>
+                <span *ngSwitchCase="'occupation'">{{ patient.occupation || '--' }}</span>
+                <span *ngSwitchCase="'aadhaar'">{{ patient.aadhaar || '--' }}</span>
+                <span *ngSwitchCase="'pan'">{{ patient.pan || '--' }}</span>
+                <span *ngSwitchCase="'emergencyContact'">{{ patient.emergencyContact || '--' }}</span>
+                <span *ngSwitchCase="'emergencyName'">{{ patient.emergencyName || '--' }}</span>
+                <span *ngSwitchCase="'address1'">{{ patient.address1 || '--' }}</span>
+                <span *ngSwitchCase="'address2'">{{ patient.address2 || '--' }}</span>
+                <span *ngSwitchCase="'district'">{{ patient.district || '--' }}</span>
+                <span *ngSwitchCase="'country'">{{ patient.country || '--' }}</span>
+                <span *ngSwitchCase="'pincode'">{{ patient.pincode || '--' }}</span>
+                <span *ngSwitchCase="'medicalHistory'">{{ patient.medicalHistory || '--' }}</span>
+                <span *ngSwitchCase="'currentMedication'">{{ patient.currentMedication || '--' }}</span>
+                <span *ngSwitchCase="'allergies'">{{ patient.allergies || '--' }}</span>
+                <span *ngSwitchCase="'insuranceProvider'">{{ patient.insuranceProvider || '--' }}</span>
+                <span *ngSwitchCase="'policyNumber'">{{ patient.policyNumber || '--' }}</span>
+                <span *ngSwitchCase="'policyHolderName'">{{ patient.policyHolderName || '--' }}</span>
+              </ng-container>
+            </td>
+          </ng-container>
+
+          <td *ngFor="let column of userColumnValues" [hidden]="!isColumnVisible(column.key)">
+            {{ getCustomColumnValue(patient, column) }}
           </td>
 
 
@@ -569,7 +754,7 @@
           ">
 
           <td
-            colspan="11"
+            [attr.colspan]="visibleColumnCount + 1"
             class="no-data">
 
             <div class="no-data-content">
@@ -990,7 +1175,7 @@
         <button
           type="button"
           class="patient-preview-edit"
-          (click)="editPatient(selectedPatient)">
+         (click)="selectedPatient && editPatient(selectedPatient)">
           <i class="bi bi-pencil" aria-hidden="true"></i>
           Edit Patient
         </button>
