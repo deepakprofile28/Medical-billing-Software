@@ -1,0 +1,417 @@
+<div class="pharma-onboard-page">
+
+  <div class="pharma-layout-container">
+
+    <!-- ================= LEFT PHARMACY BRAND PANEL ================= -->
+    <div class="pharma-brand-panel">
+      <!-- Glow background decoration -->
+      <div class="glow-orb orb-1"></div>
+      <div class="glow-orb orb-2"></div>
+
+      <div class="brand-top">
+        <div class="pharma-logo-badge">
+          <div class="pharma-icon-box">
+            <i class="bi bi-capsule-pill"></i>
+          </div>
+          <div class="pharma-logo-text">
+            <h2>PharmaCare Cloud</h2>
+            <span>Pharmacy & Medical Shop Management</span>
+          </div>
+        </div>
+
+        <div class="pharma-hero-content">
+          <div class="edition-pill">
+            <span class="live-pulse"></span>
+            <span>Dedicated Pharmacy Edition</span>
+          </div>
+
+          <h1>Launch Your Smart Medical Store in 60 Seconds</h1>
+          
+          <p class="hero-desc">
+            The all-in-one digital billing and inventory software built specifically for 
+            <strong>Retail Chemists, Medical Shops, and Wholesale Distributors</strong>.
+          </p>
+        </div>
+
+        <!-- Pharmacy Highlights -->
+        <div class="pharma-feature-list">
+          <div class="pharma-feature-item">
+            <div class="feat-icon"><i class="bi bi-upc-scan"></i></div>
+            <div>
+              <h5>Fast POS & Barcode Billing</h5>
+              <p>Print GST retail receipts, generic substitute lookup, and patient prescriptions in 3 clicks.</p>
+            </div>
+          </div>
+
+          <div class="pharma-feature-item">
+            <div class="feat-icon"><i class="bi bi-shield-check"></i></div>
+            <div>
+              <h5>Batch, Expiry & Schedule H1 Alerts</h5>
+              <p>Real-time near-expiry stock notifications and strict compliance logging for medical records.</p>
+            </div>
+          </div>
+
+          <div class="pharma-feature-item">
+            <div class="feat-icon"><i class="bi bi-box-seam-fill"></i></div>
+            <div>
+              <h5>Distributor Purchase & Margin Ledger</h5>
+              <p>Automate medicine stock entries, purchase returns, and profit margin reports.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="brand-bottom">
+        <div class="support-badge">
+          <i class="bi bi-patch-check-fill"></i>
+          <span>100% Drug Authority & GST Compliant</span>
+        </div>
+        <div class="brand-signin-prompt">
+          <span>Already registered?</span>
+          <a routerLink="/login" class="brand-signin-btn">Sign In to Pharmacy →</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================= RIGHT REGISTRATION FORM PANEL ================= -->
+    <div class="pharma-form-panel">
+      <div class="pharma-form-card">
+
+        <!-- Form Header -->
+        <div class="form-header-box">
+          <div class="header-tag">
+            <i class="bi bi-shop-window"></i>
+            <span>Pharmacy Onboarding</span>
+          </div>
+          <h2>Create Pharmacy Account</h2>
+          <p>Fill in your shop details below. You will verify your mobile number with a quick OTP on registration.</p>
+        </div>
+
+        <!-- Global Messages -->
+        <div class="alert alert-success d-flex align-items-center gap-2 mb-3 rounded-3" *ngIf="successMessage">
+          <i class="bi bi-check-circle-fill fs-5 text-success"></i>
+          <span>{{ successMessage }}</span>
+        </div>
+
+        <div class="alert alert-danger d-flex align-items-center gap-2 mb-3 rounded-3" *ngIf="errorMessage && !showOtpModal">
+          <i class="bi bi-exclamation-triangle-fill fs-5 text-danger"></i>
+          <span>{{ errorMessage }}</span>
+        </div>
+
+        <!-- Registration Form -->
+        <form [formGroup]="accountForm" (ngSubmit)="onRegisterClick()" novalidate>
+
+          <!-- 1. PHARMACY / STORE NAME -->
+          <div class="form-group mb-3">
+            <label class="form-label">
+              <i class="bi bi-shop me-1 text-success"></i>
+              Pharmacy / Medical Store Name <span class="text-danger">*</span>
+            </label>
+            <input 
+              type="text" 
+              formControlName="name" 
+              class="form-control custom-input" 
+              placeholder="e.g. Sri Krishna Pharmacy & Chemists"
+              [class.is-invalid]="accountForm.get('name')?.touched && accountForm.get('name')?.invalid">
+            <div class="invalid-feedback d-block" *ngIf="accountForm.get('name')?.touched && accountForm.get('name')?.hasError('required')">
+              Pharmacy / Store Name is required.
+            </div>
+            <div class="invalid-feedback d-block" *ngIf="accountForm.get('name')?.touched && accountForm.get('name')?.hasError('minlength')">
+              Name must be at least 3 characters long.
+            </div>
+          </div>
+
+          <!-- 2. EMAIL ADDRESS -->
+          <div class="form-group mb-3">
+            <label class="form-label">
+              <i class="bi bi-envelope-at me-1 text-success"></i>
+              Pharmacy Email Address <span class="text-danger">*</span>
+            </label>
+            <input 
+              type="email" 
+              formControlName="email" 
+              class="form-control custom-input" 
+              placeholder="e.g. contact@krishnapharmacy.com"
+              [class.is-invalid]="accountForm.get('email')?.touched && accountForm.get('email')?.invalid">
+            <div class="invalid-feedback d-block" *ngIf="accountForm.get('email')?.touched && accountForm.get('email')?.hasError('required')">
+              Email address is required.
+            </div>
+            <div class="invalid-feedback d-block" *ngIf="accountForm.get('email')?.touched && accountForm.get('email')?.hasError('email')">
+              Please enter a valid email address.
+            </div>
+          </div>
+
+          <!-- 3. MOBILE NUMBER WITH UNIFIED FLAG PICKER (ZERO EXTRA SPACING) -->
+          <div class="form-group mb-3 position-relative" #flagContainer>
+            <label class="form-label">
+              <i class="bi bi-phone me-1 text-success"></i>
+              Mobile Number <span class="text-danger">*</span>
+            </label>
+
+            <div 
+              class="mobile-unified-input" 
+              [class.is-invalid]="accountForm.get('mobile')?.touched && accountForm.get('mobile')?.invalid">
+              
+              <!-- Custom Country Flag Trigger -->
+              <button 
+                type="button" 
+                class="flag-picker-btn" 
+                (click)="toggleFlagDropdown($event)" 
+                [class.active]="isFlagDropdownOpen"
+                title="Select Country Code">
+                <img 
+                  [src]="'https://flagcdn.com/w40/' + selectedCountry.iso + '.png'" 
+                  [alt]="selectedCountry.country" 
+                  class="flag-img-icon"
+                  loading="lazy">
+                <span class="flag-code-label">{{ selectedCountry.code }}</span>
+                <i class="bi bi-chevron-down flag-chevron"></i>
+              </button>
+
+              <!-- Phone Number Input (Seamlessly attached without gap) -->
+              <input
+  type="tel"
+  formControlName="mobile"
+  class="mobile-inline-input"
+  placeholder="Mobile number"
+  [attr.maxlength]="selectedCountry.mobileLength"
+  inputmode="numeric">
+            </div>
+
+            <!-- Transparent click-outside backdrop -->
+            <div class="flag-dropdown-backdrop" *ngIf="isFlagDropdownOpen" (click)="closeFlagDropdown($event)"></div>
+
+            <!-- Custom Flag Dropdown Menu -->
+            <div class="flag-dropdown-menu shadow-lg" *ngIf="isFlagDropdownOpen">
+              <div class="flag-menu-header">Select Country & Dial Code</div>
+              <div class="flag-list-scroll">
+                <button 
+                  type="button" 
+                  class="flag-option-item" 
+                  *ngFor="let c of countryCodes" 
+                  [class.selected]="c.code === selectedCountry.code"
+                  (click)="selectCountry(c, $event)">
+                  <img 
+                    [src]="'https://flagcdn.com/w40/' + c.iso + '.png'" 
+                    [alt]="c.country" 
+                    class="flag-img-option"
+                    loading="lazy">
+                  <span class="country-name-text">{{ c.country }}</span>
+                  <span class="country-dial-code">{{ c.code }}</span>
+                  <i class="bi bi-check-lg ms-auto text-success" *ngIf="c.code === selectedCountry.code"></i>
+                </button>
+              </div>
+            </div>
+<div
+  class="invalid-feedback d-block"
+  *ngIf="accountForm.get('mobile')?.touched && accountForm.get('mobile')?.hasError('required')">
+  Mobile number is required.
+</div>
+
+<div
+  class="invalid-feedback d-block"
+  *ngIf="accountForm.get('mobile')?.touched && accountForm.get('mobile')?.hasError('pattern')">
+  Mobile number must contain digits only.
+</div>
+
+<div
+  class="invalid-feedback d-block"
+  *ngIf="accountForm.get('mobile')?.touched && accountForm.get('mobile')?.hasError('countryMobileLength')">
+
+  {{ selectedCountry.country }} requires
+  {{ selectedCountry.mobileLength }}
+  digit mobile number.
+
+</div>
+          </div>
+
+          <!-- 4. STORE ADDRESS -->
+          <div class="form-group mb-3">
+            <label class="form-label">
+              <i class="bi bi-geo-alt me-1 text-success"></i>
+              Pharmacy Store Address <span class="text-danger">*</span>
+            </label>
+            <textarea 
+              formControlName="address" 
+              class="form-control custom-input address-box" 
+              rows="2" 
+              placeholder="Shop No, Street / Main Road, Landmark, City, Pincode"
+              [class.is-invalid]="accountForm.get('address')?.touched && accountForm.get('address')?.invalid"></textarea>
+            <div class="invalid-feedback d-block" *ngIf="accountForm.get('address')?.touched && accountForm.get('address')?.hasError('required')">
+              Store address is required.
+            </div>
+            <div class="invalid-feedback d-block" *ngIf="accountForm.get('address')?.touched && accountForm.get('address')?.hasError('minlength')">
+              Address must be at least 5 characters.
+            </div>
+          </div>
+
+          <!-- 5 & 6. PASSWORDS ROW -->
+          <div class="row">
+            <!-- 5. NEW PASSWORD -->
+            <div class="col-md-6 mb-3">
+              <label class="form-label">
+                <i class="bi bi-lock me-1 text-success"></i>
+                New Password <span class="text-danger">*</span>
+              </label>
+              <div class="password-field-wrap">
+                <input 
+                  [type]="hideNewPassword ? 'password' : 'text'" 
+                  formControlName="newPassword" 
+                  class="form-control custom-input" 
+                  placeholder="Min. 6 characters"
+                  [class.is-invalid]="accountForm.get('newPassword')?.touched && accountForm.get('newPassword')?.invalid">
+                <button type="button" class="eye-toggle-btn" (click)="toggleNewPassword()" tabindex="-1" title="Toggle password">
+                  <i class="bi" [class.bi-eye]="hideNewPassword" [class.bi-eye-slash]="!hideNewPassword"></i>
+                </button>
+              </div>
+              <div class="invalid-feedback d-block" *ngIf="accountForm.get('newPassword')?.touched && accountForm.get('newPassword')?.hasError('required')">
+                Password is required.
+              </div>
+              <div class="invalid-feedback d-block" *ngIf="accountForm.get('newPassword')?.touched && accountForm.get('newPassword')?.hasError('minlength')">
+                Password must be at least 6 characters.
+              </div>
+            </div>
+
+            <!-- 6. RE-ENTER PASSWORD -->
+            <div class="col-md-6 mb-3">
+              <label class="form-label">
+                <i class="bi bi-shield-lock me-1 text-success"></i>
+                Re-enter Password <span class="text-danger">*</span>
+              </label>
+              <div class="password-field-wrap">
+                <input 
+                  [type]="hideConfirmPassword ? 'password' : 'text'" 
+                  formControlName="confirmPassword" 
+                  class="form-control custom-input" 
+                  placeholder="Re-enter password"
+                  [class.is-invalid]="accountForm.get('confirmPassword')?.touched && (accountForm.get('confirmPassword')?.invalid || accountForm.hasError('passwordMismatch'))">
+                <button type="button" class="eye-toggle-btn" (click)="toggleConfirmPassword()" tabindex="-1" title="Toggle password">
+                  <i class="bi" [class.bi-eye]="hideConfirmPassword" [class.bi-eye-slash]="!hideConfirmPassword"></i>
+                </button>
+              </div>
+              <div class="invalid-feedback d-block" *ngIf="accountForm.get('confirmPassword')?.touched && accountForm.get('confirmPassword')?.hasError('required')">
+                Please confirm your password.
+              </div>
+              <div class="invalid-feedback d-block" *ngIf="accountForm.get('confirmPassword')?.touched && accountForm.hasError('passwordMismatch')">
+                Passwords do not match.
+              </div>
+            </div>
+          </div>
+
+          <!-- Terms Agreement -->
+          <div class="form-check mb-4 mt-1">
+            <input class="form-check-input" type="checkbox" id="agreeTerms" formControlName="agreeTerms">
+            <label class="form-check-label text-muted small" for="agreeTerms">
+              I agree to the <span class="text-success fw-bold">Pharmacy Data Regulations</span> and <span class="text-success fw-bold">Terms of Service</span>.
+            </label>
+          </div>
+
+          <!-- Submit Button (Triggers OTP) -->
+          <button 
+            type="submit" 
+            class="btn btn-pharma-submit w-100 py-3 fs-6 fw-bold" 
+            [disabled]="otpSending">
+            <span *ngIf="otpSending" class="spinner-border spinner-border-sm me-2"></span>
+            <i class="bi bi-capsule me-2" *ngIf="!otpSending"></i>
+            <span>{{ otpSending ? 'Sending Verification OTP...' : 'Register Pharmacy Account' }}</span>
+          </button>
+
+          <!-- Back to Login -->
+          <div class="text-center mt-3 pt-3 border-top">
+            <span class="text-muted small">Already managing a store?</span>
+            <a routerLink="/login" class="text-success fw-bold text-decoration-none ms-1 small">Sign In to Dashboard</a>
+          </div>
+
+        </form>
+
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ================= ULTRA MODERN OTP MODAL ================= -->
+  <div class="otp-backdrop" *ngIf="showOtpModal">
+    <div class="otp-dialog-box">
+      <div class="otp-card">
+
+        <!-- Close Button -->
+        <button type="button" class="otp-close-btn" (click)="closeOtpModal()" aria-label="Close">
+          <i class="bi bi-x-lg"></i>
+        </button>
+
+        <!-- Animated Icon Ring -->
+        <div class="otp-badge-ring">
+          <div class="otp-inner-icon">
+            <i class="bi bi-shield-check"></i>
+          </div>
+        </div>
+
+        <h3>Verify Phone Number</h3>
+        <p class="otp-subtext">
+          Enter the 6-digit verification code sent to
+          <br>
+          <span class="phone-highlight">
+            <img [src]="'https://flagcdn.com/w40/' + selectedCountry.iso + '.png'" class="flag-otp-badge" [alt]="selectedCountry.country">
+            {{ selectedCountry.code }} {{ accountForm.get('mobile')?.value }}
+          </span>
+        </p>
+
+        <!-- Demo OTP Helper Alert -->
+        <div class="otp-demo-alert" *ngIf="otpNotification">
+          <div class="demo-tag"><i class="bi bi-lightning-charge-fill me-1"></i>Demo OTP</div>
+          <div class="demo-code">{{ generatedOtp }}</div>
+          <div class="demo-tip">Auto-filled for testing. Click Verify below to finish.</div>
+        </div>
+
+        <!-- OTP Error Message -->
+        <div class="alert alert-danger py-2 px-3 small text-start mb-3 rounded-3" *ngIf="otpError">
+          <i class="bi bi-exclamation-triangle-fill me-1"></i>
+          <span>{{ otpError }}</span>
+        </div>
+
+        <!-- 6-Digit OTP Code Input -->
+        <div class="otp-input-wrap mb-3">
+          <input 
+            type="text" 
+            [(ngModel)]="otpCode" 
+            class="form-control otp-giant-input" 
+            placeholder="• • • • • •" 
+            maxlength="6"
+            autofocus
+            (keyup.enter)="verifyOtpAndSubmit()">
+        </div>
+
+        <!-- Resend Timer Bar -->
+        <div class="d-flex justify-content-between align-items-center mb-4 px-1">
+          <span class="text-muted small">Didn't receive SMS?</span>
+          <button 
+            type="button" 
+            class="btn btn-link btn-sm p-0 text-decoration-none fw-bold text-success" 
+            (click)="resendOtp()" 
+            [disabled]="otpTimer > 0 || otpSending">
+            <span *ngIf="otpTimer > 0">Resend in {{ otpTimer }}s</span>
+            <span *ngIf="otpTimer === 0"><i class="bi bi-arrow-clockwise me-1"></i>Resend OTP</span>
+          </button>
+        </div>
+
+        <!-- Verify & Launch Button -->
+        <button 
+          type="button" 
+          class="btn btn-pharma-submit w-100 py-3 fw-bold mb-2 shadow-sm" 
+          (click)="verifyOtpAndSubmit()" 
+          [disabled]="loading || !otpCode || otpCode.length !== 6">
+          <span class="spinner-border spinner-border-sm me-2" *ngIf="loading"></span>
+          <i class="bi bi-rocket-takeoff-fill me-2" *ngIf="!loading"></i>
+          <span>{{ loading ? 'Provisioning Pharmacy...' : 'Verify & Launch Pharmacy' }}</span>
+        </button>
+
+        <!-- Edit Mobile Number -->
+        <button type="button" class="btn btn-light btn-sm w-100 text-muted mt-2 rounded-3 py-2" (click)="closeOtpModal()">
+          <i class="bi bi-pencil me-1"></i> Edit Phone Number
+        </button>
+
+      </div>
+    </div>
+  </div>
+
+</div>

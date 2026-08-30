@@ -16,15 +16,22 @@
 
     </div>
 
-    <button
-      type="button"
-      class="back-btn"
-      (click)="backToPatients()">
+    <div style="display: flex; gap: 10px; align-items: center;">
+      <button
+        type="button"
+        class="back-btn"
+        (click)="goToDashboard()">
+        <i class="bi bi-grid-1x2-fill" style="margin-right: 4px;"></i>
+        Dashboard
+      </button>
 
-      ← Back to Patients
-
-    </button>
-
+      <button
+        type="button"
+        class="back-btn"
+        (click)="backToPatients()">
+        ← Back to Patients
+      </button>
+    </div>
   </div>
 
 

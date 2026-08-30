@@ -43,32 +43,78 @@
         <p>Create a new patient record</p>
       </div>
 
-      <button
-        type="button"
-        class="draft-btn"
-        (click)="saveDraft()"
-        title="Save patient as draft">
+      <div style="display: flex; gap: 10px; align-items: center;">
+        <button
+          type="button"
+          class="draft-btn"
+          (click)="goToDashboard()"
+          title="Back to Dashboard">
+          <svg
+            width="17"
+            height="17"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round">
+            <rect x="3" y="3" width="7" height="9"></rect>
+            <rect x="14" y="3" width="7" height="5"></rect>
+            <rect x="14" y="12" width="7" height="9"></rect>
+            <rect x="3" y="16" width="7" height="5"></rect>
+          </svg>
+          <span>Dashboard</span>
+        </button>
 
-        <svg
-          width="17"
-          height="17"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          aria-hidden="true">
+        <button
+          type="button"
+          class="draft-btn"
+          (click)="goToPatients()"
+          title="Go to Patients List">
+          <svg
+            width="17"
+            height="17"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+            <circle cx="9" cy="7" r="4"></circle>
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+          </svg>
+          <span>Patients</span>
+        </button>
 
-          <path d="M5 4h11l3 3v13H5z"></path>
-          <path d="M8 4v6h8V4"></path>
-          <path d="M8 20v-6h8v6"></path>
+        <button
+          type="button"
+          class="draft-btn"
+          (click)="saveDraft()"
+          title="Save patient as draft">
 
-        </svg>
+          <svg
+            width="17"
+            height="17"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true">
 
-        <span>Save Draft</span>
+            <path d="M5 4h11l3 3v13H5z"></path>
+            <path d="M8 4v6h8V4"></path>
+            <path d="M8 20v-6h8v6"></path>
 
-      </button>
+          </svg>
+
+          <span>Save Draft</span>
+
+        </button>
+      </div>
     </div>
 
 

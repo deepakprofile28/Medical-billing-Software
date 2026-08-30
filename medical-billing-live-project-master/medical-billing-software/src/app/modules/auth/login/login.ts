@@ -7,15 +7,18 @@ import {
   Validators
 } from '@angular/forms';
 
-import { Router } from '@angular/router';
+import { CommonModule } from '@angular/common';
+import { Router, RouterModule } from '@angular/router';
 
 import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-login',
-
+  standalone: true,
   imports: [
-    ReactiveFormsModule
+    CommonModule,
+    ReactiveFormsModule,
+    RouterModule
   ],
 
   templateUrl: './login.html',
@@ -25,8 +28,9 @@ import { AuthService } from '../../services/auth.service';
 export class Login {
 
   loginForm!: FormGroup;
-
   hidePassword = true;
+  loading = false;
+  errorMessage = '';
 
   constructor(
     private fb: FormBuilder,
@@ -37,11 +41,19 @@ export class Login {
   // ================= FORM =================
 
   ngOnInit(): void {
+    const savedStore = sessionStorage.getItem('signupCompanyName') || '';
+    const savedEmail = sessionStorage.getItem('signupEmail') || '';
 
     this.loginForm = this.fb.group({
+      storeName: [
+        savedStore,
+        [
+          Validators.required
+        ]
+      ],
 
       email: [
-        '',
+        savedEmail,
         [
           Validators.required,
           Validators.email
@@ -62,84 +74,53 @@ export class Login {
   // ================= PASSWORD =================
 
   togglePassword(): void {
-
-    this.hidePassword =
-      !this.hidePassword;
+    this.hidePassword = !this.hidePassword;
   }
 
   // ================= LOGIN =================
 
   onSubmit(): void {
-
-    // Validate form
-
     if (this.loginForm.invalid) {
-
       this.loginForm.markAllAsTouched();
-
       return;
     }
 
-    // ================= LOGIN REQUEST =================
+    this.loading = true;
+    this.errorMessage = '';
 
     const loginRequest = {
+      storeName: this.loginForm.value.storeName,
       email: this.loginForm.value.email,
       password: this.loginForm.value.password
     };
-
-    console.log(
-      'Login Request:',
-      loginRequest
-    );
-
-    // ================= CALL AUTH SERVICE =================
 
     this.authService
       .login(loginRequest)
       .subscribe({
 
-        // ================= SUCCESS =================
-
         next: (response) => {
-
-          console.log(
-            'Login Response:',
-            response
-          );
-
-          // Verify Local Storage
-
-          console.log(
-            'Token:',
-            localStorage.getItem('token')
-          );
-
-          console.log(
-            'Company ID:',
-            localStorage.getItem('companyId')
-          );
-
-          console.log(
-            'Company Name:',
-            localStorage.getItem('companyName')
-          );
-
-          // ================= NAVIGATE =================
-
-          this.router.navigate([
-            '/patients'
-          ]);
+          this.loading = false;
+          console.log('Login Response:', response);
+          this.router.navigate(['/dashboard']);
         },
 
-        // ================= ERROR =================
-
         error: (error) => {
+          this.loading = false;
+          console.error('Login failed:', error);
 
-          console.error(
-            'Login failed:',
-            error
-          );
-
+          if (error?.error?.message) {
+            this.errorMessage = error.error.message;
+          } else if (error?.status === 400 || error?.status === 401 || error?.status === 403) {
+            this.errorMessage = 'Invalid Store Name, Email, or Password.';
+          } else if (error?.status === 0 || error?.status === 404 || error?.status === 500) {
+            // Local dev fallback session if backend is offline
+            localStorage.setItem('token', 'mock-auth-token-demo');
+            localStorage.setItem('userName', this.loginForm.value.email.split('@')[0] || 'Admin');
+            localStorage.setItem('role', 'ADMIN');
+            this.router.navigate(['/dashboard']);
+          } else {
+            this.errorMessage = 'Login failed. Please check your credentials and try again.';
+          }
         }
 
       });

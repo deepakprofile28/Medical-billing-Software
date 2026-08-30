@@ -1,0 +1,476 @@
+<div class="otp-container">
+
+  <div class="otp-card">
+
+
+    <!-- =====================================================
+         LEFT SIDE
+    ====================================================== -->
+
+    <div class="otp-left">
+
+      <div class="brand">
+
+        <i class="bi bi-capsule-pill"></i>
+
+        <h2>MedBill Pro</h2>
+
+        <p>
+          Smart Pharmacy Billing & Medical Store System
+        </p>
+
+      </div>
+
+
+      <div class="otp-features">
+
+
+        <!-- Feature 1 -->
+
+        <div class="feature">
+
+          <i class="bi bi-shield-check"></i>
+
+          <div>
+
+            <strong>
+              Secure Verification
+            </strong>
+
+            <p>
+              Your account is protected with OTP verification.
+            </p>
+
+          </div>
+
+        </div>
+
+
+        <!-- Feature 2 -->
+
+        <div class="feature">
+
+          <i class="bi bi-phone"></i>
+
+          <div>
+
+            <strong>
+              Mobile Verification
+            </strong>
+
+            <p>
+              Verify your registered mobile number.
+            </p>
+
+          </div>
+
+        </div>
+
+
+        <!-- Feature 3 -->
+
+        <div class="feature">
+
+          <i class="bi bi-receipt-cutoff"></i>
+
+          <div>
+
+            <strong>
+              Pharmacy Billing
+            </strong>
+
+            <p>
+              Manage billing, medicines and sales easily.
+            </p>
+
+          </div>
+
+        </div>
+
+
+      </div>
+
+
+      <div class="brand-footer">
+
+        <p>
+          © 2026 MedBill Pro Healthcare Solutions
+        </p>
+
+      </div>
+
+    </div>
+
+
+
+    <!-- =====================================================
+         RIGHT SIDE
+    ====================================================== -->
+
+    <div class="otp-right">
+
+
+      <!-- Header -->
+
+      <div class="form-header">
+
+        <div class="otp-icon">
+
+          <i class="bi bi-shield-lock-fill"></i>
+
+        </div>
+
+
+        <h3>
+          Verify Your Mobile 📱
+        </h3>
+
+
+        <p>
+          Enter the 6-digit OTP sent to your mobile number.
+        </p>
+
+      </div>
+
+
+
+      <!-- =====================================================
+           SUCCESS ALERT
+      ====================================================== -->
+
+      <div
+        class="alert alert-success d-flex align-items-center gap-2"
+        *ngIf="successMessage"
+      >
+
+        <i class="bi bi-check-circle-fill"></i>
+
+        <div>
+
+          {{ successMessage }}
+
+        </div>
+
+      </div>
+
+
+
+      <!-- =====================================================
+           ERROR ALERT
+      ====================================================== -->
+
+      <div
+        class="alert alert-danger d-flex align-items-center gap-2"
+        *ngIf="errorMessage"
+      >
+
+        <i class="bi bi-exclamation-triangle-fill"></i>
+
+        <div>
+
+          {{ errorMessage }}
+
+        </div>
+
+      </div>
+
+
+
+      <!-- =====================================================
+           USER DETAILS
+      ====================================================== -->
+
+      <div class="verification-info">
+
+
+        <div class="info-item">
+
+          <i class="bi bi-person"></i>
+
+          <div>
+
+            <small>
+              Name
+            </small>
+
+            <strong>
+              {{ userName }}
+            </strong>
+
+          </div>
+
+        </div>
+
+
+        <div class="info-item">
+
+          <i class="bi bi-phone"></i>
+
+          <div>
+
+            <small>
+              Mobile Number
+            </small>
+
+            <strong>
+              {{ countryCode }} {{ mobile }}
+            </strong>
+
+          </div>
+
+        </div>
+
+
+        <div
+          class="info-item"
+          *ngIf="companyName"
+        >
+
+          <i class="bi bi-shop"></i>
+
+          <div>
+
+            <small>
+              Pharmacy
+            </small>
+
+            <strong>
+              {{ companyName }}
+            </strong>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+
+      <!-- =====================================================
+           OTP FORM
+      ====================================================== -->
+
+      <form
+        [formGroup]="otpForm"
+        (ngSubmit)="verifyOtp()"
+      >
+
+
+        <!-- OTP -->
+
+        <div class="mb-4">
+
+          <label class="form-label">
+
+            Enter OTP
+
+            <span class="text-danger">
+              *
+            </span>
+
+          </label>
+
+
+          <div class="otp-input-wrapper">
+
+            <i class="bi bi-key"></i>
+
+            <input
+              type="text"
+              formControlName="otp"
+              class="form-control otp-input"
+              placeholder="Enter 6-digit OTP"
+              maxlength="6"
+              inputmode="numeric"
+              autocomplete="one-time-code"
+
+              [class.is-invalid]="
+                otpForm.get('otp')?.touched &&
+                otpForm.get('otp')?.invalid
+              "
+            />
+
+          </div>
+
+
+          <!-- Required -->
+
+          <small
+            class="text-danger"
+            *ngIf="
+              otpForm.get('otp')?.touched &&
+              otpForm.get('otp')?.hasError('required')
+            "
+          >
+
+            OTP is required
+
+          </small>
+
+
+          <!-- Pattern -->
+
+          <small
+            class="text-danger"
+            *ngIf="
+              otpForm.get('otp')?.touched &&
+              otpForm.get('otp')?.hasError('pattern')
+            "
+          >
+
+            Please enter a valid 6-digit OTP
+
+          </small>
+
+        </div>
+
+
+
+        <!-- =================================================
+             VERIFY BUTTON
+        ================================================== -->
+
+        <button
+          type="submit"
+          class="btn btn-primary w-100 verify-btn"
+
+          [disabled]="
+            otpForm.invalid ||
+            loading
+          "
+        >
+
+
+          <!-- Normal -->
+
+          <span *ngIf="!loading">
+
+            <i class="bi bi-check-circle-fill me-1"></i>
+
+            Verify OTP
+
+          </span>
+
+
+          <!-- Loading -->
+
+          <span *ngIf="loading">
+
+            <span
+              class="spinner-border spinner-border-sm me-2"
+              role="status"
+              aria-hidden="true"
+            >
+            </span>
+
+            Verifying...
+
+          </span>
+
+        </button>
+
+      </form>
+
+
+
+      <!-- =====================================================
+           RESEND OTP
+      ====================================================== -->
+
+      <div class="resend-section">
+
+
+        <p *ngIf="countdown > 0">
+
+          Didn't receive the OTP?
+
+          <span>
+            Resend in {{ countdown }}s
+          </span>
+
+        </p>
+
+
+        <p *ngIf="countdown === 0">
+
+          Didn't receive the OTP?
+
+          <button
+            type="button"
+            class="resend-btn"
+
+            [disabled]="resending"
+
+            (click)="resendOtp()"
+          >
+
+            <span *ngIf="!resending">
+
+              Resend OTP
+
+            </span>
+
+
+            <span *ngIf="resending">
+
+              Sending...
+
+            </span>
+
+          </button>
+
+        </p>
+
+      </div>
+
+
+
+      <!-- =====================================================
+           BACK TO SIGNUP
+      ====================================================== -->
+
+      <div class="back-section">
+
+        <button
+          type="button"
+          class="back-btn"
+          (click)="backToSignup()"
+        >
+
+          <i class="bi bi-arrow-left"></i>
+
+          Back to Registration
+
+        </button>
+
+      </div>
+
+
+
+      <!-- =====================================================
+           FOOTER
+      ====================================================== -->
+
+      <div class="login-footer">
+
+        <span>
+          Already verified?
+        </span>
+
+        <a
+          routerLink="/login"
+          class="signin-link"
+        >
+
+          Sign In
+
+        </a>
+
+      </div>
+
+
+    </div>
+
+  </div>
+
+</div>

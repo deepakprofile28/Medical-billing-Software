@@ -1,7 +1,10 @@
 import {
   Component,
   OnInit,
-  ChangeDetectorRef
+  ChangeDetectorRef,
+  ViewChild,
+  ElementRef,
+  HostListener
 } from '@angular/core';
 
 import { CommonModule } from '@angular/common';
@@ -95,6 +98,20 @@ export class PatientList implements OnInit {
   customColumnInputType: 'text' | 'dropdown' | 'multi-select' = 'text';
   customColumnOptionValues: string[] = [''];
   draggedCustomColumnKey: string | null = null;
+  @ViewChild('columnsMenuDetails') columnsMenuDetails?: ElementRef<HTMLDetailsElement>;
+
+  // ================= CLOSE ON OUTSIDE CLICK =================
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    if (!this.columnsMenuDetails?.nativeElement) {
+      return;
+    }
+
+    const clickedInside = this.columnsMenuDetails.nativeElement.contains(event.target as Node);
+    if (!clickedInside && this.columnsMenuDetails.nativeElement.open) {
+      this.columnsMenuDetails.nativeElement.open = false;
+    }
+  }
 
   constructor(
     private patientService: PatientService,
@@ -136,6 +153,14 @@ export class PatientList implements OnInit {
       ? [...column.options]
       : [''];
     this.showCustomColumnForm = true;
+  }
+
+  trackByIndex(index: number): number {
+    return index;
+  }
+
+  trackByColumnKey(index: number, column: { key: string }): string {
+    return column.key;
   }
 
   addCustomColumnOption(): void {
@@ -252,6 +277,11 @@ export class PatientList implements OnInit {
     this.saveCustomColumns();
     this.saveColumnSelection();
     this.cancelCustomColumnForm();
+
+    // Automatically close the Columns dropdown popup
+    if (this.columnsMenuDetails?.nativeElement) {
+      this.columnsMenuDetails.nativeElement.open = false;
+    }
   }
 
   private getCustomColumnOptions(): string[] {
@@ -1283,6 +1313,14 @@ removeDraft(id: number | undefined): void {
     this.router.navigate([
       '/patient-registration'
     ]);
+  }
+
+  goToDashboard(): void {
+    this.router.navigate(['/dashboard']);
+  }
+
+  goToUsers(): void {
+    this.router.navigate(['/users']);
   }
 
   // ==========================================

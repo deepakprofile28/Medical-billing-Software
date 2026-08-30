@@ -966,4 +966,12 @@ export class PatientRegistration implements OnInit, AfterViewInit {
         }
       });
   }
+
+  goToDashboard(): void {
+    this.router.navigate(['/dashboard']);
+  }
+
+  goToPatients(): void {
+    this.router.navigate(['/patients']);
+  }
 }

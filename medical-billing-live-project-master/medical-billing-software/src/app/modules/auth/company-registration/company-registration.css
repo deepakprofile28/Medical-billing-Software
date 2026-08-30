@@ -1,0 +1,776 @@
+/* ==========================================================================
+   PHARMACARE CLOUD - DEDICATED PHARMACY ONBOARDING THEME
+   ========================================================================== */
+:host {
+  --pharma-emerald: #059669;
+  --pharma-emerald-hover: #047857;
+  --pharma-mint: #10b981;
+  --pharma-teal: #0d9488;
+  --pharma-cyan: #06b6d4;
+  
+  --pharma-dark: #061914;
+  --pharma-dark-card: #09261f;
+  
+  --text-dark: #0f172a;
+  --text-muted: #64748b;
+  --text-light: #94a3b8;
+  
+  --border-light: #e2e8f0;
+  --border-focus: #10b981;
+  
+  --radius-sm: 8px;
+  --radius-md: 10px;
+  --radius-lg: 18px;
+  --radius-pill: 50px;
+}
+
+.pharma-onboard-page {
+  min-height: 100vh;
+  width: 100%;
+  background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 40%, #f8fafc 100%);
+  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  display: flex;
+  align-items: stretch;
+}
+
+.pharma-layout-container {
+  display: flex;
+  width: 100%;
+  min-height: 100vh;
+}
+
+/* ==========================================================================
+   LEFT BRAND PANEL (PHARMACY SUITE)
+   ========================================================================== */
+.pharma-brand-panel {
+  flex: 0 0 440px;
+  background: linear-gradient(145deg, #052e24 0%, #031c16 60%, #02120e 100%);
+  color: #ffffff;
+  padding: 40px 36px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 10px 0 35px rgba(0, 0, 0, 0.15);
+}
+
+/* Glowing background atmosphere */
+.glow-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  pointer-events: none;
+  opacity: 0.35;
+}
+
+.orb-1 {
+  width: 300px;
+  height: 300px;
+  background: #10b981;
+  top: -60px;
+  right: -60px;
+}
+
+.orb-2 {
+  width: 240px;
+  height: 240px;
+  background: #0d9488;
+  bottom: -40px;
+  left: -40px;
+}
+
+.brand-top {
+  position: relative;
+  z-index: 2;
+}
+
+.pharma-logo-badge {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 28px;
+}
+
+.pharma-icon-box {
+  width: 46px;
+  height: 46px;
+  background: linear-gradient(135deg, #10b981, #0d9488);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  color: #ffffff;
+  box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4);
+}
+
+.pharma-logo-text h2 {
+  font-size: 1.2rem;
+  font-weight: 800;
+  margin: 0;
+  letter-spacing: -0.3px;
+  color: #ffffff;
+}
+
+.pharma-logo-text span {
+  font-size: 0.74rem;
+  color: #6ee7b7;
+  font-weight: 500;
+}
+
+.pharma-hero-content {
+  margin-bottom: 28px;
+}
+
+.edition-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(16, 185, 129, 0.16);
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  color: #6ee7b7;
+  padding: 4px 12px;
+  border-radius: var(--radius-pill);
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 14px;
+}
+
+.live-pulse {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #10b981;
+  box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+  animation: pulseGreen 1.8s infinite;
+}
+
+@keyframes pulseGreen {
+  0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+  70% { transform: scale(1); box-shadow: 0 0 0 8px rgba(16, 185, 129, 0); }
+  100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+}
+
+.pharma-hero-content h1 {
+  font-size: 1.8rem;
+  font-weight: 800;
+  line-height: 1.25;
+  margin-bottom: 12px;
+  background: linear-gradient(135deg, #ffffff 30%, #a7f3d0 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+.hero-desc {
+  font-size: 0.86rem;
+  color: #a7f3d0;
+  line-height: 1.55;
+  opacity: 0.9;
+  margin: 0;
+}
+
+.hero-desc strong {
+  color: #ffffff;
+}
+
+/* Feature List */
+.pharma-feature-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.pharma-feature-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.feat-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  color: #34d399;
+  flex-shrink: 0;
+}
+
+.pharma-feature-item h5 {
+  font-size: 0.86rem;
+  font-weight: 700;
+  margin: 0 0 2px 0;
+  color: #f0fdf4;
+}
+
+.pharma-feature-item p {
+  font-size: 0.76rem;
+  color: #94a3b8;
+  line-height: 1.4;
+  margin: 0;
+}
+
+.brand-bottom {
+  position: relative;
+  z-index: 2;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.support-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.76rem;
+  color: #6ee7b7;
+  font-weight: 600;
+}
+
+.brand-signin-prompt {
+  font-size: 0.82rem;
+  color: #94a3b8;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.brand-signin-btn {
+  color: #34d399;
+  font-weight: 700;
+  text-decoration: none;
+  transition: all 0.2s;
+}
+
+.brand-signin-btn:hover {
+  color: #6ee7b7;
+  text-decoration: underline;
+}
+
+/* ==========================================================================
+   RIGHT REGISTRATION FORM PANEL
+   ========================================================================== */
+.pharma-form-panel {
+  flex: 1;
+  padding: 32px 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow-y: auto;
+}
+
+.pharma-form-card {
+  width: 100%;
+  max-width: 580px;
+  background: #ffffff;
+  border-radius: var(--radius-lg);
+  padding: 32px 36px;
+  box-shadow: 0 20px 45px -12px rgba(5, 150, 105, 0.08), 0 0 0 1px rgba(226, 232, 240, 0.8);
+  border: 1px solid #e2e8f0;
+}
+
+.form-header-box {
+  margin-bottom: 20px;
+}
+
+.header-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #ecfdf5;
+  color: var(--pharma-emerald);
+  font-size: 0.74rem;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: var(--radius-pill);
+  margin-bottom: 8px;
+  border: 1px solid #d1fae5;
+}
+
+.form-header-box h2 {
+  font-size: 1.45rem;
+  font-weight: 800;
+  color: var(--text-dark);
+  margin: 0 0 4px 0;
+  letter-spacing: -0.3px;
+}
+
+.form-header-box p {
+  font-size: 0.84rem;
+  color: var(--text-muted);
+  line-height: 1.4;
+  margin: 0;
+}
+
+/* ==========================================================================
+   FORM INPUTS & STYLING
+   ========================================================================== */
+.form-label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #334155;
+  margin-bottom: 5px;
+}
+
+.custom-input {
+  height: 44px;
+  border-radius: var(--radius-md);
+  border: 1.5px solid #cbd5e1;
+  font-size: 0.88rem;
+  color: var(--text-dark);
+  background-color: #f8fafc;
+  padding: 0 12px;
+  transition: all 0.2s ease;
+}
+
+.custom-input:focus {
+  background-color: #ffffff;
+  border-color: var(--pharma-emerald);
+  box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.12);
+  outline: none;
+}
+
+/* ==========================================================================
+   UNIFIED MOBILE INPUT BOX (NO AWKWARD SPACING)
+   ========================================================================== */
+.mobile-unified-input {
+  display: flex;
+  align-items: center;
+  height: 44px;
+  border-radius: var(--radius-md);
+  border: 1.5px solid #cbd5e1;
+  background-color: #f8fafc;
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.mobile-unified-input:focus-within {
+  background-color: #ffffff;
+  border-color: var(--pharma-emerald);
+  box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.12);
+}
+
+.mobile-unified-input.is-invalid {
+  border-color: #dc3545;
+}
+
+.flag-picker-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 100%;
+  padding: 0 10px;
+  background-color: #f1f5f9;
+  border: none;
+  border-right: 1.5px solid #cbd5e1;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  flex-shrink: 0;
+}
+
+.flag-picker-btn:hover, .flag-picker-btn.active {
+  background-color: #e2e8f0;
+}
+
+.flag-img-icon {
+  width: 20px;
+  height: 14px;
+  object-fit: cover;
+  border-radius: 2px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+}
+
+.flag-code-label {
+  font-weight: 700;
+  font-size: 0.86rem;
+  color: #334155;
+}
+
+.flag-chevron {
+  font-size: 9px;
+  color: #64748b;
+  transition: transform 0.2s ease;
+}
+
+.flag-picker-btn.active .flag-chevron {
+  transform: rotate(180deg);
+}
+
+.mobile-inline-input {
+  flex: 1;
+  height: 100%;
+  border: none;
+  background: transparent;
+  padding: 0 12px;
+  font-size: 0.88rem;
+  font-family: inherit;
+  color: var(--text-dark);
+  outline: none;
+  box-shadow: none;
+}
+
+.mobile-inline-input::placeholder {
+  color: #94a3b8;
+}
+
+/* ==========================================================================
+   CLICK-OUTSIDE BACKDROP & FLAG DROPDOWN MENU
+   ========================================================================== */
+.flag-dropdown-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 998;
+  background: transparent;
+}
+
+.flag-dropdown-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  z-index: 999;
+  width: 280px;
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 15px 35px -5px rgba(0, 0, 0, 0.18);
+  animation: dropdownSlide 0.2s ease-out forwards;
+}
+
+@keyframes dropdownSlide {
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.flag-menu-header {
+  padding: 8px 12px;
+  background: #f8fafc;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #64748b;
+  text-transform: uppercase;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.flag-list-scroll {
+  max-height: 200px;
+  overflow-y: auto;
+  padding: 4px;
+}
+
+.flag-option-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 7px 10px;
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.flag-option-item:hover {
+  background: #ecfdf5;
+}
+
+.flag-option-item.selected {
+  background: #d1fae5;
+  font-weight: 700;
+}
+
+.flag-img-option {
+  width: 20px;
+  height: 14px;
+  object-fit: cover;
+  border-radius: 2px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+}
+
+.country-name-text {
+  font-size: 0.82rem;
+  color: #1e293b;
+  flex: 1;
+}
+
+.country-dial-code {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #059669;
+  font-family: monospace;
+}
+
+.flag-otp-badge {
+  width: 18px;
+  height: 12px;
+  object-fit: cover;
+  border-radius: 2px;
+  vertical-align: middle;
+  margin-right: 6px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+}
+
+.address-box {
+  height: auto !important;
+  min-height: 64px;
+  padding: 8px 12px;
+  resize: vertical;
+}
+
+/* Password eye toggle */
+.password-field-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.password-field-wrap .custom-input {
+  padding-right: 38px;
+}
+
+.eye-toggle-btn {
+  position: absolute;
+  right: 10px;
+  background: transparent;
+  border: none;
+  color: var(--text-light);
+  font-size: 16px;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s;
+}
+
+.eye-toggle-btn:hover {
+  color: var(--pharma-emerald);
+}
+
+/* ==========================================================================
+   PRIMARY SUBMIT BUTTON (PHARMACY GRADIENT)
+   ========================================================================== */
+.btn-pharma-submit {
+  background: linear-gradient(135deg, #059669 0%, #0d9488 60%, #10b981 100%);
+  color: #ffffff;
+  border: none;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 14px rgba(5, 150, 105, 0.25);
+}
+
+.btn-pharma-submit:hover:not(:disabled) {
+  background: linear-gradient(135deg, #047857 0%, #0f766e 60%, #059669 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(5, 150, 105, 0.35);
+  color: #ffffff;
+}
+
+.btn-pharma-submit:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.btn-pharma-submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* ==========================================================================
+   ULTRA MODERN OTP POPUP MODAL
+   ========================================================================== */
+.otp-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(6, 25, 20, 0.7);
+  backdrop-filter: blur(8px);
+  z-index: 1050;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  animation: modalFadeIn 0.25s ease-out forwards;
+}
+
+.otp-dialog-box {
+  width: 100%;
+  max-width: 440px;
+  animation: modalSlideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.otp-card {
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 32px 28px;
+  box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.35);
+  position: relative;
+  text-align: center;
+}
+
+.otp-close-btn {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 1px solid #e2e8f0;
+  background: #f8fafc;
+  color: #64748b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.otp-close-btn:hover {
+  background: #fee2e2;
+  color: #ef4444;
+  border-color: #fecaca;
+}
+
+.otp-badge-ring {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: #ecfdf5;
+  border: 2px solid #a7f3d0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 14px auto;
+  box-shadow: 0 0 0 5px rgba(16, 185, 129, 0.1);
+}
+
+.otp-inner-icon {
+  font-size: 28px;
+  color: var(--pharma-emerald);
+}
+
+.otp-card h3 {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: var(--text-dark);
+  margin: 0 0 4px 0;
+}
+
+.otp-subtext {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  line-height: 1.45;
+  margin-bottom: 16px;
+}
+
+.phone-highlight {
+  color: var(--pharma-emerald);
+  font-weight: 800;
+  font-family: monospace;
+  font-size: 0.95rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Demo pill */
+.otp-demo-alert {
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: 10px;
+  padding: 10px 12px;
+  margin-bottom: 16px;
+}
+
+.demo-tag {
+  font-size: 0.7rem;
+  font-weight: 800;
+  color: #047857;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 2px;
+}
+
+.demo-code {
+  font-size: 1.4rem;
+  font-weight: 900;
+  font-family: monospace;
+  letter-spacing: 6px;
+  color: #065f46;
+}
+
+.demo-tip {
+  font-size: 0.74rem;
+  color: #059669;
+  margin-top: 2px;
+}
+
+.otp-giant-input {
+  height: 52px;
+  font-size: 1.7rem !important;
+  letter-spacing: 8px;
+  font-weight: 900;
+  font-family: monospace;
+  text-align: center;
+  border: 2px solid #a7f3d0;
+  border-radius: 12px;
+  background: #f8fafc;
+  color: #064e3b;
+  transition: all 0.2s;
+}
+
+.otp-giant-input:focus {
+  background: #ffffff;
+  border-color: var(--pharma-emerald);
+  box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.18);
+}
+
+@keyframes modalFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes modalSlideUp {
+  from { opacity: 0; transform: translateY(20px) scale(0.96); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* ==========================================================================
+   RESPONSIVE LAYOUT
+   ========================================================================== */
+@media (max-width: 1080px) {
+  .pharma-layout-container {
+    flex-direction: column;
+  }
+
+  .pharma-brand-panel {
+    flex: none;
+    padding: 32px 24px;
+  }
+
+  .pharma-form-panel {
+    padding: 24px 16px;
+  }
+
+  .pharma-form-card {
+    padding: 24px 20px;
+  }
+}

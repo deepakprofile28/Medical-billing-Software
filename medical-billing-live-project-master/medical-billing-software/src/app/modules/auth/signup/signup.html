@@ -1,0 +1,825 @@
+<div class="signup-container">
+
+  <div class="signup-card">
+
+    <!-- =====================================================
+         LEFT SIDE - BRAND & FEATURES
+    ====================================================== -->
+
+    <div class="signup-left">
+
+      <div class="brand">
+
+        <i class="bi bi-capsule-pill"></i>
+
+        <h2>MedBill Pro</h2>
+
+        <p>
+          Smart Pharmacy Billing & Medical Store System
+        </p>
+
+      </div>
+
+
+      <div class="features">
+
+        <!-- Feature 1 -->
+
+        <div class="feature">
+
+          <i class="bi bi-shield-check"></i>
+
+          <div>
+
+            <strong>
+              Secure Pharmacy Management
+            </strong>
+
+            <p>
+              Manage your medical store securely
+            </p>
+
+          </div>
+
+        </div>
+
+
+        <!-- Feature 2 -->
+
+        <div class="feature">
+
+          <i class="bi bi-receipt-cutoff"></i>
+
+          <div>
+
+            <strong>
+              Smart Pharmacy Billing
+            </strong>
+
+            <p>
+              Fast billing, invoices and GST support
+            </p>
+
+          </div>
+
+        </div>
+
+
+        <!-- Feature 3 -->
+
+        <div class="feature">
+
+          <i class="bi bi-box-seam"></i>
+
+          <div>
+
+            <strong>
+              Medicine Inventory
+            </strong>
+
+            <p>
+              Track medicines, stock and expiry dates
+            </p>
+
+          </div>
+
+        </div>
+
+
+        <!-- Feature 4 -->
+
+        <div class="feature">
+
+          <i class="bi bi-graph-up-arrow"></i>
+
+          <div>
+
+            <strong>
+              Sales & Revenue Analytics
+            </strong>
+
+            <p>
+              Track pharmacy sales and collections
+            </p>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <div class="brand-footer">
+
+        <p>
+          © 2026 MedBill Pro Healthcare Solutions
+        </p>
+
+      </div>
+
+    </div>
+
+
+
+    <!-- =====================================================
+         RIGHT SIDE - SIGNUP FORM
+    ====================================================== -->
+
+    <div class="signup-right">
+
+
+      <!-- Header -->
+
+      <div class="form-header">
+
+        <h3>
+          Create Pharmacy Account 🚀
+        </h3>
+
+        <p>
+          Register your pharmacy or medical store to get started.
+        </p>
+
+      </div>
+
+
+
+      <!-- =====================================================
+           SUCCESS MESSAGE
+      ====================================================== -->
+
+      <div
+        class="alert alert-success d-flex align-items-center gap-2"
+        *ngIf="successMessage"
+      >
+
+        <i class="bi bi-check-circle-fill"></i>
+
+        <div>
+          {{ successMessage }}
+        </div>
+
+      </div>
+
+
+
+      <!-- =====================================================
+           ERROR MESSAGE
+      ====================================================== -->
+
+      <div
+        class="alert alert-danger d-flex align-items-center gap-2"
+        *ngIf="errorMessage"
+      >
+
+        <i class="bi bi-exclamation-triangle-fill"></i>
+
+        <div>
+          {{ errorMessage }}
+        </div>
+
+      </div>
+
+
+
+      <!-- =====================================================
+           SIGNUP FORM
+      ====================================================== -->
+
+      <form
+        [formGroup]="signupForm"
+        (ngSubmit)="onSubmit()"
+      >
+
+
+        <!-- =================================================
+             FULL NAME + EMAIL
+        ================================================== -->
+
+        <div class="row">
+
+
+          <!-- Full Name -->
+
+          <div class="col-md-6 mb-3">
+
+            <label class="form-label">
+
+              Full Name
+
+              <span class="text-danger">*</span>
+
+            </label>
+
+
+            <div class="input-with-icon">
+
+              <i class="bi bi-person"></i>
+
+              <input
+                type="text"
+                formControlName="userName"
+                class="form-control"
+                placeholder="Enter your full name"
+
+                [class.is-invalid]="
+                  signupForm.get('userName')?.touched &&
+                  signupForm.get('userName')?.invalid
+                "
+              />
+
+            </div>
+
+
+            <!-- Required -->
+
+            <small
+              class="text-danger"
+              *ngIf="
+                signupForm.get('userName')?.touched &&
+                signupForm.get('userName')?.hasError('required')
+              "
+            >
+
+              Full Name is required
+
+            </small>
+
+
+            <!-- Minimum Length -->
+
+            <small
+              class="text-danger"
+              *ngIf="
+                signupForm.get('userName')?.touched &&
+                signupForm.get('userName')?.hasError('minlength')
+              "
+            >
+
+              Minimum 3 characters required
+
+            </small>
+
+          </div>
+
+
+
+          <!-- Email -->
+
+          <div class="col-md-6 mb-3">
+
+            <label class="form-label">
+
+              Email Address
+
+              <span class="text-danger">*</span>
+
+            </label>
+
+
+            <div class="input-with-icon">
+
+              <i class="bi bi-envelope"></i>
+
+              <input
+                type="email"
+                formControlName="email"
+                class="form-control"
+                placeholder="pharmacy@example.com"
+
+                [class.is-invalid]="
+                  signupForm.get('email')?.touched &&
+                  signupForm.get('email')?.invalid
+                "
+              />
+
+            </div>
+
+
+            <small
+              class="text-danger"
+              *ngIf="
+                signupForm.get('email')?.touched &&
+                signupForm.get('email')?.hasError('required')
+              "
+            >
+
+              Email is required
+
+            </small>
+
+
+            <small
+              class="text-danger"
+              *ngIf="
+                signupForm.get('email')?.touched &&
+                signupForm.get('email')?.hasError('email')
+              "
+            >
+
+              Please enter a valid email
+
+            </small>
+
+          </div>
+
+        </div>
+
+
+
+        <!-- =================================================
+             MOBILE + PHARMACY NAME
+        ================================================== -->
+
+        <div class="row">
+
+
+          <!-- Mobile -->
+
+          <div class="col-md-6 mb-3">
+
+            <label class="form-label">
+
+              Mobile Number
+
+              <span class="text-danger">*</span>
+
+            </label>
+
+
+            <div class="input-with-icon">
+
+              <i class="bi bi-telephone"></i>
+
+              <input
+                type="tel"
+                formControlName="mobile"
+                class="form-control"
+                placeholder="10-digit mobile number"
+                maxlength="10"
+
+                [class.is-invalid]="
+                  signupForm.get('mobile')?.touched &&
+                  signupForm.get('mobile')?.invalid
+                "
+              />
+
+            </div>
+
+
+            <small
+              class="text-danger"
+              *ngIf="
+                signupForm.get('mobile')?.touched &&
+                signupForm.get('mobile')?.hasError('required')
+              "
+            >
+
+              Mobile number is required
+
+            </small>
+
+
+            <small
+              class="text-danger"
+              *ngIf="
+                signupForm.get('mobile')?.touched &&
+                signupForm.get('mobile')?.hasError('pattern')
+              "
+            >
+
+              Please enter a valid 10 digit number
+
+            </small>
+
+          </div>
+
+
+
+          <!-- Pharmacy Name -->
+
+          <div class="col-md-6 mb-3">
+
+            <label class="form-label">
+
+              Pharmacy / Medical Store Name
+
+              <span class="text-danger">*</span>
+
+            </label>
+
+
+            <div class="input-with-icon">
+
+              <i class="bi bi-shop"></i>
+
+              <input
+                type="text"
+                formControlName="companyName"
+                class="form-control"
+                placeholder="e.g. Sri Medicals"
+
+                [class.is-invalid]="
+                  signupForm.get('companyName')?.touched &&
+                  signupForm.get('companyName')?.invalid
+                "
+              />
+
+            </div>
+
+
+            <small
+              class="text-danger"
+              *ngIf="
+                signupForm.get('companyName')?.touched &&
+                signupForm.get('companyName')?.hasError('required')
+              "
+            >
+
+              Pharmacy / Medical Store name is required
+
+            </small>
+
+          </div>
+
+        </div>
+
+
+
+        <!-- =================================================
+             ROLE
+        ================================================== -->
+
+        <div class="mb-3">
+
+          <label class="form-label">
+
+            Staff Role / Designation
+
+            <span class="text-danger">*</span>
+
+          </label>
+
+
+          <div class="input-with-icon">
+
+            <i class="bi bi-person-badge"></i>
+
+
+            <select
+              formControlName="role"
+              class="form-select"
+            >
+
+              <!-- Current active role -->
+
+              <option value="PHARMACIST">
+                Pharmacist / Pharmacy Staff
+              </option>
+
+
+              <!-- Future roles -->
+
+              <option value="ADMIN" disabled>
+                Hospital / Clinic Administrator
+              </option>
+
+              <option value="BILLING_OFFICER" disabled>
+                Medical Billing Specialist
+              </option>
+
+              <option value="DOCTOR" disabled>
+                Doctor / Physician
+              </option>
+
+              <option value="RECEPTIONIST" disabled>
+                Front Desk / Receptionist
+              </option>
+
+            </select>
+
+          </div>
+
+        </div>
+
+
+
+        <!-- =================================================
+             PASSWORD + CONFIRM PASSWORD
+        ================================================== -->
+
+        <div class="row">
+
+
+          <!-- Password -->
+
+          <div class="col-md-6 mb-3">
+
+            <label class="form-label">
+
+              Password
+
+              <span class="text-danger">*</span>
+
+            </label>
+
+
+            <div class="password-field">
+
+              <input
+                [type]="hidePassword ? 'password' : 'text'"
+                formControlName="password"
+                class="form-control"
+                placeholder="Minimum 6 characters"
+
+                [class.is-invalid]="
+                  signupForm.get('password')?.touched &&
+                  signupForm.get('password')?.invalid
+                "
+              />
+
+
+              <button
+                type="button"
+                class="eye-btn"
+                (click)="togglePassword()"
+              >
+
+                <i
+                  class="bi"
+                  [class.bi-eye]="hidePassword"
+                  [class.bi-eye-slash]="!hidePassword"
+                ></i>
+
+              </button>
+
+            </div>
+
+
+            <small
+              class="text-danger"
+              *ngIf="
+                signupForm.get('password')?.touched &&
+                signupForm.get('password')?.hasError('required')
+              "
+            >
+
+              Password is required
+
+            </small>
+
+
+            <small
+              class="text-danger"
+              *ngIf="
+                signupForm.get('password')?.touched &&
+                signupForm.get('password')?.hasError('minlength')
+              "
+            >
+
+              Minimum 6 characters required
+
+            </small>
+
+          </div>
+
+
+
+          <!-- Confirm Password -->
+
+          <div class="col-md-6 mb-3">
+
+            <label class="form-label">
+
+              Confirm Password
+
+              <span class="text-danger">*</span>
+
+            </label>
+
+
+            <div class="password-field">
+
+              <input
+                [type]="
+                  hideConfirmPassword
+                    ? 'password'
+                    : 'text'
+                "
+                formControlName="confirmPassword"
+                class="form-control"
+                placeholder="Re-enter password"
+
+                [class.is-invalid]="
+                  signupForm.get('confirmPassword')?.touched &&
+                  (
+                    signupForm.get('confirmPassword')?.invalid ||
+                    signupForm.hasError('passwordMismatch')
+                  )
+                "
+              />
+
+
+              <button
+                type="button"
+                class="eye-btn"
+                (click)="toggleConfirmPassword()"
+              >
+
+                <i
+                  class="bi"
+                  [class.bi-eye]="hideConfirmPassword"
+                  [class.bi-eye-slash]="!hideConfirmPassword"
+                ></i>
+
+              </button>
+
+            </div>
+
+
+            <small
+              class="text-danger"
+              *ngIf="
+                signupForm.get('confirmPassword')?.touched &&
+                signupForm.get('confirmPassword')?.hasError('required')
+              "
+            >
+
+              Please confirm your password
+
+            </small>
+
+
+            <small
+              class="text-danger"
+              *ngIf="
+                signupForm.get('confirmPassword')?.touched &&
+                signupForm.get('confirmPassword')?.hasError('passwordMismatch')
+              "
+            >
+
+              Passwords do not match
+
+            </small>
+
+          </div>
+
+        </div>
+
+
+
+        <!-- =================================================
+             TERMS
+        ================================================== -->
+
+        <div class="mb-4 form-check">
+
+          <input
+            type="checkbox"
+            class="form-check-input"
+            id="agreeTerms"
+            formControlName="agreeTerms"
+          />
+
+
+          <label
+            class="form-check-label"
+            for="agreeTerms"
+          >
+
+            I agree to the
+
+            <a
+              href="#"
+              class="terms-link"
+            >
+              Terms of Service
+            </a>
+
+            &
+
+            <a
+              href="#"
+              class="terms-link"
+            >
+              Healthcare Data Privacy Policy
+            </a>
+
+          </label>
+
+
+          <div
+            *ngIf="
+              signupForm.get('agreeTerms')?.touched &&
+              signupForm.get('agreeTerms')?.invalid
+            "
+          >
+
+            <small class="text-danger">
+
+              You must accept the terms to proceed
+
+            </small>
+
+          </div>
+
+        </div>
+
+
+
+        <!-- =================================================
+             REGISTER BUTTON
+        ================================================== -->
+
+        <button
+          type="submit"
+          class="btn btn-primary w-100 signup-submit-btn"
+
+          [disabled]="
+            signupForm.invalid ||
+            loading
+          "
+        >
+
+
+          <!-- Normal -->
+
+          <span *ngIf="!loading">
+
+            <i class="bi bi-person-check-fill me-1"></i>
+
+            Register Pharmacy Account
+
+          </span>
+
+
+          <!-- Loading -->
+
+          <span *ngIf="loading">
+
+            <span
+              class="spinner-border spinner-border-sm me-2"
+              role="status"
+              aria-hidden="true"
+            >
+            </span>
+
+            Sending OTP...
+
+          </span>
+
+        </button>
+
+      </form>
+
+
+
+      <!-- =================================================
+           FOOTER
+      ================================================== -->
+
+      <div class="login-footer">
+
+
+        <div>
+
+          <span>
+            Already have an account?
+          </span>
+
+          <a
+            routerLink="/login"
+            class="signin-link"
+          >
+            Sign In
+          </a>
+
+        </div>
+
+
+        <!-- Future -->
+
+        <div class="mt-2 pt-2 border-top">
+
+          <span>
+            Need company / medical store registration?
+          </span>
+
+          <a
+            routerLink="/account-registration"
+            class="signin-link text-primary fw-bold"
+          >
+
+            Register Medical Shop →
+
+          </a>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>

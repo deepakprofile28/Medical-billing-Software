@@ -841,6 +841,155 @@ tbody tr:hover {
 .draft-approve-btn:hover { background: var(--success-bg); }
 .draft-remove-btn { color: var(--danger); border: none; font-size: 16px; padding: 6px 8px; }
 
+/* ==========================================================================
+   DRAFT POPUP EMPTY STATE (.draft-empty)
+   ========================================================================== */
+.draft-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 44px 32px;
+  background: var(--surface);
+}
+
+.draft-empty-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 14px;
+  background: #ecfdf5;
+  color: #059669;
+  border-radius: 20px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  margin-bottom: 20px;
+  border: 1px solid #a7f3d0;
+}
+
+.draft-empty-illustration {
+  position: relative;
+  width: 96px;
+  height: 96px;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.empty-circle-outer {
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  background: #eff6ff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px dashed #bfdbfe;
+}
+
+.empty-circle-inner {
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  font-size: 1.65rem;
+  box-shadow: 0 8px 18px rgba(37, 99, 235, 0.28);
+}
+
+.sparkle {
+  position: absolute;
+  color: #f59e0b;
+  font-size: 1.1rem;
+}
+
+.sparkle-1 {
+  top: 2px;
+  right: 4px;
+  animation: bounceFloat 2s ease-in-out infinite;
+}
+
+.sparkle-2 {
+  bottom: 6px;
+  left: 4px;
+  font-size: 0.95rem;
+  color: #3b82f6;
+  animation: bounceFloat 2.4s ease-in-out infinite reverse;
+}
+
+@keyframes bounceFloat {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-4px) scale(1.1); }
+}
+
+.draft-empty h4 {
+  font-size: 1.22rem;
+  font-weight: 800;
+  color: var(--text-main);
+  margin: 0 0 8px 0;
+  letter-spacing: -0.3px;
+}
+
+.draft-empty p {
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  line-height: 1.55;
+  max-width: 380px;
+  margin: 0 0 24px 0;
+}
+
+.draft-empty-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.btn-draft-register {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--primary);
+  color: #ffffff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 0.86rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: var(--transition);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+}
+
+.btn-draft-register:hover {
+  background: var(--primary-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(37, 99, 235, 0.32);
+}
+
+.btn-draft-dismiss {
+  padding: 10px 18px;
+  background: #f1f5f9;
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 0.86rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.btn-draft-dismiss:hover {
+  background: #e2e8f0;
+  color: var(--text-main);
+}
+
 /* Patient Preview Right Panel */
 .patient-preview-panel {
   position: absolute;

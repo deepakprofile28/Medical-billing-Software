@@ -1,0 +1,346 @@
+<div class="user-management-page">
+
+  <!-- ================= TOAST FEEDBACK ================= -->
+  <div class="custom-toast-container" *ngIf="showToast">
+    <div class="custom-toast" [class.toast-success]="toastType === 'success'" [class.toast-danger]="toastType === 'danger'">
+      <i class="bi" [class.bi-check-circle-fill]="toastType === 'success'" [class.bi-exclamation-triangle-fill]="toastType === 'danger'"></i>
+      <span>{{ toastMessage }}</span>
+    </div>
+  </div>
+
+  <!-- ================= TOP HEADER CARD ================= -->
+  <div class="top-nav-card">
+    <div class="nav-brand-section">
+      <div class="brand-logo">
+        <i class="bi bi-people-fill"></i>
+      </div>
+      <div>
+        <h2>Staff & User Management</h2>
+        <p>Manage hospital users, roles, permissions, and security passwords</p>
+      </div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <nav class="nav-links">
+      <a routerLink="/dashboard" class="nav-tab">
+        <i class="bi bi-grid-1x2-fill"></i>
+        <span>Dashboard</span>
+      </a>
+      <a routerLink="/patients" class="nav-tab">
+        <i class="bi bi-person-lines-fill"></i>
+        <span>Patients</span>
+      </a>
+      <a routerLink="/users" class="nav-tab active">
+        <i class="bi bi-person-gear"></i>
+        <span>Staff Accounts</span>
+      </a>
+    </nav>
+
+    <div class="header-actions">
+      <a routerLink="/signup" class="btn-add-staff">
+        <i class="bi bi-person-plus-fill"></i>
+        <span>Register New Staff</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- ================= SUMMARY METRIC CHIPS ================= -->
+  <div class="metrics-grid">
+    <div class="metric-chip chip-total">
+      <div class="chip-icon"><i class="bi bi-people"></i></div>
+      <div class="chip-info">
+        <span class="chip-label">Total Registered Staff</span>
+        <strong class="chip-value">{{ totalUsers }} Users</strong>
+      </div>
+    </div>
+
+    <div class="metric-chip chip-admin">
+      <div class="chip-icon"><i class="bi bi-shield-lock-fill"></i></div>
+      <div class="chip-info">
+        <span class="chip-label">Administrators</span>
+        <strong class="chip-value">{{ adminCount }} Admins</strong>
+      </div>
+    </div>
+
+    <div class="metric-chip chip-billing">
+      <div class="chip-icon"><i class="bi bi-receipt"></i></div>
+      <div class="chip-info">
+        <span class="chip-label">Billing Specialists</span>
+        <strong class="chip-value">{{ billingCount }} Officers</strong>
+      </div>
+    </div>
+
+    <div class="metric-chip chip-doctor">
+      <div class="chip-icon"><i class="bi bi-heart-pulse-fill"></i></div>
+      <div class="chip-info">
+        <span class="chip-label">Doctors & Clinical Staff</span>
+        <strong class="chip-value">{{ doctorCount }} Doctors</strong>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= SEARCH & FILTER TOOLBAR ================= -->
+  <div class="filter-toolbar">
+    <div class="search-box">
+      <i class="bi bi-search"></i>
+      <input 
+        type="text" 
+        [(ngModel)]="searchTerm" 
+        (input)="applyFilter()" 
+        placeholder="Search staff by name, email, mobile, or clinic..." 
+        class="search-input">
+      <button type="button" *ngIf="searchTerm" (click)="searchTerm = ''; applyFilter()" class="clear-search-btn">×</button>
+    </div>
+
+    <div class="role-filter">
+      <i class="bi bi-funnel-fill"></i>
+      <select [(ngModel)]="selectedRole" (change)="applyFilter()" class="role-select">
+        <option value="ALL">All Designations / Roles ({{ totalUsers }})</option>
+        <option *ngFor="let r of rolesList" [value]="r.value">{{ r.label }}</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- ================= STAFF USERS TABLE ================= -->
+  <div class="table-card">
+    <div class="table-responsive">
+      <table class="user-table" *ngIf="filteredUsers.length > 0">
+        <thead>
+          <tr>
+            <th>Staff Member</th>
+            <th>Contact Details</th>
+            <th>Hospital / Clinic</th>
+            <th>Assigned Role</th>
+            <th>Status</th>
+            <th class="text-end">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let user of filteredUsers">
+            <!-- User Info Cell -->
+            <td>
+              <div class="user-cell">
+                <div class="user-avatar" [ngClass]="getRoleBadgeClass(user.role)">
+                  {{ (user.userName || user.name || 'U').charAt(0).toUpperCase() }}
+                </div>
+                <div>
+                  <div class="user-fullname">{{ user.userName || user.name }}</div>
+                  <div class="user-joined-sub">
+                    <i class="bi bi-calendar3"></i>
+                    {{ user.createdDate ? (user.createdDate | date:'mediumDate') : 'Active Member' }}
+                  </div>
+                </div>
+              </div>
+            </td>
+
+            <!-- Contact Cell -->
+            <td>
+              <div class="contact-line">
+                <i class="bi bi-envelope-fill text-muted"></i>
+                <span>{{ user.email }}</span>
+              </div>
+              <div class="contact-line" *ngIf="user.mobile">
+                <i class="bi bi-telephone-fill text-muted"></i>
+                <span>{{ user.mobile }}</span>
+              </div>
+            </td>
+
+            <!-- Clinic/Hospital Name -->
+            <td>
+              <div class="clinic-name">
+                <i class="bi bi-hospital text-primary"></i>
+                <span>{{ user.companyName || 'MediCare Hospital' }}</span>
+              </div>
+            </td>
+
+            <!-- Role Badge -->
+            <td>
+              <span class="role-badge" [ngClass]="getRoleBadgeClass(user.role)">
+                <i class="bi bi-shield-check me-1" *ngIf="user.role === 'ADMIN'"></i>
+                <i class="bi bi-receipt me-1" *ngIf="user.role === 'BILLING_OFFICER'"></i>
+                <i class="bi bi-heart-pulse me-1" *ngIf="user.role === 'DOCTOR'"></i>
+                {{ getRoleBadgeLabel(user.role) }}
+              </span>
+            </td>
+
+            <!-- Status Pill -->
+            <td>
+              <span class="status-pill" [class.status-active]="user.status !== 'Inactive'" [class.status-inactive]="user.status === 'Inactive'">
+                <span class="status-dot"></span>
+                {{ user.status || 'Active' }}
+              </span>
+            </td>
+
+            <!-- Actions -->
+            <td class="text-end">
+              <div class="actions-group">
+                <!-- Edit Button -->
+                <button 
+                  type="button" 
+                  class="action-btn edit-btn" 
+                  (click)="openEditModal(user)" 
+                  title="Edit User Profile">
+                  <i class="bi bi-pencil-square"></i>
+                  <span>Edit</span>
+                </button>
+
+                <!-- Reset Password Button -->
+                <button 
+                  type="button" 
+                  class="action-btn reset-btn" 
+                  (click)="openResetModal(user)" 
+                  title="Reset User Password">
+                  <i class="bi bi-key-fill"></i>
+                  <span>Reset Password</span>
+                </button>
+
+                <!-- Delete Button -->
+                <button 
+                  type="button" 
+                  class="action-btn delete-btn" 
+                  (click)="deleteUser(user)" 
+                  title="Delete Staff Record">
+                  <i class="bi bi-trash3-fill"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- Empty State -->
+      <div class="empty-state" *ngIf="filteredUsers.length === 0">
+        <div class="empty-icon-wrap">
+          <i class="bi bi-person-x"></i>
+        </div>
+        <h4>No Staff Accounts Found</h4>
+        <p>No user matched your search criteria "{{ searchTerm }}".</p>
+        <button type="button" class="btn-reset-filter" (click)="searchTerm = ''; selectedRole = 'ALL'; applyFilter()">
+          Clear Filters
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= EDIT USER MODAL ================= -->
+  <div class="modal-overlay" *ngIf="showEditModal" (click)="closeEditModal()">
+    <div class="modal-card" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <div class="modal-header-icon edit-icon-bg">
+          <i class="bi bi-pencil-square"></i>
+        </div>
+        <div>
+          <h3>Edit Staff Profile</h3>
+          <p>Update credentials & privileges for {{ editingUserEmail }}</p>
+        </div>
+        <button type="button" class="modal-close" (click)="closeEditModal()">×</button>
+      </div>
+
+      <form [formGroup]="editForm" (ngSubmit)="saveUserEdit()">
+        <div class="modal-body">
+          <div class="mb-3">
+            <label class="form-label">Full Name <span class="text-danger">*</span></label>
+            <input type="text" formControlName="userName" class="form-control" placeholder="Staff Name">
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Mobile Number <span class="text-danger">*</span></label>
+            <input type="tel" formControlName="mobile" class="form-control" placeholder="10-digit mobile" maxlength="10">
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Hospital / Clinic Name <span class="text-danger">*</span></label>
+            <input type="text" formControlName="companyName" class="form-control" placeholder="Clinic / Hospital">
+          </div>
+
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Designation / Role</label>
+              <select formControlName="role" class="form-select">
+                <option *ngFor="let r of rolesList" [value]="r.value">{{ r.label }}</option>
+              </select>
+            </div>
+
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Account Status</label>
+              <select formControlName="status" class="form-select">
+                <option value="Active">Active</option>
+                <option value="Inactive">Inactive / Suspended</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn-cancel" (click)="closeEditModal()">Cancel</button>
+          <button type="submit" class="btn-save" [disabled]="editForm.invalid">
+            <i class="bi bi-check2"></i>
+            <span>Save Changes</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ================= RESET PASSWORD MODAL ================= -->
+  <div class="modal-overlay" *ngIf="showResetModal" (click)="closeResetModal()">
+    <div class="modal-card modal-sm" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <div class="modal-header-icon key-icon-bg">
+          <i class="bi bi-key-fill"></i>
+        </div>
+        <div>
+          <h3>Reset Staff Password</h3>
+          <p>Set a new password for <strong>{{ resetUserName }}</strong> ({{ resetUserEmail }})</p>
+        </div>
+        <button type="button" class="modal-close" (click)="closeResetModal()">×</button>
+      </div>
+
+      <div class="modal-body">
+        <!-- Error Alert -->
+        <div class="alert alert-danger py-2 px-3 mb-3 d-flex align-items-center gap-2" *ngIf="resetError" style="font-size: 13px;">
+          <i class="bi bi-exclamation-triangle-fill"></i>
+          <span>{{ resetError }}</span>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">New Password (Min. 6 chars) <span class="text-danger">*</span></label>
+          <div class="password-input-wrap">
+            <input 
+              [type]="hideNewPassword ? 'password' : 'text'" 
+              [(ngModel)]="newPassword" 
+              class="form-control" 
+              placeholder="Enter new password">
+            <button type="button" class="eye-btn" (click)="hideNewPassword = !hideNewPassword">
+              <i class="bi" [class.bi-eye]="hideNewPassword" [class.bi-eye-slash]="!hideNewPassword"></i>
+            </button>
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Confirm New Password <span class="text-danger">*</span></label>
+          <div class="password-input-wrap">
+            <input 
+              [type]="hideConfirmPassword ? 'password' : 'text'" 
+              [(ngModel)]="confirmPassword" 
+              class="form-control" 
+              placeholder="Confirm new password">
+            <button type="button" class="eye-btn" (click)="hideConfirmPassword = !hideConfirmPassword">
+              <i class="bi" [class.bi-eye]="hideConfirmPassword" [class.bi-eye-slash]="!hideConfirmPassword"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn-cancel" (click)="closeResetModal()">Cancel</button>
+        <button type="button" class="btn-save btn-key-save" (click)="submitPasswordReset()">
+          <i class="bi bi-shield-lock-fill"></i>
+          <span>Update Password</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+</div>
+

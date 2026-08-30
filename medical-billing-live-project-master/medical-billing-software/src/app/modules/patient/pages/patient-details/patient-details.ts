@@ -162,6 +162,10 @@ export class PatientDetails implements OnInit {
     ]);
   }
 
+  goToDashboard(): void {
+    this.router.navigate(['/dashboard']);
+  }
+
   // ==========================================
   // EDIT PATIENT
   // ==========================================
