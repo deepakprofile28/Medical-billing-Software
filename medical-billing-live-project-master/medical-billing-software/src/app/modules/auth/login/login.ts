@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 
 import {
   ReactiveFormsModule,
@@ -25,17 +25,20 @@ import { AuthService } from '../../services/auth.service';
 
   styleUrls: ['./login.css']
 })
-export class Login {
+export class Login implements OnInit {
 
   loginForm!: FormGroup;
   hidePassword = true;
   loading = false;
   errorMessage = '';
+  isNotVerified = false;
+  unverifiedData: any = null;
 
   constructor(
     private fb: FormBuilder,
     private router: Router,
-    private authService: AuthService
+    private authService: AuthService,
+    private cdr: ChangeDetectorRef
   ) {}
 
   // ================= FORM =================
@@ -69,12 +72,32 @@ export class Login {
       ]
 
     });
+
+    // Clear error message when user edits any field
+    this.loginForm.valueChanges.subscribe(() => {
+      if (this.errorMessage) {
+        this.errorMessage = '';
+        this.isNotVerified = false;
+        this.cdr.detectChanges();
+      }
+    });
   }
 
   // ================= PASSWORD =================
 
   togglePassword(): void {
     this.hidePassword = !this.hidePassword;
+  }
+
+  goToVerifyOtp(): void {
+    this.router.navigate(['/verify-otp'], {
+      state: {
+        email: this.unverifiedData?.email || this.loginForm.value.email,
+        mobile: this.unverifiedData?.mobile || '',
+        countryCode: this.unverifiedData?.countryCode || '+91',
+        companyName: this.unverifiedData?.companyName || this.loginForm.value.storeName
+      }
+    });
   }
 
   // ================= LOGIN =================
@@ -87,6 +110,8 @@ export class Login {
 
     this.loading = true;
     this.errorMessage = '';
+    this.isNotVerified = false;
+    this.cdr.detectChanges();
 
     const loginRequest = {
       storeName: this.loginForm.value.storeName,
@@ -94,33 +119,40 @@ export class Login {
       password: this.loginForm.value.password
     };
 
+    console.log('Submitting Login Request:', { email: loginRequest.email, storeName: loginRequest.storeName });
+
     this.authService
       .login(loginRequest)
       .subscribe({
 
         next: (response) => {
           this.loading = false;
-          console.log('Login Response:', response);
+          console.log('Login Success:', response);
           this.router.navigate(['/dashboard']);
         },
 
         error: (error) => {
           this.loading = false;
-          console.error('Login failed:', error);
+          console.error('Login Failed with error:', error);
+          this.isNotVerified = false;
 
-          if (error?.error?.message) {
+          if (error?.error?.notVerified || (error?.error?.message && error.error.message.toLowerCase().includes('otp'))) {
+            this.isNotVerified = true;
+            this.unverifiedData = error.error;
+            this.errorMessage = error.error.message || 'Your account is not verified yet! Please complete OTP verification to log in.';
+          } else if (error?.error?.message) {
             this.errorMessage = error.error.message;
+          } else if (typeof error?.error === 'string' && error.error.length > 0 && error.error.length < 200) {
+            this.errorMessage = error.error;
           } else if (error?.status === 400 || error?.status === 401 || error?.status === 403) {
-            this.errorMessage = 'Invalid Store Name, Email, or Password.';
-          } else if (error?.status === 0 || error?.status === 404 || error?.status === 500) {
-            // Local dev fallback session if backend is offline
-            localStorage.setItem('token', 'mock-auth-token-demo');
-            localStorage.setItem('userName', this.loginForm.value.email.split('@')[0] || 'Admin');
-            localStorage.setItem('role', 'ADMIN');
-            this.router.navigate(['/dashboard']);
+            this.errorMessage = 'Invalid username or password. Please check your Store Name, Email, and Password.';
+          } else if (error?.status === 0) {
+            this.errorMessage = 'Backend server is not reachable. Please start your Spring Boot application on port 8082.';
           } else {
-            this.errorMessage = 'Login failed. Please check your credentials and try again.';
+            this.errorMessage = 'Invalid username or password. Please verify your credentials.';
           }
+
+          this.cdr.detectChanges();
         }
 
       });

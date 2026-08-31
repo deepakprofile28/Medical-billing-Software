@@ -1079,19 +1079,27 @@
             class="btn-secondary"
             (click)="previousStep()"
             [disabled]="currentStep === 1">
-
             Previous
-
           </button>
 
+          <button
+            type="button"
+            class="btn-secondary d-inline-flex align-items-center gap-1"
+            (click)="saveDraft()"
+            title="Save as Draft">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M5 4h11l3 3v13H5z"></path>
+              <path d="M8 4v6h8V4"></path>
+              <path d="M8 20v-6h8v6"></path>
+            </svg>
+            <span>Save Draft</span>
+          </button>
 
           <button
             type="button"
             class="btn-primary"
             (click)="nextStep()">
-
             {{ currentStep === 5 ? 'Save Patient' : 'Save & Continue' }}
-
           </button>
 
         </div>

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
@@ -55,7 +55,8 @@ export class UserManagement implements OnInit {
   constructor(
     private authService: AuthService,
     private fb: FormBuilder,
-    private router: Router
+    private router: Router,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -75,9 +76,15 @@ export class UserManagement implements OnInit {
 
   loadUsers(): void {
     this.authService.getAllUsers().subscribe((data: SignupRequest[]) => {
-      this.users = Array.isArray(data) ? data : [];
+      const rawUsers = Array.isArray(data) ? data : [];
+      this.users = rawUsers.filter(u => {
+        const email = (u.email || '').toLowerCase().trim();
+        const role = (u.role || '').toUpperCase().trim();
+        return email !== 'admin@gmail.com' && role !== 'SUPER_ADMIN' && role !== 'SUPERADMIN';
+      });
       this.applyFilter();
       this.calculateMetrics();
+      this.cdr.detectChanges();
     });
   }
 
@@ -225,8 +232,10 @@ export class UserManagement implements OnInit {
     this.toastMessage = message;
     this.toastType = type;
     this.showToast = true;
+    this.cdr.detectChanges();
     setTimeout(() => {
       this.showToast = false;
+      this.cdr.detectChanges();
     }, 3000);
   }
 

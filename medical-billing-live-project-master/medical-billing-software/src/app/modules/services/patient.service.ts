@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, catchError, of, tap, throwError } from 'rxjs';
+import { Observable, catchError, map, of, tap, throwError } from 'rxjs';
 
 export interface Patient {
   id?: number;
@@ -71,23 +71,24 @@ export class PatientService {
 
   private saveLocalDraft(patient: Patient): Patient {
     const drafts = this.getLocalDrafts();
-    if (!patient.id) {
-      patient.id = Date.now();
+    const draftCopy: Patient = { ...patient };
+    if (!draftCopy.id) {
+      draftCopy.id = Date.now();
     }
-    patient.status = 'Draft';
-    if (!patient.createdDate) {
-      patient.createdDate = new Date().toISOString();
+    draftCopy.status = 'Draft';
+    if (!draftCopy.createdDate) {
+      draftCopy.createdDate = new Date().toISOString();
     }
 
-    const index = drafts.findIndex(d => d.id === patient.id);
+    const index = drafts.findIndex(d => d.id === draftCopy.id);
     if (index >= 0) {
-      drafts[index] = patient;
+      drafts[index] = draftCopy;
     } else {
-      drafts.unshift(patient);
+      drafts.unshift(draftCopy);
     }
 
     localStorage.setItem(this.DRAFTS_KEY, JSON.stringify(drafts));
-    return patient;
+    return draftCopy;
   }
 
   private getLocalPatients(): Patient[] {
@@ -101,25 +102,32 @@ export class PatientService {
 
   private saveLocalPatient(patient: Patient): Patient {
     const patients = this.getLocalPatients();
-    if (!patient.id) {
-      patient.id = Date.now();
+    const patientCopy: Patient = { ...patient };
+    if (!patientCopy.id) {
+      patientCopy.id = Date.now();
     }
-    if (!patient.status) {
-      patient.status = 'Active';
+    if (!patientCopy.status) {
+      patientCopy.status = 'Active';
     }
-    if (!patient.createdDate) {
-      patient.createdDate = new Date().toISOString();
+    if (!patientCopy.createdDate) {
+      patientCopy.createdDate = new Date().toISOString();
     }
 
-    const index = patients.findIndex(p => p.id === patient.id);
+    // Deduplicate by id OR by name + email
+    const index = patients.findIndex(p => 
+      (p.id && p.id === patientCopy.id) ||
+      (patientCopy.name && p.name && p.name.trim().toLowerCase() === patientCopy.name.trim().toLowerCase() && 
+       p.email && patientCopy.email && p.email.trim().toLowerCase() === patientCopy.email.trim().toLowerCase())
+    );
+
     if (index >= 0) {
-      patients[index] = patient;
+      patients[index] = { ...patients[index], ...patientCopy };
     } else {
-      patients.unshift(patient);
+      patients.unshift(patientCopy);
     }
 
     localStorage.setItem(this.PATIENTS_KEY, JSON.stringify(patients));
-    return patient;
+    return patientCopy;
   }
 
   // =====================================================
@@ -128,10 +136,33 @@ export class PatientService {
 
   getAllPatients(): Observable<Patient[]> {
     return this.http.get<Patient[]>(this.apiUrl).pipe(
-      tap((patients) => {
-        if (Array.isArray(patients) && patients.length > 0) {
-          localStorage.setItem(this.PATIENTS_KEY, JSON.stringify(patients));
+      map((backendPatients) => {
+        const bList = Array.isArray(backendPatients) ? backendPatients : [];
+        const localPatients = this.getLocalPatients();
+
+        const mergedMap = new Map<string, Patient>();
+
+        // Real Database patients from MySQL take highest precedence
+        for (const p of bList) {
+          if (p && p.id) {
+            const key = p.name ? `${p.name.trim().toLowerCase()}_${(p.email || '').trim().toLowerCase()}` : `id_${p.id}`;
+            mergedMap.set(key, p);
+          }
         }
+
+        // Add local only if not already saved to database
+        for (const p of localPatients) {
+          if (p && p.id) {
+            const key = p.name ? `${p.name.trim().toLowerCase()}_${(p.email || '').trim().toLowerCase()}` : `id_${p.id}`;
+            if (!mergedMap.has(key)) {
+              mergedMap.set(key, p);
+            }
+          }
+        }
+
+        const combined = Array.from(mergedMap.values());
+        localStorage.setItem(this.PATIENTS_KEY, JSON.stringify(combined));
+        return combined;
       }),
       catchError(() => {
         console.warn('Backend patients API offline, returning local patients storage.');
@@ -166,22 +197,64 @@ export class PatientService {
   }
 
   // =====================================================
+  // PREPARE BACKEND PAYLOAD HELPER
+  // =====================================================
+
+  private prepareBackendPayload(patient: any, targetStatus: 'APPROVED' | 'DRAFT'): any {
+    const payload: any = { ...patient };
+
+    // Remove local temporary ID
+    if (payload.id && payload.id > 1000000000000) {
+      delete payload.id;
+    }
+
+    // Set correct enum status
+    payload.status = targetStatus;
+
+    // Fix DOB format: "YYYY-MM-DD" or null (never empty string "")
+    if (payload.dob) {
+      if (typeof payload.dob === 'string' && payload.dob.trim() === '') {
+        payload.dob = null;
+      } else if (typeof payload.dob === 'string' && payload.dob.includes('T')) {
+        payload.dob = payload.dob.split('T')[0];
+      }
+    } else {
+      payload.dob = null;
+    }
+
+    // Remove client-only createdDate so backend sets LocalDateTime.now()
+    delete payload.createdDate;
+
+    // Default name if blank
+    if (!payload.name || payload.name.trim() === '') {
+      payload.name = targetStatus === 'DRAFT' ? 'Draft Patient' : 'Registered Patient';
+    }
+
+    return payload;
+  }
+
+  // =====================================================
   // CREATE / SAVE PATIENT
   // =====================================================
 
   savePatient(patient: Patient): Observable<Patient> {
-    // Save locally first
-    const savedLocal = this.saveLocalPatient(patient);
+    const localPatient = this.saveLocalPatient(patient);
+    const payload = this.prepareBackendPayload(patient, 'APPROVED');
 
-    return this.http.post<Patient>(this.apiUrl, patient).pipe(
+    console.log('Sending clean Patient payload to Backend POST /api/patients:', payload);
+
+    return this.http.post<Patient>(this.apiUrl, payload).pipe(
       tap((res) => {
         if (res && res.id) {
-          this.saveLocalPatient(res);
+          console.log('Patient saved into Backend MySQL DB successfully! ID:', res.id);
+          const patients = this.getLocalPatients().filter(p => p.id !== localPatient.id && p.id !== res.id);
+          patients.unshift(res);
+          localStorage.setItem(this.PATIENTS_KEY, JSON.stringify(patients));
         }
       }),
       catchError((err) => {
         console.warn('Backend save patient offline, saved in local session:', err);
-        return of(savedLocal);
+        return of(localPatient);
       })
     );
   }
@@ -217,18 +290,23 @@ export class PatientService {
   // =====================================================
 
   saveDraft(patient: Patient): Observable<Patient> {
-    // Always store draft locally first
-    const savedDraft = this.saveLocalDraft(patient);
+    const localDraft = this.saveLocalDraft(patient);
+    const payload = this.prepareBackendPayload(patient, 'DRAFT');
 
-    return this.http.post<Patient>(`${this.apiUrl}/draft`, patient).pipe(
+    console.log('Sending Draft Patient payload to Backend POST /api/patients/draft:', payload);
+
+    return this.http.post<Patient>(`${this.apiUrl}/draft`, payload).pipe(
       tap((res) => {
         if (res && res.id) {
-          this.saveLocalDraft(res);
+          console.log('Draft saved into Backend MySQL DB successfully! ID:', res.id);
+          const drafts = this.getLocalDrafts().filter(d => d.id !== localDraft.id && d.id !== res.id);
+          drafts.unshift(res);
+          localStorage.setItem(this.DRAFTS_KEY, JSON.stringify(drafts));
         }
       }),
       catchError((err) => {
         console.warn('Backend draft API offline or returned error, stored in local storage:', err);
-        return of(savedDraft);
+        return of(localDraft);
       })
     );
   }
@@ -239,10 +317,20 @@ export class PatientService {
 
   getDraftPatients(): Observable<Patient[]> {
     return this.http.get<Patient[]>(`${this.apiUrl}/drafts`).pipe(
-      tap((drafts) => {
-        if (Array.isArray(drafts)) {
-          localStorage.setItem(this.DRAFTS_KEY, JSON.stringify(drafts));
+      map((drafts) => {
+        const localDrafts = this.getLocalDrafts();
+        if (!Array.isArray(drafts) || drafts.length === 0) {
+          return localDrafts;
         }
+        const combined = [...drafts];
+        const existingIds = new Set(drafts.map(d => d.id));
+        for (const ld of localDrafts) {
+          if (!existingIds.has(ld.id)) {
+            combined.push(ld);
+          }
+        }
+        localStorage.setItem(this.DRAFTS_KEY, JSON.stringify(combined));
+        return combined;
       }),
       catchError(() => {
         console.warn('Backend draft API offline, returning local drafts.');
@@ -257,21 +345,37 @@ export class PatientService {
 
   approvePatient(id: number): Observable<Patient> {
     const drafts = this.getLocalDrafts();
-    const draftIndex = drafts.findIndex(d => d.id === id);
-    let approvedPatient: Patient | undefined;
+    const draftIndex = drafts.findIndex(d => Number(d.id) === Number(id));
+    let draftToApprove: Patient | undefined;
 
     if (draftIndex >= 0) {
-      approvedPatient = drafts[draftIndex];
-      approvedPatient.status = 'Active';
+      draftToApprove = drafts[draftIndex];
       drafts.splice(draftIndex, 1);
       localStorage.setItem(this.DRAFTS_KEY, JSON.stringify(drafts));
-      this.saveLocalPatient(approvedPatient);
     }
 
-    return this.http.put<Patient>(`${this.apiUrl}/${id}/approve`, {}).pipe(
-      catchError(() => {
-        if (approvedPatient) {
-          return of(approvedPatient);
+    const approvePayload: any = draftToApprove ? { ...draftToApprove, status: 'Active' } : { status: 'Active' };
+
+    // If ID is a local timestamp (> 1000000000000), save directly in DB as new approved patient
+    if (id > 1000000000000 || (draftToApprove && (!draftToApprove.id || draftToApprove.id > 1000000000000))) {
+      delete approvePayload.id;
+      return this.savePatient(approvePayload);
+    }
+
+    return this.http.put<Patient>(`${this.apiUrl}/${id}/approve`, approvePayload).pipe(
+      tap((res) => {
+        if (res && res.id) {
+          this.saveLocalPatient(res);
+        } else if (draftToApprove) {
+          this.saveLocalPatient(draftToApprove);
+        }
+      }),
+      catchError((err) => {
+        console.warn('Backend draft approve fallback:', err);
+        if (draftToApprove) {
+          const payload: any = { ...draftToApprove, status: 'Active' };
+          delete payload.id;
+          return this.savePatient(payload);
         }
         return of({ id, name: 'Patient', status: 'Active' } as Patient);
       })

@@ -569,19 +569,27 @@ export class PatientList implements OnInit {
             data || [];
 
           // ==================================
-          // APPROVED PATIENTS ONLY
+          // APPROVED PATIENTS ONLY & DEDUPLICATE
           // ==================================
+          const seen = new Set<string>();
+          const uniquePatients: Patient[] = [];
 
-          this.patients =
-            allPatients.filter(
-              (patient: Patient) =>
-                String(
-                  patient?.status || ''
-                )
-                  .trim()
-                  .toUpperCase() ===
-                'APPROVED'
-            );
+          for (const patient of allPatients) {
+            const s = String(patient?.status || '').trim().toUpperCase();
+            if (s === 'DRAFT') continue;
+
+            const nameKey = (patient.name || '').trim().toLowerCase();
+            const emailKey = (patient.email || '').trim().toLowerCase();
+            const mobileKey = (patient.mobile || '').trim();
+            const dedupeKey = nameKey && emailKey ? `${nameKey}_${emailKey}` : (patient.id ? `id_${patient.id}` : `${nameKey}_${mobileKey}`);
+
+            if (!seen.has(dedupeKey)) {
+              seen.add(dedupeKey);
+              uniquePatients.push(patient);
+            }
+          }
+
+          this.patients = uniquePatients;
 
           console.log(
             'Approved Patients:',

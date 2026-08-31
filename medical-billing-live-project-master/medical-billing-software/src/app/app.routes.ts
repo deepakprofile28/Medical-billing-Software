@@ -17,8 +17,7 @@ export const routes: Routes = [
   { path: 'signup', component: Signup },
   { path: 'register', component: Signup },
   { path: 'verify-otp', component: VerifyOtp },
-  { path: 'company-registration', component: CompanyRegistration },
-  { path: 'account-registration', component: CompanyRegistration },
+   { path: 'account-registration', component: CompanyRegistration },
   { path: 'patient-login', component: PatientLogin },
 
   // Protected Routes

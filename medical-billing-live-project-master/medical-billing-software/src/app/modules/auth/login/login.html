@@ -88,9 +88,20 @@
         </div>
 
         <!-- Global Error Message -->
-        <div class="alert alert-danger d-flex align-items-center gap-2 mb-3 rounded-3" *ngIf="errorMessage">
-          <i class="bi bi-exclamation-triangle-fill fs-5 text-danger flex-shrink-0"></i>
-          <span>{{ errorMessage }}</span>
+        <div class="alert alert-danger d-flex align-items-start gap-2 mb-3 rounded-3" *ngIf="errorMessage">
+          <i class="bi bi-exclamation-triangle-fill fs-5 text-danger flex-shrink-0 mt-1"></i>
+          <div class="flex-grow-1">
+            <div>{{ errorMessage }}</div>
+            <div *ngIf="isNotVerified" class="mt-2 pt-1">
+              <button 
+                type="button" 
+                (click)="goToVerifyOtp()" 
+                class="btn btn-sm btn-outline-danger fw-bold bg-white d-inline-flex align-items-center gap-1 shadow-sm">
+                <i class="bi bi-shield-check"></i>
+                <span>Complete OTP Verification →</span>
+              </button>
+            </div>
+          </div>
         </div>
 
         <!-- Login Form -->

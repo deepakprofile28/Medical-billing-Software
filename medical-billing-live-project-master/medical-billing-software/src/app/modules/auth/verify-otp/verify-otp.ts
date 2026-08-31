@@ -237,16 +237,10 @@ export class VerifyOtp implements OnInit {
     // ===================================================
 
     const request = {
-
-      countryCode:
-        this.countryCode,
-
-      mobile:
-        this.mobile,
-
-      otp:
-        otp
-
+      countryCode: this.countryCode,
+      mobile: this.mobile,
+      email: this.email,
+      otp: otp
     };
 
 

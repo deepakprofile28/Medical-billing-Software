@@ -3,7 +3,8 @@ import {
   ElementRef,
   ViewChild,
   AfterViewInit,
-  OnInit
+  OnInit,
+  ChangeDetectorRef
 } from '@angular/core';
 
 import { CommonModule } from '@angular/common';
@@ -92,7 +93,8 @@ export class PatientRegistration implements OnInit, AfterViewInit {
     private fb: FormBuilder,
     private patientService: PatientService,
     private router: Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private cdr: ChangeDetectorRef
   ) {
 
     // ===================================================
@@ -870,101 +872,44 @@ export class PatientRegistration implements OnInit, AfterViewInit {
   // =====================================================
 
   saveDraft(): void {
+    console.log('Saving patient as draft...');
+    const raw = this.patientForm.getRawValue();
+    const nameVal = (raw.name || '').trim();
 
-    console.log(
-      'Saving patient as draft...'
-    );
-
-    // =================================================
-    // PREPARE DRAFT DATA
-    // =================================================
-
-    const patientData = {
-
-      ...this.patientForm.getRawValue(),
-
-      // =================================================
-      // IMPORTANT:
-      // Empty DOB must be null instead of ""
-      // Backend LocalDate accepts null
-      // =================================================
-
-      dob:
-        this.patientForm
-          .get('dob')
-          ?.value || null
+    const patientData: any = {
+      ...raw,
+      name: nameVal.length > 0 ? nameVal : 'Draft Patient (' + (raw.mobile || new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })) + ')',
+      dob: raw.dob ? raw.dob : null,
+      status: 'Draft'
     };
 
-    console.log(
-      'Draft Patient Data:',
-      patientData
-    );
+    if (this.isEditMode && this.editPatientId) {
+      patientData.id = this.editPatientId;
+    }
 
-    console.log(
-      'Draft DOB:',
-      patientData.dob
-    );
+    console.log('Draft Patient Data to save:', patientData);
 
-    // =================================================
-    // SAVE DRAFT API
-    // =================================================
+    this.patientService.saveDraft(patientData).subscribe({
+      next: (response: any) => {
+        console.log('Draft saved successfully:', response);
+        this.showToast('Patient draft saved successfully! Redirecting...', 'success');
+        this.cdr.detectChanges();
 
-    this.patientService
-      .saveDraft(patientData)
-      .subscribe({
+        setTimeout(() => {
+          this.router.navigate(['/patients']);
+        }, 1000);
+      },
 
-        // =============================================
-        // SUCCESS
-        // =============================================
+      error: (error: any) => {
+        console.error('Failed to save patient draft on backend, saved locally:', error);
+        this.showToast('Patient draft saved to local drafts.', 'success');
+        this.cdr.detectChanges();
 
-        next: (response: any) => {
-
-          console.log(
-            'Draft saved successfully:',
-            response
-          );
-
-          this.showToast(
-            'Patient draft saved successfully',
-            'success'
-          );
-
-          setTimeout(() => {
-
-            this.router.navigate([
-              '/patients'
-            ]);
-
-          }, 1000);
-        },
-
-        // =============================================
-        // ERROR
-        // =============================================
-
-        error: (error: any) => {
-
-          console.error(
-            'Failed to save patient draft:',
-            error
-          );
-
-          console.error(
-            'Draft Error Status:',
-            error?.status
-          );
-
-          console.error(
-            'Draft Error Body:',
-            error?.error
-          );
-
-          this.showToast(
-            'Failed to save patient draft',
-            'error'
-          );
-        }
-      });
+        setTimeout(() => {
+          this.router.navigate(['/patients']);
+        }, 1000);
+      }
+    });
   }
 
   goToDashboard(): void {

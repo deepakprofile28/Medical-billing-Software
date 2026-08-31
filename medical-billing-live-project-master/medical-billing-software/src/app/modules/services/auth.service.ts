@@ -1,12 +1,13 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, tap, catchError, of, throwError } from 'rxjs';
+import { Observable, tap, catchError, map, of, throwError } from 'rxjs';
 
 // =====================================================
 // LOGIN REQUEST & RESPONSE
 // =====================================================
 
 export interface LoginRequest {
+  storeName?: string;
   email: string;
   password: string;
 }
@@ -43,8 +44,9 @@ export interface SignupRequest {
 // =====================================================
 
 export interface VerifyOtpRequest {
-  countryCode: string;
-  mobile: string;
+  countryCode?: string;
+  mobile?: string;
+  email?: string;
   otp: string;
 }
 
@@ -54,48 +56,54 @@ export interface VerifyOtpRequest {
 
 export interface CompanyRegistrationRequest {
   companyName: string;
+  name?: string;
+  userName?: string;
+  role?: string;
   businessType?: string;
   drugLicenseNumber?: string;
   gstNumber?: string;
-  businessPhone: string;
-  businessEmail: string;
+  businessPhone?: string;
+  businessEmail?: string;
   countryCode?: string;
   mobile?: string;
-  address: string;
+  email?: string;
+  address?: string;
   city?: string;
   state?: string;
   pincode?: string;
   invoicePrefix?: string;
 
   // Primary Owner Credentials
-  ownerName: string;
-  ownerEmail: string;
-  ownerMobile: string;
+  ownerName?: string;
+  ownerEmail?: string;
+  ownerMobile?: string;
   ownerCountryCode?: string;
-  password: string;
+  password?: string;
 
   status?: 'ACTIVE' | 'TRIAL' | 'INACTIVE';
   plan?: string | number;
 }
 
 export interface CompanyAccount {
-  id: number;
+  id?: number;
   companyName: string;
+  name?: string;
+  userName?: string;
   businessType?: string;
   drugLicenseNumber?: string;
   gstNumber?: string;
-  businessPhone: string;
-  businessEmail: string;
-  address: string;
+  businessPhone?: string;
+  businessEmail?: string;
+  address?: string;
   city?: string;
   state?: string;
   pincode?: string;
   invoicePrefix?: string;
-  ownerName: string;
-  ownerEmail: string;
-  ownerMobile: string;
-  status: string;
-  createdDate: string;
+  ownerName?: string;
+  ownerEmail?: string;
+  ownerMobile?: string;
+  status?: string;
+  createdDate?: string;
 }
 
 @Injectable({
@@ -184,12 +192,44 @@ export class AuthService {
   // =====================================================
   getAllUsers(): Observable<SignupRequest[]> {
     return this.http.get<SignupRequest[]>(`${this.apiUrl}/users`).pipe(
+      map((backendUsers) => {
+        const localUsers = this.getLocalUsers();
+        const bUsers = Array.isArray(backendUsers) ? backendUsers : [];
+
+        // Intelligently merge local and backend users by email
+        const mergedMap = new Map<string, SignupRequest>();
+        for (const u of localUsers) {
+          if (u && u.email) {
+            mergedMap.set(u.email.toLowerCase().trim(), u);
+          }
+        }
+        for (const u of bUsers) {
+          if (u && u.email) {
+            const existing = mergedMap.get(u.email.toLowerCase().trim());
+            mergedMap.set(u.email.toLowerCase().trim(), { ...existing, ...u });
+          }
+        }
+
+        const combined = Array.from(mergedMap.values());
+        return combined.filter(u => {
+          const email = (u.email || '').toLowerCase().trim();
+          const role = (u.role || '').toUpperCase().trim();
+          return email !== 'admin@gmail.com' && role !== 'SUPER_ADMIN' && role !== 'SUPERADMIN';
+        });
+      }),
       tap((users) => {
         if (Array.isArray(users) && users.length > 0) {
           localStorage.setItem(this.USERS_STORAGE_KEY, JSON.stringify(users));
         }
       }),
-      catchError(() => of(this.getLocalUsers()))
+      catchError(() => {
+        const local = this.getLocalUsers().filter(u => {
+          const email = (u.email || '').toLowerCase().trim();
+          const role = (u.role || '').toUpperCase().trim();
+          return email !== 'admin@gmail.com' && role !== 'SUPER_ADMIN' && role !== 'SUPERADMIN';
+        });
+        return of(local);
+      })
     );
   }
 
@@ -357,12 +397,26 @@ export class AuthService {
     const payload = {
       countryCode: request.countryCode ? request.countryCode.trim() : '+91',
       mobile: request.mobile ? request.mobile.replace(/\D/g, '') : '',
+      email: request.email ? request.email.trim().toLowerCase() : '',
       otp: request.otp ? request.otp.trim() : ''
     };
 
     console.log('Sending OTP Verification to Backend:', payload);
 
-    return this.http.post<any>(`${this.apiUrl}/verify-otp`, payload);
+    return this.http.post<any>(`${this.apiUrl}/verify-otp`, payload).pipe(
+      tap((res) => {
+        // Upon OTP verification, activate local user & company
+        if (payload.email) {
+          const users = this.getLocalUsers();
+          const userIdx = users.findIndex(u => u.email.toLowerCase() === payload.email.toLowerCase());
+          if (userIdx >= 0) {
+            users[userIdx].active = true;
+            users[userIdx].status = 'Active';
+            localStorage.setItem(this.USERS_STORAGE_KEY, JSON.stringify(users));
+          }
+        }
+      })
+    );
   }
 
   // =====================================================
@@ -441,6 +495,26 @@ export class AuthService {
             }
             localStorage.setItem(this.COMPANIES_STORAGE_KEY, JSON.stringify(companies));
           }
+
+          // Save registered Admin User so they immediately appear in User Management (/users)
+          const adminEmail = req.ownerEmail || req.businessEmail || req.email || '';
+          const adminName = req.ownerName || req.userName || req.name || req.companyName || 'Admin';
+          const adminMobile = req.ownerMobile || req.mobile || req.businessPhone || '';
+          if (adminEmail) {
+            this.saveLocalUser({
+              name: adminName,
+              userName: adminName,
+              email: adminEmail.trim().toLowerCase(),
+              mobile: adminMobile.replace(/\D/g, ''),
+              countryCode: req.countryCode || '+91',
+              role: 'ADMIN',
+              companyName: req.companyName,
+              companyId: savedComp ? savedComp.id : undefined,
+              status: 'Active',
+              active: true,
+              createdDate: new Date().toISOString()
+            });
+          }
         } catch (e) {
           console.warn('Error saving local company copy:', e);
         }
@@ -454,17 +528,18 @@ export class AuthService {
         const newCompany: CompanyAccount = {
           id: newCompanyId,
           companyName: req.companyName,
+          name: req.companyName,
           businessType: req.businessType || 'PHARMACY',
-          drugLicenseNumber: req.drugLicenseNumber,
-          gstNumber: req.gstNumber,
+          drugLicenseNumber: req.drugLicenseNumber || '',
+          gstNumber: req.gstNumber || '',
           businessPhone: req.businessPhone || req.mobile || '',
           businessEmail: req.businessEmail || req.ownerEmail || '',
-          address: req.address,
+          address: req.address || '',
           city: req.city || 'Chennai',
           state: req.state || 'Tamil Nadu',
           pincode: req.pincode || '600001',
           invoicePrefix: req.invoicePrefix || 'MED-',
-          ownerName: req.ownerName,
+          ownerName: req.ownerName || req.userName || req.name || req.companyName || 'Admin',
           ownerEmail: req.ownerEmail || req.businessEmail || '',
           ownerMobile: req.ownerMobile || req.mobile || '',
           status: req.status || 'ACTIVE',
@@ -473,6 +548,26 @@ export class AuthService {
 
         companies.unshift(newCompany);
         localStorage.setItem(this.COMPANIES_STORAGE_KEY, JSON.stringify(companies));
+
+        // Save local admin user as well
+        const adminEmail = req.ownerEmail || req.businessEmail || req.email || '';
+        const adminName = req.ownerName || req.userName || req.name || req.companyName || 'Admin';
+        const adminMobile = req.ownerMobile || req.mobile || req.businessPhone || '';
+        if (adminEmail) {
+          this.saveLocalUser({
+            name: adminName,
+            userName: adminName,
+            email: adminEmail.trim().toLowerCase(),
+            mobile: adminMobile.replace(/\D/g, ''),
+            countryCode: req.countryCode || '+91',
+            role: 'ADMIN',
+            companyName: req.companyName,
+            companyId: newCompanyId,
+            status: 'Active',
+            active: true,
+            createdDate: new Date().toISOString()
+          });
+        }
 
         return of({
           success: true,
@@ -494,6 +589,7 @@ export class AuthService {
   // =====================================================
   login(request: LoginRequest): Observable<LoginResponse> {
     const payload = {
+      storeName: request.storeName ? request.storeName.trim() : '',
       email: request.email.trim().toLowerCase(),
       password: request.password
     };
@@ -501,28 +597,6 @@ export class AuthService {
     return this.http.post<LoginResponse>(`${this.apiUrl}/login`, payload).pipe(
       tap((response: LoginResponse) => {
         this.saveSession(response);
-      }),
-      catchError((error) => {
-        console.warn('Backend login failed, checking registered local users:', error);
-
-        const localUsers = this.getLocalUsers();
-        const matchedUser = localUsers.find(
-          u => u.email.toLowerCase() === request.email.toLowerCase() && u.password === request.password
-        );
-
-        if (matchedUser) {
-          const localResponse: LoginResponse = {
-            userName: matchedUser.userName || matchedUser.name || 'User',
-            role: matchedUser.role || 'ADMIN',
-            token: 'jwt-local-token-' + btoa(matchedUser.email) + '-' + Date.now(),
-            companyId: matchedUser.companyId || 1,
-            companyName: matchedUser.companyName || 'MediCare Hospital'
-          };
-          this.saveSession(localResponse);
-          return of(localResponse);
-        }
-
-        return throwError(() => error);
       })
     );
   }
