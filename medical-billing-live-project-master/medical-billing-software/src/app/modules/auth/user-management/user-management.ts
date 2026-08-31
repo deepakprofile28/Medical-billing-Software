@@ -77,11 +77,33 @@ export class UserManagement implements OnInit {
   loadUsers(): void {
     this.authService.getAllUsers().subscribe((data: SignupRequest[]) => {
       const rawUsers = Array.isArray(data) ? data : [];
+      const currentCompanyId = localStorage.getItem('companyId');
+      const currentCompanyName = (localStorage.getItem('companyName') || '').trim().toLowerCase();
+      const currentRole = (localStorage.getItem('role') || '').trim().toUpperCase();
+      const isSuperAdmin = currentRole.includes('SUPER_ADMIN') || currentRole.includes('SUPERADMIN');
+
       this.users = rawUsers.filter(u => {
         const email = (u.email || '').toLowerCase().trim();
         const role = (u.role || '').toUpperCase().trim();
-        return email !== 'admin@gmail.com' && role !== 'SUPER_ADMIN' && role !== 'SUPERADMIN';
+        if (email === 'admin@gmail.com' || role === 'SUPER_ADMIN' || role === 'SUPERADMIN') {
+          return false;
+        }
+
+        if (!isSuperAdmin) {
+          if (currentCompanyId && u.companyId !== undefined && u.companyId !== null) {
+            if (String(u.companyId) !== String(currentCompanyId)) {
+              return false;
+            }
+          } else if (currentCompanyName && u.companyName) {
+            if (u.companyName.trim().toLowerCase() !== currentCompanyName) {
+              return false;
+            }
+          }
+        }
+
+        return true;
       });
+
       this.applyFilter();
       this.calculateMetrics();
       this.cdr.detectChanges();

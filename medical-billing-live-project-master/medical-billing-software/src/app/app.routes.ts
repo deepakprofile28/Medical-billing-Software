@@ -14,10 +14,11 @@ import { authGuard } from './@core/guards/auth-guard';
 export const routes: Routes = [
   // Public Multi-Tenant Business Onboarding & Auth Routes
   { path: 'login', component: Login },
-  { path: 'signup', component: Signup },
-  { path: 'register', component: Signup },
+  { path: 'staff-registration', component: Signup },
+  { path: 'signup', redirectTo: 'staff-registration', pathMatch: 'full' },
+  { path: 'register', redirectTo: 'staff-registration', pathMatch: 'full' },
   { path: 'verify-otp', component: VerifyOtp },
-   { path: 'account-registration', component: CompanyRegistration },
+  { path: 'account-registration', component: CompanyRegistration },
   { path: 'patient-login', component: PatientLogin },
 
   // Protected Routes

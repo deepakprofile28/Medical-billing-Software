@@ -22,14 +22,14 @@
         <div class="pharma-hero-content">
           <div class="edition-pill">
             <span class="live-pulse"></span>
-            <span>Staff & Pharmacy Onboarding</span>
+            <span>Hospital & Pharmacy Staff Portal</span>
           </div>
 
-          <h1>Empower Your Pharmacy Team</h1>
+          <h1>Staff Registration</h1>
 
           <p class="hero-desc">
-            Join the digital billing and inventory ecosystem designed specifically for 
-            <strong>Retail Chemists, Medical Shops, and Healthcare Providers</strong>.
+            Register team members and staff accounts under your medical store with role-based access for 
+            <strong>Pharmacists, Billing Specialists, Doctors, and Receptionists</strong>.
           </p>
         </div>
 
@@ -81,10 +81,26 @@
         <div class="form-header-box">
           <div class="header-tag">
             <i class="bi bi-person-plus-fill"></i>
-            <span>Staff & Pharmacy Registration</span>
+            <span>Staff Member Registration</span>
           </div>
-          <h2>Create Pharmacy Account 🚀</h2>
-          <p>Fill in your details below to register your account and verify via OTP.</p>
+          <h2>Register Staff Account 🚀</h2>
+          <p>Fill in staff details below to register under your pharmacy / medical store.</p>
+        </div>
+
+        <!-- Active Store Indicator Banner -->
+        <div class="active-store-banner mb-3 p-3 rounded-3 d-flex align-items-center justify-content-between" style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.25);">
+          <div class="d-flex align-items-center gap-2">
+            <div class="store-badge-icon d-flex align-items-center justify-content-center rounded-2" style="width: 38px; height: 38px; background: #10b981; color: #fff;">
+              <i class="bi bi-shop-window fs-5"></i>
+            </div>
+            <div>
+              <span class="d-block text-muted" style="font-size: 11.5px; font-weight: 600; letter-spacing: 0.5px;">REGISTERING STAFF FOR:</span>
+              <strong class="text-dark" style="font-size: 15px;">{{ activeStoreName || 'Apollo' }}</strong>
+            </div>
+          </div>
+          <span class="badge bg-success bg-opacity-10 text-success px-3 py-2 rounded-pill fw-semibold">
+            Store ID: #{{ activeStoreId || '6' }}
+          </span>
         </div>
 
         <!-- Success Message -->
@@ -137,7 +153,7 @@
                   formControlName="email" 
                   id="su-email" 
                   class="form-control custom-input" 
-                  placeholder="deepak@example.com"
+                  placeholder="staff@example.com"
                   [class.is-invalid]="signupForm.get('email')?.touched && signupForm.get('email')?.invalid">
               </div>
               <div class="invalid-feedback d-block" *ngIf="signupForm.get('email')?.touched && signupForm.get('email')?.hasError('required')">
@@ -149,7 +165,7 @@
             </div>
           </div>
 
-          <!-- 2. MOBILE + PHARMACY NAME -->
+          <!-- 2. MOBILE NUMBER + ROLE -->
           <div class="row g-3 mb-3">
             <div class="col-md-6">
               <label class="form-label">
@@ -176,38 +192,18 @@
 
             <div class="col-md-6">
               <label class="form-label">
-                <i class="bi bi-shop me-1 text-success"></i>
-                Pharmacy / Medical Store <span class="text-danger">*</span>
+                <i class="bi bi-person-badge me-1 text-success"></i>
+                Staff Role / Designation <span class="text-danger">*</span>
               </label>
               <div class="input-icon-wrap">
-                <input 
-                  type="text" 
-                  formControlName="companyName" 
-                  id="su-store" 
-                  class="form-control custom-input" 
-                  placeholder="e.g. Apollo Pharmacy / City Meds"
-                  [class.is-invalid]="signupForm.get('companyName')?.touched && signupForm.get('companyName')?.invalid">
+                <select formControlName="role" id="su-role" class="form-select custom-input">
+                  <option value="PHARMACIST">Pharmacist / Billing Staff</option>
+                  <option value="BILLING_OFFICER">Medical Billing Specialist</option>
+                  <option value="DOCTOR">Doctor / Physician</option>
+                  <option value="RECEPTIONIST">Front Desk / Receptionist</option>
+                  <option value="ADMIN">Store Administrator / Co-Admin</option>
+                </select>
               </div>
-              <div class="invalid-feedback d-block" *ngIf="signupForm.get('companyName')?.touched && signupForm.get('companyName')?.hasError('required')">
-                Pharmacy / Store name is required.
-              </div>
-            </div>
-          </div>
-
-          <!-- 3. ROLE -->
-          <div class="form-group mb-3">
-            <label class="form-label">
-              <i class="bi bi-person-badge me-1 text-success"></i>
-              Staff Role / Designation <span class="text-danger">*</span>
-            </label>
-            <div class="input-icon-wrap">
-              <select formControlName="role" id="su-role" class="form-select custom-input">
-                <option value="PHARMACIST">Pharmacist / Billing Staff</option>
-                <option value="ADMIN" disabled>Hospital / Clinic Administrator (Use Organization Registration)</option>
-                <option value="BILLING_OFFICER" disabled>Medical Billing Specialist</option>
-                <option value="DOCTOR" disabled>Doctor / Physician</option>
-                <option value="RECEPTIONIST" disabled>Front Desk / Receptionist</option>
-              </select>
             </div>
           </div>
 
@@ -293,7 +289,7 @@
             [disabled]="signupForm.invalid || loading">
             <span *ngIf="loading" class="spinner-border spinner-border-sm me-2"></span>
             <i class="bi bi-person-check-fill me-2" *ngIf="!loading"></i>
-            <span>{{ loading ? 'Sending Verification OTP...' : 'Register Pharmacy Account' }}</span>
+            <span>{{ loading ? 'Registering Staff...' : 'Register Staff Account' }}</span>
           </button>
 
           <!-- Login Link -->

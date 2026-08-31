@@ -41,6 +41,8 @@ export class Signup implements OnInit {
   loading = false;
   errorMessage = '';
   successMessage = '';
+  activeStoreName = '';
+  activeStoreId = '';
 
   readonly roles = [
     {
@@ -58,6 +60,10 @@ export class Signup implements OnInit {
     {
       value: 'RECEPTIONIST',
       label: 'Front Desk / Receptionist'
+    },
+    {
+      value: 'ADMIN',
+      label: 'Store Administrator / Co-Admin'
     }
   ];
 
@@ -74,11 +80,11 @@ export class Signup implements OnInit {
   // =====================================================
 
   ngOnInit(): void {
+    this.activeStoreName = localStorage.getItem('companyName') || 'Apollo';
+    this.activeStoreId = localStorage.getItem('companyId') || '6';
 
     this.signupForm = this.fb.group(
-
       {
-
         userName: [
           '',
           [
@@ -86,7 +92,6 @@ export class Signup implements OnInit {
             Validators.minLength(3)
           ]
         ],
-
 
         email: [
           '',
@@ -96,7 +101,6 @@ export class Signup implements OnInit {
           ]
         ],
 
-
         mobile: [
           '',
           [
@@ -105,22 +109,12 @@ export class Signup implements OnInit {
           ]
         ],
 
-
-        companyName: [
-          '',
-          [
-            Validators.required
-          ]
-        ],
-
-
         role: [
           'PHARMACIST',
           [
             Validators.required
           ]
         ],
-
 
         password: [
           '',
@@ -130,7 +124,6 @@ export class Signup implements OnInit {
           ]
         ],
 
-
         confirmPassword: [
           '',
           [
@@ -138,24 +131,18 @@ export class Signup implements OnInit {
           ]
         ],
 
-
         agreeTerms: [
           false,
           [
             Validators.requiredTrue
           ]
         ]
-
       },
-
       {
         validators: this.passwordMatchValidator
       }
-
     );
-
   }
-
 
   // =====================================================
   // PASSWORD MATCH VALIDATOR
@@ -164,78 +151,43 @@ export class Signup implements OnInit {
   private passwordMatchValidator(
     control: AbstractControl
   ): ValidationErrors | null {
+    const password = control.get('password')?.value;
+    const confirmPassword = control.get('confirmPassword')?.value;
 
-    const password =
-      control.get('password')?.value;
-
-    const confirmPassword =
-      control.get('confirmPassword')?.value;
-
-
-    if (
-      password &&
-      confirmPassword &&
-      password !== confirmPassword
-    ) {
-
-      control
-        .get('confirmPassword')
-        ?.setErrors({
-          passwordMismatch: true
-        });
-
-      return {
+    if (password && confirmPassword && password !== confirmPassword) {
+      control.get('confirmPassword')?.setErrors({
         passwordMismatch: true
-      };
-
+      });
+      return { passwordMismatch: true };
     }
-
-
     return null;
   }
-
 
   // =====================================================
   // PASSWORD TOGGLE
   // =====================================================
 
   togglePassword(): void {
-
-    this.hidePassword =
-      !this.hidePassword;
-
+    this.hidePassword = !this.hidePassword;
   }
-
 
   // =====================================================
   // CONFIRM PASSWORD TOGGLE
   // =====================================================
 
   toggleConfirmPassword(): void {
-
-    this.hideConfirmPassword =
-      !this.hideConfirmPassword;
-
+    this.hideConfirmPassword = !this.hideConfirmPassword;
   }
-
 
   // =====================================================
   // SUBMIT
   // =====================================================
 
   onSubmit(): void {
-
-    // ---------------------------------------------------
-    // VALIDATION
-    // ---------------------------------------------------
-
     if (this.signupForm.invalid) {
-
       this.signupForm.markAllAsTouched();
-
       return;
     }
-
 
     this.loading = true;
     this.errorMessage = '';
@@ -243,68 +195,49 @@ export class Signup implements OnInit {
     this.cdr.detectChanges();
 
     const val = this.signupForm.value;
+    const currentCompanyId = localStorage.getItem('companyId') || this.activeStoreId;
+    const currentCompanyName = localStorage.getItem('companyName') || this.activeStoreName || 'Apollo';
+    const isLoggedIn = !!localStorage.getItem('token');
 
-    const companyRequest: CompanyRegistrationRequest = {
-      companyName: val.companyName,
-      businessPhone: val.mobile,
-      businessEmail: val.email,
-      countryCode: '+91',
-      mobile: val.mobile,
-      address: '',
-      ownerName: val.userName,
-      ownerEmail: val.email,
-      ownerMobile: val.mobile,
-      ownerCountryCode: '+91',
+    // STAFF REGISTRATION (LINK DIRECTLY TO CURRENT STORE COMPANY ID)
+    const staffPayload: SignupRequest = {
+      name: val.userName,
+      userName: val.userName,
+      email: val.email.trim().toLowerCase(),
       password: val.password,
-      status: 'TRIAL',
-      plan: 1
+      mobile: val.mobile ? val.mobile.replace(/\D/g, '') : '',
+      countryCode: '+91',
+      role: val.role || 'PHARMACIST',
+      companyId: currentCompanyId ? Number(currentCompanyId) : undefined,
+      companyName: currentCompanyName,
+      active: true,
+      status: 'Active'
     };
 
-    console.log('Registering Staff/Pharmacy Account:', companyRequest);
+    console.log('Registering Staff Member for Store:', staffPayload);
 
-    this.authService.registerCompany(companyRequest).subscribe({
+    this.authService.registerUser(staffPayload).subscribe({
       next: (response) => {
         this.loading = false;
-        this.successMessage = 'Pharmacy registered successfully! Redirecting to OTP verification...';
+        this.successMessage = `Staff member '${val.userName}' registered successfully for ${currentCompanyName}!`;
         this.cdr.detectChanges();
 
-        sessionStorage.setItem('signupEmail', val.email);
-        sessionStorage.setItem('signupMobile', val.mobile);
-        sessionStorage.setItem('signupCountryCode', '+91');
-        sessionStorage.setItem('signupUserName', val.userName);
-        sessionStorage.setItem('signupCompanyName', val.companyName);
-        sessionStorage.setItem('signupRole', 'PHARMACIST');
-
-        const companyId = response?.company?.id || response?.companyId || response?.id;
-        if (companyId) {
-          sessionStorage.setItem('signupCompanyId', companyId.toString());
-        }
-
         setTimeout(() => {
-          this.router.navigate(['/verify-otp'], {
-            state: {
-              email: val.email,
-              mobile: val.mobile,
-              countryCode: '+91',
-              userName: val.userName,
-              companyName: val.companyName,
-              companyId: companyId,
-              role: 'PHARMACIST'
-            }
-          });
-        }, 500);
+          if (isLoggedIn) {
+            this.router.navigate(['/users']);
+          } else {
+            this.router.navigate(['/login']);
+          }
+        }, 1200);
       },
-
       error: (err) => {
         this.loading = false;
-        console.error('Registration failed:', err);
-
+        console.error('Staff registration failed:', err);
         this.errorMessage =
           err?.error?.message ||
           err?.error?.error ||
           err?.message ||
-          'Registration failed. Please check your details and try again.';
-
+          'Staff registration failed. Please check your details and try again.';
         this.cdr.detectChanges();
       }
     });

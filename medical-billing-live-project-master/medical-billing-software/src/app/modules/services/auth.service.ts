@@ -25,6 +25,7 @@ export interface LoginResponse {
 // =====================================================
 
 export interface SignupRequest {
+  id?: number;
   name?: string;
   userName?: string;
   email: string;
@@ -191,7 +192,14 @@ export class AuthService {
   // GET ALL USERS (FOR USER MANAGEMENT COMPONENT)
   // =====================================================
   getAllUsers(): Observable<SignupRequest[]> {
-    return this.http.get<SignupRequest[]>(`${this.apiUrl}/users`).pipe(
+    const currentCompanyId = localStorage.getItem('companyId');
+    const currentCompanyName = (localStorage.getItem('companyName') || '').trim().toLowerCase();
+    const currentRole = (localStorage.getItem('role') || '').trim().toUpperCase();
+    const isSuperAdmin = currentRole.includes('SUPER_ADMIN') || currentRole.includes('SUPERADMIN');
+
+    const url = currentCompanyId ? `${this.apiUrl}/users?companyId=${encodeURIComponent(currentCompanyId)}` : `${this.apiUrl}/users`;
+
+    return this.http.get<SignupRequest[]>(url).pipe(
       map((backendUsers) => {
         const localUsers = this.getLocalUsers();
         const bUsers = Array.isArray(backendUsers) ? backendUsers : [];
@@ -214,11 +222,28 @@ export class AuthService {
         return combined.filter(u => {
           const email = (u.email || '').toLowerCase().trim();
           const role = (u.role || '').toUpperCase().trim();
-          return email !== 'admin@gmail.com' && role !== 'SUPER_ADMIN' && role !== 'SUPERADMIN';
+          if (email === 'admin@gmail.com' || role === 'SUPER_ADMIN' || role === 'SUPERADMIN') {
+            return false;
+          }
+
+          // Strict Company Isolation for each store
+          if (!isSuperAdmin) {
+            if (currentCompanyId && u.companyId !== undefined && u.companyId !== null) {
+              if (String(u.companyId) !== String(currentCompanyId)) {
+                return false;
+              }
+            } else if (currentCompanyName && u.companyName) {
+              if (u.companyName.trim().toLowerCase() !== currentCompanyName) {
+                return false;
+              }
+            }
+          }
+
+          return true;
         });
       }),
       tap((users) => {
-        if (Array.isArray(users) && users.length > 0) {
+        if (Array.isArray(users)) {
           localStorage.setItem(this.USERS_STORAGE_KEY, JSON.stringify(users));
         }
       }),
@@ -226,7 +251,24 @@ export class AuthService {
         const local = this.getLocalUsers().filter(u => {
           const email = (u.email || '').toLowerCase().trim();
           const role = (u.role || '').toUpperCase().trim();
-          return email !== 'admin@gmail.com' && role !== 'SUPER_ADMIN' && role !== 'SUPERADMIN';
+          if (email === 'admin@gmail.com' || role === 'SUPER_ADMIN' || role === 'SUPERADMIN') {
+            return false;
+          }
+
+          // Strict Company Isolation
+          if (!isSuperAdmin) {
+            if (currentCompanyId && u.companyId !== undefined && u.companyId !== null) {
+              if (String(u.companyId) !== String(currentCompanyId)) {
+                return false;
+              }
+            } else if (currentCompanyName && u.companyName) {
+              if (u.companyName.trim().toLowerCase() !== currentCompanyName) {
+                return false;
+              }
+            }
+          }
+
+          return true;
         });
         return of(local);
       })
@@ -332,7 +374,7 @@ export class AuthService {
   }
 
   // =====================================================
-  // REGISTER USER / SEND OTP
+  // REGISTER STAFF / USER (LINK TO STORE COMPANY)
   // =====================================================
   register(request: SignupRequest): Observable<any> {
     this.saveLocalUser(request);
@@ -346,21 +388,32 @@ export class AuthService {
       countryCode: request.countryCode || '+91',
       companyId: request.companyId,
       companyName: request.companyName,
-      role: request.role || 'ADMIN',
+      role: request.role || 'PHARMACIST',
       active: request.active !== undefined ? request.active : true
     };
 
+    console.log('Sending Staff/User Registration to Backend POST /api/auth/register:', payload);
+
     return this.http.post<any>(`${this.apiUrl}/register`, payload).pipe(
-      catchError((err) => {
-        console.warn('Backend /register returned error or not reachable. Registered locally:', err);
-        return of({
-          success: true,
-          message: 'User registered successfully',
-          userName: payload.name,
-          email: payload.email
-        });
+      tap((res) => {
+        if (res && res.id) {
+          this.saveLocalUser({
+            ...request,
+            id: res.id,
+            companyId: res.companyId || request.companyId,
+            companyName: res.companyName || request.companyName
+          });
+        }
       })
     );
+  }
+
+  registerUser(request: SignupRequest): Observable<any> {
+    return this.register(request);
+  }
+
+  registerStaff(request: SignupRequest): Observable<any> {
+    return this.register(request);
   }
 
   // =====================================================
