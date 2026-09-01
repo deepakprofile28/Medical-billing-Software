@@ -87,6 +87,12 @@
           <p>Sign in with your registered email and password to access your pharmacy dashboard.</p>
         </div>
 
+        <!-- Global Success Message -->
+        <div class="alert alert-success d-flex align-items-center gap-2 mb-3 rounded-3" *ngIf="successMessage">
+          <i class="bi bi-check-circle-fill fs-5 text-success flex-shrink-0"></i>
+          <span>{{ successMessage }}</span>
+        </div>
+
         <!-- Global Error Message -->
         <div class="alert alert-danger d-flex align-items-start gap-2 mb-3 rounded-3" *ngIf="errorMessage">
           <i class="bi bi-exclamation-triangle-fill fs-5 text-danger flex-shrink-0 mt-1"></i>
@@ -189,7 +195,7 @@
                 Remember Me
               </label>
             </div>
-            <a href="javascript:void(0)" class="text-success fw-bold text-decoration-none small">Forgot Password?</a>
+            <a routerLink="/forgot-password" class="text-success fw-bold text-decoration-none small">Forgot Password?</a>
           </div>
 
           <!-- Submit Button -->

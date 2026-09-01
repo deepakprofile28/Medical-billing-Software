@@ -1,497 +1,636 @@
-<div class="dashboard-page">
+<div class="dashboard-layout-wrapper" [class.sidebar-collapsed]="isSidebarCollapsed">
 
-  <!-- ================= TOP NAVIGATION & HEADER ================= -->
-  <header class="top-nav-card">
-    <div class="nav-brand-section">
-      <div class="brand-logo">
+  <!-- ================= LEFT SIDEBAR MENU ================= -->
+  <aside class="app-sidebar">
+    
+    <!-- Sidebar Brand Header -->
+    <div class="sidebar-brand">
+      <div class="brand-icon-box">
         <i class="bi bi-hospital-fill"></i>
       </div>
-      <div class="brand-text">
-        <h1>MediCare Clinical & Billing</h1>
-        <p>Hospital Information & Revenue Management System</p>
+      <div class="brand-details" *ngIf="!isSidebarCollapsed">
+        <h2 class="brand-title">PharmaCare</h2>
+        <span class="brand-subtitle">Clinical & Billing Hub</span>
       </div>
     </div>
 
-    <!-- Navigation Tabs -->
-    <nav class="nav-links">
-      <a routerLink="/dashboard" routerLinkActive="active" class="nav-tab">
-        <i class="bi bi-grid-1x2-fill"></i>
-        <span>Dashboard</span>
-      </a>
-      <a routerLink="/patients" class="nav-tab">
-        <i class="bi bi-people-fill"></i>
-        <span>Patients</span>
-      </a>
-      <a routerLink="/patient-registration" class="nav-tab">
-        <i class="bi bi-person-plus-fill"></i>
-        <span>Register</span>
-      </a>
-      <a routerLink="/users" class="nav-tab">
-        <i class="bi bi-person-gear"></i>
-        <span>Staff Accounts</span>
-      </a>
-    </nav>
-
-    <!-- Top Right Status / Actions -->
-    <div class="nav-actions">
-      <div class="live-clock" title="Current System Time">
-        <i class="bi bi-clock-fill"></i>
-        <span>{{ currentDateTime }}</span>
-      </div>
-
-      <button 
-        type="button" 
-        class="refresh-btn" 
-        (click)="refreshDashboard()" 
-        title="Refresh live metrics"
-        [disabled]="loading">
-        <i class="bi bi-arrow-clockwise" [class.spin]="loading"></i>
-        <span>Refresh</span>
-      </button>
-
-      <div class="user-profile-badge">
-        <div class="avatar-circle">
-          <span>{{ (loggedInUser || 'U').charAt(0).toUpperCase() }}</span>
-        </div>
-        <div class="user-meta">
-          <span class="user-name">{{ loggedInUser }}</span>
-          <span class="user-role">{{ userRole }}</span>
-        </div>
-      </div>
-
-      <button 
-        type="button" 
-        class="refresh-btn text-danger" 
-        (click)="logout()" 
-        title="Sign Out">
-        <i class="bi bi-box-arrow-right"></i>
-        <span>Logout</span>
-      </button>
-    </div>
-  </header>
-
-  <!-- ================= WELCOME & QUICK BANNER ================= -->
-  <section class="welcome-banner">
-    <div class="banner-content">
-      <div class="banner-tag">
-        <i class="bi bi-shield-check"></i> Live Operations Active
-      </div>
-      <h2>Welcome Back, Administrator 👋</h2>
-      <p>Here is the overview of hospital patient intake, bed occupancy, and billing revenue performance.</p>
-    </div>
-
-    <div class="banner-actions">
-      <button type="button" class="btn-primary-action" (click)="navigateTo('/patient-registration')">
-        <i class="bi bi-person-plus-fill"></i>
-        <span>New Patient Registration</span>
-      </button>
-      <button type="button" class="btn-secondary-action" (click)="navigateTo('/patients')">
-        <i class="bi bi-card-list"></i>
-        <span>View All Patients ({{ totalPatientsCount }})</span>
-      </button>
-    </div>
-  </section>
-
-  <!-- ================= KEY STATS & KPI CARDS ================= -->
-  <section class="kpi-grid">
-
-    <!-- Total Patients -->
-    <div class="kpi-card kpi-blue">
-      <div class="kpi-header">
-        <span class="kpi-title">Total Patients</span>
-        <div class="kpi-icon-box">
-          <i class="bi bi-people-fill"></i>
-        </div>
-      </div>
-      <div class="kpi-body">
-        <div class="kpi-number">{{ totalPatientsCount }}</div>
-        <div class="kpi-trend positive">
-          <i class="bi bi-arrow-up-short"></i>
-          <span>+12.4%</span>
-          <span class="trend-text">vs last month</span>
-        </div>
-      </div>
-      <div class="kpi-footer">
-        <span>Active records in database</span>
+    <!-- Active Store Badge -->
+    <div class="sidebar-store-pill" *ngIf="!isSidebarCollapsed">
+      <i class="bi bi-shop-window text-emerald"></i>
+      <div class="store-text">
+        <span class="store-label">Active Store</span>
+        <strong class="store-name">{{ activeStoreName }} (#{{ activeStoreId }})</strong>
       </div>
     </div>
 
-    <!-- Today Registrations -->
-    <div class="kpi-card kpi-emerald">
-      <div class="kpi-header">
-        <span class="kpi-title">Today's Intake</span>
-        <div class="kpi-icon-box">
-          <i class="bi bi-calendar-check-fill"></i>
-        </div>
-      </div>
-      <div class="kpi-body">
-        <div class="kpi-number">{{ todayPatientsCount }}</div>
-        <div class="kpi-trend positive">
-          <i class="bi bi-lightning-charge-fill"></i>
-          <span>Live today</span>
-        </div>
-      </div>
-      <div class="kpi-footer">
-        <span>New registrations today</span>
-      </div>
-    </div>
-
-    <!-- Total Billing Revenue -->
-    <div class="kpi-card kpi-indigo">
-      <div class="kpi-header">
-        <span class="kpi-title">Billed Revenue</span>
-        <div class="kpi-icon-box">
-          <i class="bi bi-currency-rupee"></i>
-        </div>
-      </div>
-      <div class="kpi-body">
-        <div class="kpi-number">{{ formatCurrency(totalRevenue) }}</div>
-        <div class="kpi-trend positive">
-          <i class="bi bi-arrow-up-short"></i>
-          <span>+15.8%</span>
-          <span class="trend-text">this quarter</span>
-        </div>
-      </div>
-      <div class="kpi-footer">
-        <span>{{ formatCurrency(collectedThisMonth) }} collected this mo.</span>
-      </div>
-    </div>
-
-    <!-- Pending Claims & Invoices -->
-    <div class="kpi-card kpi-amber">
-      <div class="kpi-header">
-        <span class="kpi-title">Pending Claims</span>
-        <div class="kpi-icon-box">
-          <i class="bi bi-hourglass-split"></i>
-        </div>
-      </div>
-      <div class="kpi-body">
-        <div class="kpi-number">{{ formatCurrency(pendingAmount) }}</div>
-        <div class="kpi-trend neutral">
-          <i class="bi bi-exclamation-circle-fill"></i>
-          <span>14 Invoices</span>
-        </div>
-      </div>
-      <div class="kpi-footer">
-        <span>Awaiting TPA / Patient settlement</span>
-      </div>
-    </div>
-
-    <!-- Insurance Coverage -->
-    <div class="kpi-card kpi-purple">
-      <div class="kpi-header">
-        <span class="kpi-title">Insurance Coverage</span>
-        <div class="kpi-icon-box">
-          <i class="bi bi-shield-shaded"></i>
-        </div>
-      </div>
-      <div class="kpi-body">
-        <div class="kpi-number">{{ insuredPercentage }}%</div>
-        <div class="kpi-trend positive">
-          <i class="bi bi-check-circle-fill"></i>
-          <span>{{ claimApprovalRate }}% Approved</span>
-        </div>
-      </div>
-      <div class="kpi-footer">
-        <span>{{ insuredPatientsCount }} insured patients</span>
-      </div>
-    </div>
-
-    <!-- Pending Drafts -->
-    <div class="kpi-card kpi-rose">
-      <div class="kpi-header">
-        <span class="kpi-title">Draft Applications</span>
-        <div class="kpi-icon-box">
-          <i class="bi bi-file-earmark-text-fill"></i>
-        </div>
-      </div>
-      <div class="kpi-body">
-        <div class="kpi-number">{{ draftsCount }}</div>
-        <div class="kpi-trend neutral">
-          <i class="bi bi-clock"></i>
-          <span>Pending approval</span>
-        </div>
-      </div>
-      <div class="kpi-footer">
-        <span>Draft registrations awaiting review</span>
-      </div>
-    </div>
-
-  </section>
-
-  <!-- ================= ANALYTICS & OCCUPANCY GRID ================= -->
-  <div class="analytics-grid">
-
-    <!-- Monthly Revenue & Patient Volume Chart -->
-    <div class="panel-card chart-panel">
-      <div class="panel-header">
-        <div>
-          <h3>Revenue & Patient Volume Trend</h3>
-          <p>Monthly billing performance over the last 6 months</p>
-        </div>
-        <div class="panel-tag">
-          <i class="bi bi-graph-up"></i> 6 Months
-        </div>
-      </div>
-
-      <div class="chart-container">
-        <div class="chart-bars-wrap">
-          <div class="chart-bar-group" *ngFor="let item of monthlyTrends">
-            <div class="bar-track">
-              <div class="bar-fill" [style.height.%]="item.heightPercent">
-                <span class="bar-tooltip">
-                  <strong>{{ item.month }}:</strong> {{ formatCurrency(item.revenue) }}<br/>
-                  <small>{{ item.patientCount }} Patients</small>
-                </span>
-              </div>
-            </div>
-            <span class="bar-label">{{ item.month }}</span>
-            <span class="bar-value">₹{{ (item.revenue / 100000).toFixed(1) }}L</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="chart-legend">
-        <div class="legend-item">
-          <span class="legend-dot dot-primary"></span>
-          <span>Monthly Revenue (INR)</span>
-        </div>
-        <div class="legend-item">
-          <span class="legend-dot dot-secondary"></span>
-          <span>Inpatient & Outpatient Inflow</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- Department Occupancy & Utilization -->
-    <div class="panel-card dept-panel">
-      <div class="panel-header">
-        <div>
-          <h3>Department Utilization & Capacity</h3>
-          <p>Real-time department workload and bed occupancy</p>
-        </div>
-        <div class="panel-tag status-live">
-          <span class="pulse-dot"></span> Live
-        </div>
-      </div>
-
-      <div class="dept-list">
-        <div class="dept-item" *ngFor="let dept of departments">
-          <div class="dept-info">
-            <div class="dept-name-box">
-              <i class="bi" [ngClass]="dept.icon" [style.color]="dept.color"></i>
-              <span class="dept-name">{{ dept.name }}</span>
-            </div>
-            <div class="dept-count">
-              <strong>{{ dept.activeCount }}</strong> / {{ dept.capacity }}
-              <span class="dept-percent" [style.color]="dept.color">({{ dept.percentage }}%)</span>
-            </div>
-          </div>
-          <div class="progress-track">
-            <div 
-              class="progress-bar" 
-              [style.width.%]="dept.percentage"
-              [style.background-color]="dept.color">
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-  </div>
-
-  <!-- ================= RECENT PATIENTS & INVOICES ================= -->
-  <div class="tables-grid">
-
-    <!-- Recent Registered Patients -->
-    <div class="panel-card table-panel">
-      <div class="panel-header">
-        <div>
-          <h3>Recent Patient Registrations</h3>
-          <p>Latest admissions and patient files created</p>
-        </div>
-        <a routerLink="/patients" class="view-all-link">
-          <span>View All ({{ totalPatientsCount }})</span>
-          <i class="bi bi-chevron-right"></i>
+    <!-- Sidebar Navigation Items -->
+    <nav class="sidebar-nav">
+      
+      <!-- 1. DASHBOARD -->
+      <div class="nav-group">
+        <a routerLink="/dashboard" routerLinkActive="active" class="menu-item root-item">
+          <i class="bi bi-grid-1x2-fill menu-icon"></i>
+          <span class="menu-text" *ngIf="!isSidebarCollapsed">Dashboard</span>
+          <span class="badge-live-pulse" *ngIf="!isSidebarCollapsed">Live</span>
         </a>
       </div>
 
-      <div class="table-responsive">
-        <table class="custom-table" *ngIf="recentPatients.length > 0">
-          <thead>
-            <tr>
-              <th>Patient</th>
-              <th>Contact / Mobile</th>
-              <th>Blood Grp</th>
-              <th>Insurance Provider</th>
-              <th>Status</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let patient of recentPatients">
-              <td>
-                <div class="patient-cell">
-                  <div class="patient-avatar">
-                    {{ (patient.name || 'P').charAt(0).toUpperCase() }}
-                  </div>
-                  <div>
-                    <div class="patient-name">{{ patient.name }}</div>
-                    <div class="patient-sub">{{ patient.gender || 'Not specified' }} • {{ patient.city || 'N/A' }}</div>
-                  </div>
-                </div>
-              </td>
-              <td>
-                <div class="contact-text">
-                  <i class="bi bi-telephone-fill"></i> {{ patient.mobile || 'N/A' }}
-                </div>
-                <div class="email-sub" *ngIf="patient.email">{{ patient.email }}</div>
-              </td>
-              <td>
-                <span class="blood-badge" *ngIf="patient.bloodGroup">{{ patient.bloodGroup }}</span>
-                <span class="text-muted" *ngIf="!patient.bloodGroup">-</span>
-              </td>
-              <td>
-                <div class="insurance-cell" *ngIf="patient.insuranceProvider">
-                  <i class="bi bi-shield-check text-success"></i>
-                  <span>{{ patient.insuranceProvider }}</span>
-                </div>
-                <span class="badge-self-pay" *ngIf="!patient.insuranceProvider">Self Pay</span>
-              </td>
-              <td>
-                <span class="status-pill status-active">
-                  {{ patient.status || 'Active' }}
-                </span>
-              </td>
-              <td>
-                <button type="button" class="btn-table-action" (click)="viewPatient(patient)" title="View Patient Details">
-                  <i class="bi bi-eye"></i>
-                  <span>View</span>
-                </button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+      <!-- 2. PATIENT MANAGEMENT -->
+      <div class="nav-group">
+        <div class="menu-header" (click)="togglePatientMenu()" [class.expanded]="isPatientMenuOpen" *ngIf="!isSidebarCollapsed">
+          <div class="header-left">
+            <i class="bi bi-person-vcard-fill header-icon"></i>
+            <span>Patient Management</span>
+          </div>
+          <i class="bi bi-chevron-down chevron-icon" [class.rotate]="isPatientMenuOpen"></i>
+        </div>
 
-        <!-- Empty state if no patients -->
-        <div class="empty-table-state" *ngIf="recentPatients.length === 0">
-          <i class="bi bi-folder2-open"></i>
-          <p>No recent patients registered yet.</p>
-          <button type="button" class="btn-primary-sm" (click)="navigateTo('/patient-registration')">
-            Register First Patient
+        <!-- Collapsed icon fallback -->
+        <a *ngIf="isSidebarCollapsed" routerLink="/patients" class="menu-item root-item" title="Patient Management">
+          <i class="bi bi-person-vcard-fill menu-icon"></i>
+        </a>
+
+        <div class="sub-menu" *ngIf="isPatientMenuOpen && !isSidebarCollapsed">
+          <!-- Patient List -->
+          <a routerLink="/patients" routerLinkActive="active" class="sub-menu-item">
+            <i class="bi bi-people-fill sub-icon"></i>
+            <span>Patient List</span>
+            <span class="count-badge">{{ totalPatientsCount }}</span>
+          </a>
+
+          <!-- Add Patient -->
+          <a routerLink="/patient-registration" routerLinkActive="active" class="sub-menu-item">
+            <i class="bi bi-person-plus-fill sub-icon text-success"></i>
+            <span>Add Patient</span>
+          </a>
+
+          <!-- Patient Draft -->
+          <a routerLink="/patients" class="sub-menu-item">
+            <i class="bi bi-file-earmark-text-fill sub-icon text-warning"></i>
+            <span>Patient Draft</span>
+            <span class="count-badge badge-warning" *ngIf="draftsCount > 0">{{ draftsCount }}</span>
+          </a>
+
+          <!-- Patient Analysis -->
+          <a href="javascript:void(0)" (click)="scrollToAnalysis()" class="sub-menu-item">
+            <i class="bi bi-graph-up-arrow sub-icon text-primary"></i>
+            <span>Patient Analysis</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- 3. USER MANAGEMENT -->
+      <div class="nav-group">
+        <div class="menu-header" (click)="toggleUserMenu()" [class.expanded]="isUserMenuOpen" *ngIf="!isSidebarCollapsed">
+          <div class="header-left">
+            <i class="bi bi-person-gear header-icon"></i>
+            <span>User Management</span>
+          </div>
+          <i class="bi bi-chevron-down chevron-icon" [class.rotate]="isUserMenuOpen"></i>
+        </div>
+
+        <!-- Collapsed icon fallback -->
+        <a *ngIf="isSidebarCollapsed" routerLink="/users" class="menu-item root-item" title="User Management">
+          <i class="bi bi-person-gear menu-icon"></i>
+        </a>
+
+        <div class="sub-menu" *ngIf="isUserMenuOpen && !isSidebarCollapsed">
+          <!-- User List -->
+          <a routerLink="/users" routerLinkActive="active" class="sub-menu-item">
+            <i class="bi bi-people sub-icon"></i>
+            <span>User List</span>
+            <span class="count-badge">{{ totalUsersCount }}</span>
+          </a>
+
+          <!-- Access Permissions -->
+          <a routerLink="/users" class="sub-menu-item">
+            <i class="bi bi-key-fill sub-icon text-info"></i>
+            <span>Access</span>
+          </a>
+
+          <!-- Role Assignment -->
+          <a routerLink="/staff-registration" class="sub-menu-item">
+            <i class="bi bi-shield-check sub-icon text-emerald"></i>
+            <span>Role</span>
+          </a>
+        </div>
+      </div>
+
+    </nav>
+
+    <!-- Sidebar Footer (User Info & Logout) -->
+    <div class="sidebar-footer">
+      <div class="user-brief" *ngIf="!isSidebarCollapsed">
+        <div class="user-avatar-sm">
+          {{ (loggedInUser || 'A').charAt(0).toUpperCase() }}
+        </div>
+        <div class="user-details-sm">
+          <span class="u-name">{{ loggedInUser }}</span>
+          <span class="u-role">{{ userRole }}</span>
+        </div>
+      </div>
+
+      <button type="button" class="sidebar-logout-btn" (click)="logout()" title="Sign Out">
+        <i class="bi bi-box-arrow-right"></i>
+        <span *ngIf="!isSidebarCollapsed">Logout</span>
+      </button>
+    </div>
+
+  </aside>
+
+  <!-- ================= RIGHT MAIN CONTENT AREA ================= -->
+  <main class="app-main-content">
+
+    <!-- Top Navigation Card -->
+    <header class="top-nav-card">
+      <div class="top-nav-left">
+        <button type="button" class="btn-sidebar-toggle" (click)="toggleSidebar()" title="Toggle Navigation Menu">
+          <i class="bi bi-list"></i>
+        </button>
+        <div class="page-title-wrap">
+          <h2>Dashboard Overview</h2>
+          <div class="breadcrumb-sub">
+            <span>Home</span> / <strong>Live Database Metrics</strong>
+          </div>
+        </div>
+      </div>
+
+      <!-- Actions & Sync Status -->
+      <div class="top-nav-right">
+        <div class="live-clock-pill">
+          <i class="bi bi-clock-fill text-primary"></i>
+          <span>{{ currentDateTime }}</span>
+        </div>
+
+        <button 
+          type="button" 
+          class="btn-sync-db" 
+          (click)="refreshDashboard()" 
+          title="Sync live data from MySQL"
+          [disabled]="loading">
+          <i class="bi bi-arrow-clockwise" [class.spin]="loading"></i>
+          <span>Sync DB</span>
+        </button>
+
+        <div class="top-user-pill">
+          <div class="avatar-circle">
+            {{ (loggedInUser || 'A').charAt(0).toUpperCase() }}
+          </div>
+          <div class="user-info-text">
+            <strong>{{ loggedInUser }}</strong>
+            <span class="badge-role">{{ userRole }}</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Welcome & Operations Banner -->
+    <section class="welcome-banner">
+      <div class="banner-content">
+        <div class="banner-tag">
+          <span class="pulse-dot"></span>
+          <span>Live Operations Active • MySQL DB Connected</span>
+        </div>
+        <h2>Welcome to {{ activeStoreName }} Dashboard 👋</h2>
+        <p>
+          Managing patient intake and staff assignments for <strong>{{ activeStoreName }}</strong>. 
+          Currently tracking <strong>{{ totalPatientsCount }} Patients</strong> and <strong>{{ totalUsersCount }} Staff Accounts</strong>.
+        </p>
+      </div>
+
+      <div class="banner-actions">
+        <button type="button" class="btn-primary-action" (click)="navigateTo('/patient-registration')">
+          <i class="bi bi-person-plus-fill"></i>
+          <span>New Patient Registration</span>
+        </button>
+        <button type="button" class="btn-secondary-action" (click)="navigateTo('/staff-registration')">
+          <i class="bi bi-person-badge-fill"></i>
+          <span>Register New Staff</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- 4 Core Live KPI Cards -->
+    <section class="kpi-grid">
+
+      <!-- 1. Total Patients -->
+      <div class="kpi-card kpi-blue">
+        <div class="kpi-header">
+          <span class="kpi-title">Total Patients (DB)</span>
+          <div class="kpi-icon-box">
+            <i class="bi bi-people-fill"></i>
+          </div>
+        </div>
+        <div class="kpi-body">
+          <div class="kpi-number">{{ totalPatientsCount }}</div>
+          <div class="kpi-trend positive">
+            <i class="bi bi-check-circle-fill"></i>
+            <span>{{ activePatientsCount }} Active files</span>
+          </div>
+        </div>
+        <div class="kpi-footer">
+          <a routerLink="/patients" class="kpi-link">View Patient Directory →</a>
+        </div>
+      </div>
+
+      <!-- 2. Today's Patient Intake -->
+      <div class="kpi-card kpi-emerald">
+        <div class="kpi-header">
+          <span class="kpi-title">Today's Patient Intake</span>
+          <div class="kpi-icon-box">
+            <i class="bi bi-calendar-check-fill"></i>
+          </div>
+        </div>
+        <div class="kpi-body">
+          <div class="kpi-number">{{ todayPatientsCount }}</div>
+          <div class="kpi-trend positive">
+            <i class="bi bi-lightning-charge-fill"></i>
+            <span>Live today</span>
+          </div>
+        </div>
+        <div class="kpi-footer">
+          <span>Registered on {{ currentDateTime | slice:0:11 }}</span>
+        </div>
+      </div>
+
+      <!-- 3. Insurance Coverage -->
+      <div class="kpi-card kpi-purple">
+        <div class="kpi-header">
+          <span class="kpi-title">Insurance Coverage</span>
+          <div class="kpi-icon-box">
+            <i class="bi bi-shield-shaded"></i>
+          </div>
+        </div>
+        <div class="kpi-body">
+          <div class="kpi-number">{{ insuredPercentage }}%</div>
+          <div class="kpi-trend positive">
+            <i class="bi bi-shield-check"></i>
+            <span>{{ insuredPatientsCount }} / {{ totalPatientsCount }} Patients</span>
+          </div>
+        </div>
+        <div class="kpi-footer">
+          <span>Covered under health insurance / TPA</span>
+        </div>
+      </div>
+
+      <!-- 4. Total Staff & Users -->
+      <div class="kpi-card kpi-indigo">
+        <div class="kpi-header">
+          <span class="kpi-title">Store Staff & Users (DB)</span>
+          <div class="kpi-icon-box">
+            <i class="bi bi-person-gear"></i>
+          </div>
+        </div>
+        <div class="kpi-body">
+          <div class="kpi-number">{{ totalUsersCount }}</div>
+          <div class="kpi-trend positive">
+            <i class="bi bi-person-check-fill"></i>
+            <span>{{ activeUsersCount }} Active accounts</span>
+          </div>
+        </div>
+        <div class="kpi-footer">
+          <a routerLink="/users" class="kpi-link">Manage Staff Team →</a>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- Staff Roles & Patient Demographics Grid -->
+    <div class="analytics-grid" id="patient-demographics-section">
+
+      <!-- 1. Staff Team & Role Breakdown -->
+      <div class="panel-card staff-breakdown-panel">
+        <div class="panel-header">
+          <div>
+            <h3>Store Staff Operations & Roles</h3>
+            <p>Active user accounts assigned to <strong>{{ activeStoreName }}</strong></p>
+          </div>
+          <div class="panel-tag status-live">
+            <span class="pulse-dot"></span> Live DB
+          </div>
+        </div>
+
+        <div class="role-stats-grid">
+          <div class="role-stat-card">
+            <div class="role-stat-icon icon-admin"><i class="bi bi-shield-lock-fill"></i></div>
+            <div class="role-stat-meta">
+              <span class="role-count">{{ adminCount }}</span>
+              <span class="role-name">Store Admins</span>
+            </div>
+          </div>
+
+          <div class="role-stat-card">
+            <div class="role-stat-icon icon-pharmacist"><i class="bi bi-capsule-pill"></i></div>
+            <div class="role-stat-meta">
+              <span class="role-count">{{ pharmacistCount }}</span>
+              <span class="role-name">Pharmacists</span>
+            </div>
+          </div>
+
+          <div class="role-stat-card">
+            <div class="role-stat-icon icon-billing"><i class="bi bi-receipt"></i></div>
+            <div class="role-stat-meta">
+              <span class="role-count">{{ billingCount }}</span>
+              <span class="role-name">Billing Specialists</span>
+            </div>
+          </div>
+
+          <div class="role-stat-card">
+            <div class="role-stat-icon icon-doctor"><i class="bi bi-heart-pulse-fill"></i></div>
+            <div class="role-stat-meta">
+              <span class="role-count">{{ doctorCount }}</span>
+              <span class="role-name">Doctors</span>
+            </div>
+          </div>
+
+          <div class="role-stat-card">
+            <div class="role-stat-icon icon-receptionist"><i class="bi bi-person-workspace"></i></div>
+            <div class="role-stat-meta">
+              <span class="role-count">{{ receptionistCount }}</span>
+              <span class="role-name">Receptionists</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel-action-footer">
+          <button type="button" class="btn-primary-sm" (click)="navigateTo('/staff-registration')">
+            <i class="bi bi-person-plus-fill me-1"></i> Register New Staff
+          </button>
+          <button type="button" class="btn-secondary-sm" (click)="navigateTo('/users')">
+            <i class="bi bi-people me-1"></i> View Staff Directory ({{ totalUsersCount }})
           </button>
         </div>
       </div>
-    </div>
 
-    <!-- Recent Billing Invoices -->
-    <div class="panel-card table-panel">
-      <div class="panel-header">
-        <div>
-          <h3>Recent Invoices & Claims</h3>
-          <p>Transactions processed across hospital services</p>
+      <!-- 2. Patient Demographics & Profile -->
+      <div class="panel-card demographics-panel">
+        <div class="panel-header">
+          <div>
+            <h3>Patient Profile & Demographics</h3>
+            <p>Real-time patient distribution in database</p>
+          </div>
+          <div class="panel-tag">
+            <i class="bi bi-pie-chart-fill"></i> Analytics
+          </div>
         </div>
-        <div class="panel-tag">
-          <i class="bi bi-receipt"></i> Live Billing
+
+        <!-- Gender Distribution -->
+        <div class="gender-section mb-4">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <span class="section-label"><i class="bi bi-gender-ambiguous me-1"></i> Gender Ratio:</span>
+            <span class="small text-muted">
+              Male: <strong>{{ genderDistribution.male }}</strong> | 
+              Female: <strong>{{ genderDistribution.female }}</strong> | 
+              Other: <strong>{{ genderDistribution.other }}</strong>
+            </span>
+          </div>
+          <div class="gender-progress-bar">
+            <div 
+              class="gender-bar bar-male" 
+              [style.width.%]="totalPatientsCount > 0 ? (genderDistribution.male / totalPatientsCount) * 100 : 0" 
+              title="Male">
+            </div>
+            <div 
+              class="gender-bar bar-female" 
+              [style.width.%]="totalPatientsCount > 0 ? (genderDistribution.female / totalPatientsCount) * 100 : 0" 
+              title="Female">
+            </div>
+            <div 
+              class="gender-bar bar-other" 
+              [style.width.%]="totalPatientsCount > 0 ? (genderDistribution.other / totalPatientsCount) * 100 : 0" 
+              title="Other">
+            </div>
+          </div>
+        </div>
+
+        <!-- Blood Group Grid -->
+        <div class="blood-group-section">
+          <span class="section-label mb-2 d-block"><i class="bi bi-droplet-half me-1 text-danger"></i> Blood Group Matrix:</span>
+          <div class="blood-group-chips">
+            <div class="bg-chip" *ngFor="let bg of ['O+', 'A+', 'B+', 'AB+', 'O-', 'A-', 'B-', 'AB-']">
+              <span class="bg-type">{{ bg }}</span>
+              <span class="bg-count">{{ bloodGroupCounts[bg] || 0 }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Top Cities -->
+        <div class="cities-section mt-3 pt-3 border-top" *ngIf="topCities.length > 0">
+          <span class="section-label mb-2 d-block"><i class="bi bi-geo-alt-fill me-1 text-primary"></i> Top Patient Locations:</span>
+          <div class="d-flex flex-wrap gap-2">
+            <span class="badge bg-light text-dark border p-2 px-3" *ngFor="let city of topCities">
+              {{ city.name }}: <strong>{{ city.count }}</strong>
+            </span>
+          </div>
         </div>
       </div>
 
-      <div class="table-responsive">
-        <table class="custom-table">
-          <thead>
-            <tr>
-              <th>Invoice #</th>
-              <th>Patient & Service</th>
-              <th>Dept</th>
-              <th>Amount</th>
-              <th>Payment / Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let inv of recentInvoices">
-              <td>
-                <span class="invoice-badge">{{ inv.id }}</span>
-                <div class="date-sub">{{ inv.date }}</div>
-              </td>
-              <td>
-                <div class="patient-name">{{ inv.patientName }}</div>
-                <div class="service-sub">{{ inv.service }}</div>
-              </td>
-              <td>
-                <span class="dept-badge">{{ inv.department }}</span>
-              </td>
-              <td>
-                <strong class="amount-text">{{ formatCurrency(inv.amount) }}</strong>
-              </td>
-              <td>
-                <div class="status-wrap">
-                  <span 
-                    class="status-pill"
-                    [class.status-paid]="inv.status === 'Paid'"
-                    [class.status-pending]="inv.status === 'Pending'"
-                    [class.status-review]="inv.status === 'In Review'">
-                    {{ inv.status }}
+    </div>
+
+    <!-- Live Database Tables -->
+    <div class="tables-grid">
+
+      <!-- 1. Recent Registered Patients -->
+      <div class="panel-card table-panel">
+        <div class="panel-header">
+          <div>
+            <h3>Recent Patient Registrations</h3>
+            <p>Live entries fetched from MySQL <code>patients</code> table</p>
+          </div>
+          <a routerLink="/patients" class="view-all-link">
+            <span>View All ({{ totalPatientsCount }})</span>
+            <i class="bi bi-chevron-right"></i>
+          </a>
+        </div>
+
+        <div class="table-responsive">
+          <table class="custom-table" *ngIf="recentPatients.length > 0">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Patient Name</th>
+                <th>Contact</th>
+                <th>Blood Grp</th>
+                <th>City</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let patient of recentPatients">
+                <td>
+                  <span class="badge bg-light text-dark border fw-bold">#{{ patient.id }}</span>
+                </td>
+                <td>
+                  <div class="patient-cell">
+                    <div class="patient-avatar">
+                      {{ (patient.name || 'P').charAt(0).toUpperCase() }}
+                    </div>
+                    <div>
+                      <div class="patient-name">{{ patient.name }}</div>
+                      <div class="patient-sub">{{ patient.gender || 'N/A' }} • {{ patient.dob || 'DOB: N/A' }}</div>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <div class="contact-text">
+                    <i class="bi bi-telephone-fill text-success"></i> {{ patient.mobile || 'N/A' }}
+                  </div>
+                </td>
+                <td>
+                  <span class="blood-badge" *ngIf="patient.bloodGroup">{{ patient.bloodGroup }}</span>
+                  <span class="text-muted" *ngIf="!patient.bloodGroup">-</span>
+                </td>
+                <td>
+                  <span>{{ patient.city || patient.district || '-' }}</span>
+                </td>
+                <td>
+                  <span class="status-pill status-active">
+                    {{ patient.status || 'APPROVED' }}
                   </span>
-                  <div class="payment-sub">{{ inv.paymentMethod }}</div>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+                </td>
+                <td>
+                  <button type="button" class="btn-table-action" (click)="viewPatient(patient)" title="View Patient Details">
+                    <i class="bi bi-eye"></i>
+                    <span>View</span>
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
+          <!-- Empty state if no patients -->
+          <div class="empty-table-state" *ngIf="recentPatients.length === 0">
+            <i class="bi bi-people"></i>
+            <h5>No Patient Records in Database</h5>
+            <p>No patients have been registered yet for this store.</p>
+            <button type="button" class="btn-primary-sm" (click)="navigateTo('/patient-registration')">
+              <i class="bi bi-person-plus-fill me-1"></i> Register First Patient
+            </button>
+          </div>
+        </div>
       </div>
+
+      <!-- 2. Recent Store Staff Team -->
+      <div class="panel-card table-panel">
+        <div class="panel-header">
+          <div>
+            <h3>Store Staff & User Accounts</h3>
+            <p>Live entries fetched from MySQL <code>users</code> table</p>
+          </div>
+          <a routerLink="/users" class="view-all-link">
+            <span>Manage All ({{ totalUsersCount }})</span>
+            <i class="bi bi-chevron-right"></i>
+          </a>
+        </div>
+
+        <div class="table-responsive">
+          <table class="custom-table" *ngIf="recentUsers.length > 0">
+            <thead>
+              <tr>
+                <th>Staff User</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let u of recentUsers">
+                <td>
+                  <div class="patient-cell">
+                    <div class="patient-avatar" style="background: linear-gradient(135deg, #059669, #0d9488);">
+                      {{ (u.name || u.userName || 'S').charAt(0).toUpperCase() }}
+                    </div>
+                    <div>
+                      <div class="patient-name">{{ u.name || u.userName || 'Staff Member' }}</div>
+                      <div class="patient-sub text-success">{{ u.companyName || activeStoreName }}</div>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <div class="contact-text">
+                    <i class="bi bi-envelope text-muted me-1"></i>
+                    {{ u.email }}
+                  </div>
+                </td>
+                <td>
+                  <span class="status-pill" [ngClass]="getRoleBadgeClass(u.role)">
+                    {{ getRoleBadgeLabel(u.role) }}
+                  </span>
+                </td>
+                <td>
+                  <span class="status-pill status-active">
+                    {{ u.status || (u.active !== false ? 'Active' : 'Inactive') }}
+                  </span>
+                </td>
+                <td>
+                  <button type="button" class="btn-table-action" (click)="navigateTo('/users')" title="Manage Staff">
+                    <i class="bi bi-gear"></i>
+                    <span>Manage</span>
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
+          <!-- Empty state if no staff -->
+          <div class="empty-table-state" *ngIf="recentUsers.length === 0">
+            <i class="bi bi-person-x"></i>
+            <h5>No Staff Accounts Found</h5>
+            <p>No additional staff registered yet for this store.</p>
+            <button type="button" class="btn-primary-sm" (click)="navigateTo('/staff-registration')">
+              <i class="bi bi-person-plus-fill me-1"></i> Register New Staff
+            </button>
+          </div>
+        </div>
+      </div>
+
     </div>
 
-  </div>
-
-  <!-- ================= DEMOGRAPHICS & QUICK STATS FOOTER ================= -->
-  <div class="demographics-grid">
-    
-    <!-- Blood Group Distribution -->
-    <div class="panel-card">
-      <div class="panel-header">
+    <!-- Quick System Shortcuts -->
+    <div class="shortcuts-card-full mt-4">
+      <div class="panel-header mb-3">
         <div>
-          <h4>Blood Group Availability</h4>
-          <p>Registered patient blood groups for emergencies</p>
-        </div>
-        <i class="bi bi-droplet-half text-danger"></i>
-      </div>
-      <div class="blood-group-chips">
-        <div class="bg-chip" *ngFor="let bg of ['O+', 'A+', 'B+', 'AB+', 'O-', 'A-', 'B-', 'AB-']">
-          <span class="bg-type">{{ bg }}</span>
-          <span class="bg-count">{{ bloodGroupCounts[bg] || (bg === 'O+' ? 12 : bg === 'B+' ? 9 : bg === 'A+' ? 7 : 3) }}</span>
+          <h4>⚡ Quick System Navigation</h4>
+          <p>Instant shortcuts to daily clinical, patient, and staff workflows</p>
         </div>
       </div>
-    </div>
+      <div class="shortcut-buttons-grid">
+        <button type="button" class="shortcut-action-card" (click)="navigateTo('/patient-registration')">
+          <div class="sc-icon icon-green"><i class="bi bi-person-plus-fill"></i></div>
+          <div class="sc-text">
+            <strong>Register Patient</strong>
+            <span>Create new patient admission & record</span>
+          </div>
+        </button>
 
-    <!-- Quick Shortcuts Card -->
-    <div class="panel-card shortcuts-card">
-      <div class="panel-header">
-        <div>
-          <h4>Quick System Shortcuts</h4>
-          <p>Common daily administrative actions</p>
-        </div>
-        <i class="bi bi-lightning-fill text-warning"></i>
-      </div>
-      <div class="shortcut-buttons">
-        <button type="button" class="shortcut-btn" (click)="navigateTo('/patient-registration')">
-          <i class="bi bi-person-plus"></i>
-          <span>Add Patient</span>
+        <button type="button" class="shortcut-action-card" (click)="navigateTo('/patients')">
+          <div class="sc-icon icon-blue"><i class="bi bi-people-fill"></i></div>
+          <div class="sc-text">
+            <strong>Patient Directory</strong>
+            <span>View, search and print patient records</span>
+          </div>
         </button>
-        <button type="button" class="shortcut-btn" (click)="navigateTo('/patients')">
-          <i class="bi bi-search"></i>
-          <span>Search Records</span>
+
+        <button type="button" class="shortcut-action-card" (click)="navigateTo('/staff-registration')">
+          <div class="sc-icon icon-purple"><i class="bi bi-person-badge-fill"></i></div>
+          <div class="sc-text">
+            <strong>Register Staff</strong>
+            <span>Onboard new pharmacist or billing staff</span>
+          </div>
         </button>
-        <button type="button" class="shortcut-btn" (click)="navigateTo('/users')">
-          <i class="bi bi-person-gear"></i>
-          <span>Staff Accounts</span>
-        </button>
-        <button type="button" class="shortcut-btn" (click)="refreshDashboard()">
-          <i class="bi bi-arrow-repeat"></i>
-          <span>Sync Data</span>
+
+        <button type="button" class="shortcut-action-card" (click)="navigateTo('/users')">
+          <div class="sc-icon icon-amber"><i class="bi bi-person-gear"></i></div>
+          <div class="sc-text">
+            <strong>Staff Management</strong>
+            <span>Manage permissions & role assignments</span>
+          </div>
         </button>
       </div>
     </div>
 
-  </div>
+  </main>
 
 </div>

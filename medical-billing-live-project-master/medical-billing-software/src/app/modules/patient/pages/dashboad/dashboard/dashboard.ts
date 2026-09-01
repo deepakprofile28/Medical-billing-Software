@@ -1,927 +1,379 @@
-import {
-  Component,
-  OnInit,
-  OnDestroy
-} from '@angular/core';
-
+import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { catchError, of } from 'rxjs';
-
-import {
-  PatientService,
-  Patient
-} from '../../../../services/patient.service';
-
-import { AuthService } from '../../../../services/auth.service';
-
-
-// =====================================================
-// INVOICE ITEM
-// =====================================================
-
-export interface InvoiceItem {
-
-  id: string;
-
-  patientName: string;
-
-  patientId: number | string;
-
-  service: string;
-
-  department:
-    | 'OPD'
-    | 'IPD'
-    | 'Pharmacy'
-    | 'Diagnostics'
-    | 'Surgery'
-    | 'ICU';
-
-  amount: number;
-
-  paymentMethod:
-    | 'Insurance / TPA'
-    | 'Credit Card'
-    | 'Cash / UPI'
-    | 'Pending Claim';
-
-  status:
-    | 'Paid'
-    | 'Pending'
-    | 'In Review'
-    | 'Partially Paid';
-
-  date: string;
-}
-
-
-// =====================================================
-// DEPARTMENT STAT
-// =====================================================
-
-export interface DepartmentStat {
-
-  name: string;
-
-  icon: string;
-
-  activeCount: number;
-
-  capacity: number;
-
-  percentage: number;
-
-  color: string;
-}
-
-
-// =====================================================
-// DASHBOARD COMPONENT
-// =====================================================
+import { PatientService, Patient } from '../../../../services/patient.service';
+import { AuthService, SignupRequest } from '../../../../services/auth.service';
 
 @Component({
-
   selector: 'app-dashboard',
-
   standalone: true,
-
   imports: [
     CommonModule,
     FormsModule,
     RouterModule
   ],
-
   templateUrl: './dashboard.html',
-
   styleUrl: './dashboard.css'
-
 })
-
-
 export class Dashboard implements OnInit, OnDestroy {
-
 
   // =====================================================
   // LOADING & STATE
   // =====================================================
-
   loading = true;
-
   errorMessage = '';
-
   currentDateTime = '';
-
-  selectedPeriod:
-    | 'today'
-    | 'week'
-    | 'month'
-    | 'year' = 'month';
-
   private clockSubscription?: ReturnType<typeof setInterval>;
 
+  // =====================================================
+  // SIDEBAR NAVIGATION STATE
+  // =====================================================
+  isSidebarCollapsed = false;
+  isPatientMenuOpen = true;
+  isUserMenuOpen = true;
 
   // =====================================================
-  // PATIENT DATA
+  // STORE CONTEXT & LOGGED-IN USER
   // =====================================================
+  activeStoreName = 'Apollo';
+  activeStoreId = '6';
+  loggedInUser = 'Administrator';
+  userRole = 'ADMIN';
 
+  // =====================================================
+  // LIVE DATABASE PATIENT DATA
+  // =====================================================
   patients: Patient[] = [];
-
   drafts: Patient[] = [];
-
   recentPatients: Patient[] = [];
 
-
-  // =====================================================
-  // PATIENT METRICS
-  // =====================================================
-
+  // Patient Metrics
   totalPatientsCount = 0;
-
   todayPatientsCount = 0;
-
   insuredPatientsCount = 0;
-
   insuredPercentage = 0;
-
   activePatientsCount = 0;
-
   draftsCount = 0;
 
-
-  // =====================================================
-  // FINANCIAL / BILLING METRICS
-  // =====================================================
-
-  totalRevenue = 845200;
-
-  pendingAmount = 118400;
-
-  collectedThisMonth = 382500;
-
-  claimApprovalRate = 96.4;
-
-
-  // =====================================================
-  // DEMOGRAPHICS
-  // =====================================================
-
+  // Demographics
   genderDistribution = {
     male: 0,
     female: 0,
     other: 0
   };
 
-  bloodGroupCounts: {
-    [key: string]: number
-  } = {};
-
+  bloodGroupCounts: { [key: string]: number } = {};
+  topCities: { name: string; count: number }[] = [];
 
   // =====================================================
-  // DEPARTMENT OCCUPANCY
+  // LIVE DATABASE USERS & STAFF DATA
   // =====================================================
+  users: SignupRequest[] = [];
+  recentUsers: SignupRequest[] = [];
 
-  departments: DepartmentStat[] = [
-
-    {
-      name: 'Outpatient (OPD)',
-      icon: 'bi-person-walking',
-      activeCount: 42,
-      capacity: 60,
-      percentage: 70,
-      color: '#2563eb'
-    },
-
-    {
-      name: 'Inpatient (IPD)',
-      icon: 'bi-hospital',
-      activeCount: 38,
-      capacity: 50,
-      percentage: 76,
-      color: '#059669'
-    },
-
-    {
-      name: 'ICU & Critical Care',
-      icon: 'bi-heart-pulse-fill',
-      activeCount: 8,
-      capacity: 10,
-      percentage: 80,
-      color: '#dc2626'
-    },
-
-    {
-      name: 'Diagnostic Lab',
-      icon: 'bi-activity',
-      activeCount: 65,
-      capacity: 80,
-      percentage: 81,
-      color: '#7c3aed'
-    },
-
-    {
-      name: 'Pharmacy Desk',
-      icon: 'bi-capsule',
-      activeCount: 112,
-      capacity: 120,
-      percentage: 93,
-      color: '#ea580c'
-    }
-
-  ];
-
-
-  // =====================================================
-  // RECENT BILLING TRANSACTIONS
-  // =====================================================
-
-  recentInvoices: InvoiceItem[] = [
-
-    {
-      id: 'INV-2026-089',
-      patientName: 'Kavitha Ramanathan',
-      patientId: 101,
-      service: 'General Consultation & Blood Panel',
-      department: 'OPD',
-      amount: 2450,
-      paymentMethod: 'Cash / UPI',
-      status: 'Paid',
-      date: 'Today, 11:30 AM'
-    },
-
-    {
-      id: 'INV-2026-088',
-      patientName: 'Suresh Kumar',
-      patientId: 102,
-      service: 'Ortho Surgery & Inpatient Stay (3 Days)',
-      department: 'IPD',
-      amount: 68500,
-      paymentMethod: 'Insurance / TPA',
-      status: 'In Review',
-      date: 'Today, 10:15 AM'
-    },
-
-    {
-      id: 'INV-2026-087',
-      patientName: 'Anitha Rajendran',
-      patientId: 103,
-      service: 'MRI Brain & Neurological Assessment',
-      department: 'Diagnostics',
-      amount: 9800,
-      paymentMethod: 'Credit Card',
-      status: 'Paid',
-      date: 'Yesterday'
-    },
-
-    {
-      id: 'INV-2026-086',
-      patientName: 'Mohammed Faisal',
-      patientId: 104,
-      service: 'Cardio Monitoring & Medication',
-      department: 'ICU',
-      amount: 24000,
-      paymentMethod: 'Pending Claim',
-      status: 'Pending',
-      date: 'Yesterday'
-    },
-
-    {
-      id: 'INV-2026-085',
-      patientName: 'Priya Sundaram',
-      patientId: 105,
-      service: 'Pediatric Vaccine & Prescription',
-      department: 'Pharmacy',
-      amount: 1750,
-      paymentMethod: 'Cash / UPI',
-      status: 'Paid',
-      date: '27 Aug 2026'
-    }
-
-  ];
-
-
-  // =====================================================
-  // MONTHLY REVENUE TREND
-  // =====================================================
-
-  monthlyTrends = [
-
-    {
-      month: 'Mar',
-      revenue: 520000,
-      patientCount: 94,
-      heightPercent: 62
-    },
-
-    {
-      month: 'Apr',
-      revenue: 610000,
-      patientCount: 110,
-      heightPercent: 72
-    },
-
-    {
-      month: 'May',
-      revenue: 580000,
-      patientCount: 102,
-      heightPercent: 68
-    },
-
-    {
-      month: 'Jun',
-      revenue: 740000,
-      patientCount: 135,
-      heightPercent: 86
-    },
-
-    {
-      month: 'Jul',
-      revenue: 790000,
-      patientCount: 142,
-      heightPercent: 92
-    },
-
-    {
-      month: 'Aug',
-      revenue: 845200,
-      patientCount: 156,
-      heightPercent: 100
-    }
-
-  ];
-
-
-  // =====================================================
-  // LOGGED-IN USER
-  // =====================================================
-
-  loggedInUser = 'Administrator';
-
-  userRole = 'Billing Admin';
-
-
-  // =====================================================
-  // CONSTRUCTOR
-  // =====================================================
+  // Staff Metrics
+  totalUsersCount = 0;
+  activeUsersCount = 0;
+  adminCount = 0;
+  pharmacistCount = 0;
+  billingCount = 0;
+  doctorCount = 0;
+  receptionistCount = 0;
 
   constructor(
-
     private patientService: PatientService,
-
     private authService: AuthService,
-
-    private router: Router
-
+    private router: Router,
+    private cdr: ChangeDetectorRef
   ) {}
 
-
-  // =====================================================
-  // ON INIT
-  // =====================================================
-
   ngOnInit(): void {
-
-    // Logged-in user
-    this.loggedInUser =
-      this.authService.getUserName() ||
-      'Administrator';
-
-
-    // Logged-in role
-    this.userRole =
-      this.authService.getRole() ||
-      'Billing Admin';
-
-
-    // Start clock
+    this.initStoreContext();
     this.updateClock();
-
-
-    this.clockSubscription =
-      setInterval(() => {
-
-        this.updateClock();
-
-      }, 1000);
-
-
-    // Load dashboard
+    this.clockSubscription = setInterval(() => this.updateClock(), 1000);
     this.loadDashboardData();
-
   }
-
-
-  // =====================================================
-  // LOGOUT
-  // =====================================================
-
-  logout(): void {
-
-    this.authService.logout();
-
-    this.router.navigate(['/login']);
-
-  }
-
-
-  // =====================================================
-  // ON DESTROY
-  // =====================================================
 
   ngOnDestroy(): void {
-
     if (this.clockSubscription) {
-
       clearInterval(this.clockSubscription);
-
     }
-
   }
 
-
-  // =====================================================
-  // CURRENT DATE / TIME
-  // =====================================================
+  private initStoreContext(): void {
+    this.loggedInUser = this.authService.getUserName() || 'Administrator';
+    this.userRole = (this.authService.getRole() || 'ADMIN').toUpperCase();
+    this.activeStoreName = localStorage.getItem('companyName') || sessionStorage.getItem('signupCompanyName') || 'Apollo';
+    this.activeStoreId = localStorage.getItem('companyId') || '6';
+  }
 
   private updateClock(): void {
-
     const now = new Date();
-
     const options: Intl.DateTimeFormatOptions = {
-
       weekday: 'short',
-
       year: 'numeric',
-
       month: 'short',
-
       day: 'numeric',
-
       hour: '2-digit',
-
       minute: '2-digit',
-
       second: '2-digit',
-
       hour12: true
-
     };
-
-
-    this.currentDateTime =
-      now.toLocaleString(
-        'en-IN',
-        options
-      );
-
+    this.currentDateTime = now.toLocaleString('en-IN', options);
   }
 
-
   // =====================================================
-  // LOAD DASHBOARD DATA
+  // LOAD LIVE DASHBOARD DATA (USERS & PATIENTS)
   // =====================================================
-
   loadDashboardData(): void {
-
     this.loading = true;
-
     this.errorMessage = '';
 
-
-    // ===================================================
-    // LOAD PATIENTS
-    // ===================================================
-
-    this.patientService
-      .getAllPatients()
-
-      .pipe(
-
-        catchError((err) => {
-
-          console.error(
-            'Failed to load patients:',
-            err
-          );
-
-
-          /*
-           * IMPORTANT
-           *
-           * Do NOT use demo patients here.
-           *
-           * PatientService already handles
-           * local storage fallback.
-           *
-           * Returning [] prevents another
-           * company's demo data from appearing.
-           */
-
-          this.errorMessage =
-            'Unable to retrieve patient data.';
-
-
-          return of([] as Patient[]);
-
-        })
-
-      )
-
-      .subscribe({
-
-        next: (data: Patient[]) => {
-
-          this.patients =
-            Array.isArray(data)
-              ? data
-              : [];
-
-
-          // Calculate all metrics
-          this.calculatePatientMetrics();
-
-
-          this.loading = false;
-
-        },
-
-
-        error: (err) => {
-
-          console.error(
-            'Dashboard patient loading error:',
-            err
-          );
-
-
-          this.patients = [];
-
-          this.calculatePatientMetrics();
-
-
-          this.errorMessage =
-            'Could not retrieve patient data.';
-
-
-          this.loading = false;
-
-        }
-
-      });
-
-
-    // ===================================================
-    // LOAD DRAFTS
-    // ===================================================
-
-    this.patientService
-      .getDraftPatients()
-
-      .pipe(
-
-        catchError((err) => {
-
-          console.error(
-            'Failed to load drafts:',
-            err
-          );
-
-          return of([] as Patient[]);
-
-        })
-
-      )
-
-      .subscribe({
-
-        next: (draftData: Patient[]) => {
-
-          this.drafts =
-            Array.isArray(draftData)
-              ? draftData
-              : [];
-
-
-          this.draftsCount =
-            this.drafts.length;
-
-        },
-
-        error: () => {
-
-          this.drafts = [];
-
-          this.draftsCount = 0;
-
-        }
-
-      });
-
-  }
-
-
-  // =====================================================
-  // CALCULATE PATIENT METRICS
-  // =====================================================
-
-  private calculatePatientMetrics(): void {
-
-
-    // ===================================================
-    // TOTAL PATIENTS
-    // ===================================================
-
-    this.totalPatientsCount =
-      this.patients.length;
-
-
-    // ===================================================
-    // TODAY
-    // ===================================================
-
-    const todayStr =
-      new Date()
-        .toISOString()
-        .split('T')[0];
-
-
-    let todayCount = 0;
-
-    let insuredCount = 0;
-
-    let activeCount = 0;
-
-
-    let male = 0;
-
-    let female = 0;
-
-    let other = 0;
-
-
-    const bgMap: {
-      [key: string]: number
-    } = {};
-
-
-    // ===================================================
-    // LOOP PATIENTS
-    // ===================================================
-
-    this.patients.forEach((p: Patient) => {
-
-
-      // =================================================
-      // CREATED TODAY
-      // =================================================
-
-      if (
-
-        p.createdDate &&
-
-        p.createdDate.startsWith(todayStr)
-
-      ) {
-
-        todayCount++;
-
+    // 1. Fetch Patients from MySQL Database
+    this.patientService.getAllPatients().pipe(
+      catchError((err) => {
+        console.error('Failed to load live patients from DB:', err);
+        return of([] as Patient[]);
+      })
+    ).subscribe({
+      next: (data: Patient[]) => {
+        this.patients = Array.isArray(data) ? data : [];
+        this.calculatePatientMetrics();
+        this.loading = false;
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        console.error('Error fetching patients:', err);
+        this.patients = [];
+        this.calculatePatientMetrics();
+        this.loading = false;
+        this.cdr.detectChanges();
       }
-
-
-      // =================================================
-      // INSURANCE
-      // =================================================
-
-      if (
-
-        p.insuranceProvider &&
-
-        p.insuranceProvider
-          .trim()
-          .length > 0
-
-      ) {
-
-        insuredCount++;
-
-      }
-
-
-      // =================================================
-      // ACTIVE PATIENTS
-      // =================================================
-
-      if (
-
-        !p.status ||
-
-        p.status
-          .toLowerCase()
-          .trim() === 'active'
-
-      ) {
-
-        activeCount++;
-
-      }
-
-
-      // =================================================
-      // GENDER
-      // =================================================
-
-      const gender =
-        (p.gender || '')
-          .toLowerCase()
-          .trim();
-
-
-      if (
-
-        gender === 'male' ||
-
-        gender === 'm'
-
-      ) {
-
-        male++;
-
-      }
-
-      else if (
-
-        gender === 'female' ||
-
-        gender === 'f'
-
-      ) {
-
-        female++;
-
-      }
-
-      else {
-
-        other++;
-
-      }
-
-
-      // =================================================
-      // BLOOD GROUP
-      // =================================================
-
-      if (p.bloodGroup) {
-
-        const bg =
-          p.bloodGroup
-            .toUpperCase()
-            .trim();
-
-
-        bgMap[bg] =
-          (bgMap[bg] || 0) + 1;
-
-      }
-
     });
 
+    // 2. Fetch Users / Staff from MySQL Database
+    this.authService.getAllUsers().pipe(
+      catchError((err) => {
+        console.error('Failed to load live users from DB:', err);
+        return of([] as SignupRequest[]);
+      })
+    ).subscribe({
+      next: (userData: SignupRequest[]) => {
+        const rawUsers = Array.isArray(userData) ? userData : [];
+        const currentCompanyId = localStorage.getItem('companyId');
+        const currentCompanyName = (localStorage.getItem('companyName') || '').trim().toLowerCase();
+        const currentRole = (localStorage.getItem('role') || '').trim().toUpperCase();
+        const isSuperAdmin = currentRole.includes('SUPER_ADMIN') || currentRole.includes('SUPERADMIN');
 
-    // ===================================================
-    // SET METRICS
-    // ===================================================
+        // Filter users strictly by company if not Super Admin
+        this.users = rawUsers.filter(u => {
+          const email = (u.email || '').toLowerCase().trim();
+          const role = (u.role || '').toUpperCase().trim();
+          if (email === 'admin@gmail.com' || role === 'SUPER_ADMIN' || role === 'SUPERADMIN') {
+            return false;
+          }
 
-    this.todayPatientsCount =
-      todayCount;
+          if (!isSuperAdmin) {
+            if (currentCompanyId && u.companyId !== undefined && u.companyId !== null) {
+              if (String(u.companyId) !== String(currentCompanyId)) {
+                return false;
+              }
+            } else if (currentCompanyName && u.companyName) {
+              if (u.companyName.trim().toLowerCase() !== currentCompanyName) {
+                return false;
+              }
+            }
+          }
+          return true;
+        });
 
+        this.calculateUserMetrics();
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.users = [];
+        this.calculateUserMetrics();
+        this.cdr.detectChanges();
+      }
+    });
 
-    this.insuredPatientsCount =
-      insuredCount;
+    // 3. Fetch Draft Patients
+    this.patientService.getDraftPatients().pipe(
+      catchError(() => of([] as Patient[]))
+    ).subscribe({
+      next: (draftData: Patient[]) => {
+        this.drafts = Array.isArray(draftData) ? draftData : [];
+        this.draftsCount = this.drafts.length;
+        this.cdr.detectChanges();
+      }
+    });
+  }
 
+  // =====================================================
+  // CALCULATE LIVE PATIENT METRICS
+  // =====================================================
+  private calculatePatientMetrics(): void {
+    this.totalPatientsCount = this.patients.length;
 
-    this.insuredPercentage =
-      this.totalPatientsCount > 0
+    const todayStr = new Date().toISOString().split('T')[0];
+    let todayCount = 0;
+    let insuredCount = 0;
+    let activeCount = 0;
+    let male = 0;
+    let female = 0;
+    let other = 0;
 
-        ? Math.round(
-            (
-              insuredCount /
-              this.totalPatientsCount
-            ) * 100
-          )
-
-        : 0;
-
-
-    this.activePatientsCount =
-      activeCount;
-
-
-    this.genderDistribution = {
-
-      male,
-
-      female,
-
-      other
-
+    const bgMap: { [key: string]: number } = {
+      'O+': 0, 'A+': 0, 'B+': 0, 'AB+': 0,
+      'O-': 0, 'A-': 0, 'B-': 0, 'AB-': 0
     };
 
+    const cityMap: { [key: string]: number } = {};
 
-    this.bloodGroupCounts =
-      bgMap;
+    this.patients.forEach((p: Patient) => {
+      // Today registration
+      if (p.createdDate && p.createdDate.startsWith(todayStr)) {
+        todayCount++;
+      }
 
+      // Insurance
+      if (p.insuranceProvider && p.insuranceProvider.trim().length > 0) {
+        insuredCount++;
+      }
 
-    // ===================================================
-    // RECENT PATIENTS
-    // ===================================================
+      // Active
+      if (!p.status || p.status.toLowerCase().trim() === 'approved' || p.status.toLowerCase().trim() === 'active') {
+        activeCount++;
+      }
 
-    this.recentPatients =
-      [...this.patients]
+      // Gender
+      const gender = (p.gender || '').toLowerCase().trim();
+      if (gender === 'male' || gender === 'm') {
+        male++;
+      } else if (gender === 'female' || gender === 'f') {
+        female++;
+      } else {
+        other++;
+      }
 
-        .sort((a, b) => {
+      // Blood Group
+      if (p.bloodGroup) {
+        const bg = p.bloodGroup.toUpperCase().trim();
+        bgMap[bg] = (bgMap[bg] || 0) + 1;
+      }
 
-          const dateA =
-            a.createdDate
-              ? new Date(a.createdDate).getTime()
-              : 0;
+      // City
+      if (p.city && p.city.trim().length > 0) {
+        const c = p.city.trim();
+        cityMap[c] = (cityMap[c] || 0) + 1;
+      }
+    });
 
+    this.todayPatientsCount = todayCount;
+    this.insuredPatientsCount = insuredCount;
+    this.insuredPercentage = this.totalPatientsCount > 0 ? Math.round((insuredCount / this.totalPatientsCount) * 100) : 0;
+    this.activePatientsCount = activeCount;
+    this.genderDistribution = { male, female, other };
+    this.bloodGroupCounts = bgMap;
 
-          const dateB =
-            b.createdDate
-              ? new Date(b.createdDate).getTime()
-              : 0;
+    // Top Cities
+    this.topCities = Object.keys(cityMap)
+      .map(k => ({ name: k, count: cityMap[k] }))
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 5);
 
-
-          return dateB - dateA;
-
-        })
-
-        .slice(0, 5);
-
+    // Recent 5 Patients from DB
+    this.recentPatients = [...this.patients]
+      .sort((a, b) => {
+        const dateA = a.createdDate ? new Date(a.createdDate).getTime() : (a.id || 0);
+        const dateB = b.createdDate ? new Date(b.createdDate).getTime() : (b.id || 0);
+        return Number(dateB) - Number(dateA);
+      })
+      .slice(0, 5);
   }
 
+  // =====================================================
+  // CALCULATE LIVE USER / STAFF METRICS
+  // =====================================================
+  private calculateUserMetrics(): void {
+    this.totalUsersCount = this.users.length;
+    this.adminCount = this.users.filter(u => (u.role || '').toUpperCase() === 'ADMIN').length;
+    this.pharmacistCount = this.users.filter(u => (u.role || '').toUpperCase() === 'PHARMACIST').length;
+    this.billingCount = this.users.filter(u => (u.role || '').toUpperCase() === 'BILLING_OFFICER').length;
+    this.doctorCount = this.users.filter(u => (u.role || '').toUpperCase() === 'DOCTOR').length;
+    this.receptionistCount = this.users.filter(u => (u.role || '').toUpperCase() === 'RECEPTIONIST').length;
+    this.activeUsersCount = this.users.filter(u => u.active !== false && (u.status || '').toLowerCase() !== 'inactive').length;
+    
+    // Recent 5 Staff from DB
+    this.recentUsers = [...this.users].slice(0, 5);
+  }
 
   // =====================================================
-  // NAVIGATION
+  // ROLE HELPERS
   // =====================================================
+  getRoleBadgeLabel(role?: string): string {
+    switch ((role || '').toUpperCase()) {
+      case 'ADMIN': return 'Administrator';
+      case 'PHARMACIST': return 'Pharmacist';
+      case 'BILLING_OFFICER': return 'Billing Officer';
+      case 'DOCTOR': return 'Doctor / Physician';
+      case 'RECEPTIONIST': return 'Receptionist';
+      default: return role || 'Staff';
+    }
+  }
 
+  getRoleBadgeClass(role?: string): string {
+    switch ((role || '').toUpperCase()) {
+      case 'ADMIN': return 'badge-admin';
+      case 'PHARMACIST': return 'badge-pharmacist';
+      case 'BILLING_OFFICER': return 'badge-billing';
+      case 'DOCTOR': return 'badge-doctor';
+      case 'RECEPTIONIST': return 'badge-receptionist';
+      default: return 'badge-default';
+    }
+  }
+
+  // =====================================================
+  // SIDEBAR TOGGLES
+  // =====================================================
+  toggleSidebar(): void {
+    this.isSidebarCollapsed = !this.isSidebarCollapsed;
+  }
+
+  togglePatientMenu(): void {
+    this.isPatientMenuOpen = !this.isPatientMenuOpen;
+  }
+
+  toggleUserMenu(): void {
+    this.isUserMenuOpen = !this.isUserMenuOpen;
+  }
+
+  scrollToAnalysis(): void {
+    const el = document.getElementById('patient-demographics-section');
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth' });
+    }
+  }
+
+  // =====================================================
+  // ACTIONS & NAVIGATION
+  // =====================================================
   navigateTo(path: string): void {
-
     this.router.navigate([path]);
-
   }
-
-
-  // =====================================================
-  // VIEW PATIENT
-  // =====================================================
 
   viewPatient(patient: Patient): void {
-
-    this.router.navigate(
-      ['/patient-details'],
-      {
-        state: {
-          patient
-        }
-      }
-    );
-
+    this.router.navigate(['/patient-details'], { state: { patient } });
   }
-
-
-  // =====================================================
-  // REFRESH DASHBOARD
-  // =====================================================
 
   refreshDashboard(): void {
-
     this.loadDashboardData();
-
   }
 
-
-  // =====================================================
-  // FORMAT CURRENCY
-  // =====================================================
-
-  formatCurrency(val: number): string {
-
-    return new Intl.NumberFormat(
-      'en-IN',
-      {
-
-        style: 'currency',
-
-        currency: 'INR',
-
-        maximumFractionDigits: 0
-
-      }
-
-    ).format(val);
-
+  logout(): void {
+    this.authService.logout();
+    this.router.navigate(['/login']);
   }
-
 }

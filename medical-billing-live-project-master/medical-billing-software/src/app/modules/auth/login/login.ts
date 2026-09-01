@@ -1,15 +1,12 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
-
 import {
   ReactiveFormsModule,
   FormBuilder,
   FormGroup,
   Validators
 } from '@angular/forms';
-
 import { CommonModule } from '@angular/common';
-import { Router, RouterModule } from '@angular/router';
-
+import { Router, RouterModule, ActivatedRoute } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 
 @Component({
@@ -20,9 +17,7 @@ import { AuthService } from '../../services/auth.service';
     ReactiveFormsModule,
     RouterModule
   ],
-
   templateUrl: './login.html',
-
   styleUrls: ['./login.css']
 })
 export class Login implements OnInit {
@@ -31,12 +26,14 @@ export class Login implements OnInit {
   hidePassword = true;
   loading = false;
   errorMessage = '';
+  successMessage = '';
   isNotVerified = false;
   unverifiedData: any = null;
 
   constructor(
     private fb: FormBuilder,
     private router: Router,
+    private route: ActivatedRoute,
     private authService: AuthService,
     private cdr: ChangeDetectorRef
   ) {}
@@ -46,6 +43,12 @@ export class Login implements OnInit {
   ngOnInit(): void {
     const savedStore = sessionStorage.getItem('signupCompanyName') || '';
     const savedEmail = sessionStorage.getItem('signupEmail') || '';
+
+    this.route.queryParams.subscribe(params => {
+      if (params['resetSuccess']) {
+        this.successMessage = 'Password reset successfully! Please sign in with your new password.';
+      }
+    });
 
     this.loginForm = this.fb.group({
       storeName: [

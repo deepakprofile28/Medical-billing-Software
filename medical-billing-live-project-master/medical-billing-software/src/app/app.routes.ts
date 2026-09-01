@@ -2,6 +2,7 @@ import { Routes } from '@angular/router';
 import { PatientLogin } from './patient-login/patient-login';
 import { Login } from './modules/auth/login/login';
 import { Signup } from './modules/auth/signup/signup';
+import { ForgotPassword } from './modules/auth/forgot-password/forgot-password';
 import { VerifyOtp } from './modules/auth/verify-otp/verify-otp';
 import { CompanyRegistration } from './modules/auth/company-registration/company-registration';
 import { PatientRegistration } from './modules/patient/pages/patient-registration/patient-registration';
@@ -14,6 +15,8 @@ import { authGuard } from './@core/guards/auth-guard';
 export const routes: Routes = [
   // Public Multi-Tenant Business Onboarding & Auth Routes
   { path: 'login', component: Login },
+  { path: 'forgot-password', component: ForgotPassword },
+  { path: 'reset-password', component: ForgotPassword },
   { path: 'staff-registration', component: Signup },
   { path: 'signup', redirectTo: 'staff-registration', pathMatch: 'full' },
   { path: 'register', redirectTo: 'staff-registration', pathMatch: 'full' },

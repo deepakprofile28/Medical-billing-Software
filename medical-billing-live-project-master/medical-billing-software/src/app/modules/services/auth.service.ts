@@ -292,22 +292,7 @@ export class AuthService {
     );
   }
 
-  // =====================================================
-  // RESET PASSWORD
-  // =====================================================
-  resetPassword(email: string, newPassword: string): Observable<boolean> {
-    const users = this.getLocalUsers();
-    const index = users.findIndex(u => u.email.toLowerCase() === email.toLowerCase());
-    if (index >= 0) {
-      users[index].password = newPassword;
-      localStorage.setItem(this.USERS_STORAGE_KEY, JSON.stringify(users));
-    }
 
-    return this.http.post<any>(`${this.apiUrl}/reset-password`, { email, newPassword }).pipe(
-      catchError(() => of(true)),
-      tap(() => true)
-    );
-  }
 
   // =====================================================
   // DELETE USER
@@ -417,6 +402,71 @@ export class AuthService {
   }
 
   // =====================================================
+  // FORGOT PASSWORD / REQUEST RESET TOKEN
+  // POST /api/auth/forgot-password
+  // =====================================================
+  forgotPassword(email: string): Observable<any> {
+    const payload = { email: email.trim().toLowerCase() };
+    console.log('Sending Forgot Password Request:', payload);
+    return this.http.post<any>(`${this.apiUrl}/forgot-password`, payload);
+  }
+
+  // =====================================================
+  // VERIFY PASSWORD RESET TOKEN
+  // POST /api/auth/verify-reset-token
+  // =====================================================
+  verifyResetToken(email: string, token: string): Observable<any> {
+    const payload = {
+      email: email.trim().toLowerCase(),
+      token: token.trim(),
+      otp: token.trim()
+    };
+    console.log('Verifying Password Reset Token:', payload);
+    return this.http.post<any>(`${this.apiUrl}/verify-reset-token`, payload);
+  }
+
+  // =====================================================
+  // RESET PASSWORD (Supports both Token-based reset and Admin Direct reset)
+  // POST /api/auth/reset-password
+  // =====================================================
+  resetPassword(
+    emailOrPayload: string | { email: string; token?: string; otp?: string; newPassword?: string; password?: string },
+    newPasswordParam?: string
+  ): Observable<any> {
+    let email = '';
+    let token = '';
+    let newPassword = '';
+
+    if (typeof emailOrPayload === 'object' && emailOrPayload !== null) {
+      email = (emailOrPayload.email || '').trim().toLowerCase();
+      token = (emailOrPayload.token || emailOrPayload.otp || '').trim();
+      newPassword = emailOrPayload.newPassword || emailOrPayload.password || '';
+    } else {
+      email = String(emailOrPayload || '').trim().toLowerCase();
+      newPassword = newPasswordParam || '';
+    }
+
+    // Update local cache if present
+    const users = this.getLocalUsers();
+    const index = users.findIndex(u => (u.email || '').toLowerCase() === email.toLowerCase());
+    if (index >= 0 && newPassword) {
+      users[index].password = newPassword;
+      localStorage.setItem(this.USERS_STORAGE_KEY, JSON.stringify(users));
+    }
+
+    const payload = {
+      email,
+      token,
+      otp: token,
+      newPassword,
+      password: newPassword
+    };
+
+    console.log('Sending Reset Password to Backend:', { email: payload.email, hasToken: !!payload.token });
+    return this.http.post<any>(`${this.apiUrl}/reset-password`, payload);
+  }
+
+  // =====================================================
   // RESEND OTP
   // POST /api/auth/resend-otp
   // =====================================================
@@ -468,21 +518,6 @@ export class AuthService {
             localStorage.setItem(this.USERS_STORAGE_KEY, JSON.stringify(users));
           }
         }
-      })
-    );
-  }
-
-  // =====================================================
-  // FORGOT PASSWORD
-  // POST /api/auth/forgot-password
-  // =====================================================
-  forgotPassword(email: string): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/forgot-password`, { email: email.trim().toLowerCase() }).pipe(
-      catchError(() => {
-        return of({
-          success: true,
-          message: 'Password reset instructions sent to your registered Gmail address.'
-        });
       })
     );
   }
