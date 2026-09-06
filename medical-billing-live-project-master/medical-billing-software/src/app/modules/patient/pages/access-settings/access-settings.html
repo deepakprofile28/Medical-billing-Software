@@ -1,0 +1,788 @@
+<div class="dashboard-layout-wrapper" [class.sidebar-collapsed]="isSidebarCollapsed">
+
+  <!-- ================= LEFT SIDEBAR MENU (IDENTICAL TO DASHBOARD) ================= -->
+  <aside class="app-sidebar">
+    
+    <!-- Sidebar Brand Header -->
+    <div class="sidebar-brand">
+      <div class="brand-icon-box">
+        <i class="bi bi-hospital-fill"></i>
+      </div>
+      <div class="brand-details" *ngIf="!isSidebarCollapsed">
+        <h2 class="brand-title">PharmaCare</h2>
+        <span class="brand-subtitle">Clinical & Billing Hub</span>
+      </div>
+    </div>
+
+    <!-- Active Store Badge -->
+    <div class="sidebar-store-pill" *ngIf="!isSidebarCollapsed">
+      <i class="bi bi-shop-window text-emerald"></i>
+      <div class="store-text">
+        <span class="store-label">Active Store</span>
+        <strong class="store-name">{{ activeStoreName }} (#{{ activeStoreId }})</strong>
+      </div>
+    </div>
+
+    <!-- Sidebar Navigation Items -->
+    <nav class="sidebar-nav">
+      
+      <!-- 1. DASHBOARD -->
+      <!-- 1. DASHBOARD -->
+      <div class="nav-group" *ngIf="canAccess('DASHBOARD')">
+        <a routerLink="/dashboard" class="menu-item root-item" title="Dashboard">
+          <i class="bi bi-grid-1x2-fill menu-icon"></i>
+          <span class="menu-text" *ngIf="!isSidebarCollapsed">Dashboard</span>
+          <span class="badge-live-pulse" *ngIf="!isSidebarCollapsed">Live</span>
+        </a>
+      </div>
+
+      <!-- 2. POS BILLING COUNTER -->
+      <div class="nav-group" *ngIf="canAccess('POS_BILLING')">
+        <a routerLink="/pos" class="menu-item root-item" title="POS Billing Counter">
+          <i class="bi bi-receipt-cutoff menu-icon text-warning"></i>
+          <span class="menu-text" *ngIf="!isSidebarCollapsed">POS Billing Counter</span>
+          <span class="badge-pos-pulse" *ngIf="!isSidebarCollapsed">POS</span>
+        </a>
+      </div>
+
+      <!-- 2.5 SALES MENU -->
+      <div class="nav-group">
+        <div class="menu-header" (click)="isSalesMenuOpen = !isSalesMenuOpen" [class.expanded]="isSalesMenuOpen" *ngIf="!isSidebarCollapsed">
+          <div class="header-left">
+            <i class="bi bi-cart-check-fill header-icon text-success"></i>
+            <span>Sales Management</span>
+          </div>
+          <i class="bi bi-chevron-down chevron-icon" [class.rotate]="isSalesMenuOpen"></i>
+        </div>
+
+        <a *ngIf="isSidebarCollapsed" (click)="isSidebarCollapsed = false; isSalesMenuOpen = true" class="menu-item root-item" style="cursor: pointer;" title="Sales Management">
+          <i class="bi bi-cart-check-fill menu-icon text-success"></i>
+        </a>
+
+        <div class="sub-menu" *ngIf="isSalesMenuOpen && !isSidebarCollapsed">
+          <a routerLink="/sales-transactions" class="sub-menu-item">
+            <i class="bi bi-credit-card-2-front-fill sub-icon text-primary"></i>
+            <span>Transaction</span>
+          </a>
+          <a routerLink="/sales-orders" class="sub-menu-item">
+            <i class="bi bi-box-seam-fill sub-icon text-info"></i>
+            <span>Order</span>
+          </a>
+          <a routerLink="/sales-suspended" class="sub-menu-item">
+            <i class="bi bi-pause-circle-fill sub-icon text-warning"></i>
+            <span>Order Suspended</span>
+          </a>
+          <a routerLink="/sales-completed" class="sub-menu-item">
+            <i class="bi bi-check-circle-fill sub-icon text-success"></i>
+            <span>Completed</span>
+          </a>
+          <a routerLink="/sales-exchange" class="sub-menu-item">
+            <i class="bi bi-arrow-repeat sub-icon text-purple"></i>
+            <span>Exchange</span>
+          </a>
+          <a routerLink="/sales-returns" class="sub-menu-item">
+            <i class="bi bi-arrow-counterclockwise sub-icon text-danger"></i>
+            <span>Return and Refund</span>
+          </a>
+        </div>
+      </div>
+
+      
+      <!-- PURCHASE MENU -->
+      <div class="nav-group">
+        <div class="menu-header" (click)="isPurchaseMenuOpen = !isPurchaseMenuOpen" [class.expanded]="isPurchaseMenuOpen" *ngIf="!isSidebarCollapsed">
+          <div class="header-left">
+            <i class="bi bi-bag-check-fill header-icon" style="color: #f59e0b;"></i>
+            <span>Purchase Management</span>
+          </div>
+          <i class="bi bi-chevron-down chevron-icon" [class.rotate]="isPurchaseMenuOpen"></i>
+        </div>
+
+        <a *ngIf="isSidebarCollapsed" (click)="isSidebarCollapsed = false; isPurchaseMenuOpen = true" class="menu-item root-item" style="cursor: pointer;" title="Purchase Management">
+          <i class="bi bi-bag-check-fill menu-icon" style="color: #f59e0b;"></i>
+        </a>
+
+        <div class="sub-menu" *ngIf="isPurchaseMenuOpen && !isSidebarCollapsed">
+          <a routerLink="/purchase" class="sub-menu-item">
+            <i class="bi bi-cart-plus-fill sub-icon text-info"></i>
+            <span>Purchase</span>
+          </a>
+          <a routerLink="/purchase-returns" class="sub-menu-item">
+            <i class="bi bi-arrow-return-left sub-icon text-danger"></i>
+            <span>Purchase Return</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- 3. TABLETS & MEDICINES -->
+      <div class="nav-group" *ngIf="canAccess('TABLETS')">
+        <a routerLink="/tablets" class="menu-item root-item" title="Tablets & Medicines">
+          <i class="bi bi-capsule-pill menu-icon text-emerald"></i>
+          <span class="menu-text" *ngIf="!isSidebarCollapsed">Tablets & Medicines</span>
+        </a>
+      </div>
+
+      <!-- 4. AI CLINICAL ASSISTANT -->
+      <div class="nav-group" *ngIf="canAccess('AI_ASSISTANT')">
+        <a routerLink="/ai-assistant" class="menu-item root-item" title="AI Medical Assistant">
+          <i class="bi bi-robot menu-icon" style="color: #a855f7;"></i>
+          <span class="menu-text" *ngIf="!isSidebarCollapsed">AI Clinical Assistant</span>
+          <span class="badge-pos-pulse" style="background: #7c3aed;" *ngIf="!isSidebarCollapsed">AI DB</span>
+        </a>
+      </div>
+
+      <!-- 5. PATIENT MANAGEMENT -->
+      <div class="nav-group" *ngIf="canAccess('PATIENT_LIST') || canAccess('PATIENT_REGISTRATION') || canAccess('PATIENT_DETAILS')">
+        <div class="menu-header" (click)="togglePatientMenu()" [class.expanded]="isPatientMenuOpen" *ngIf="!isSidebarCollapsed">
+          <div class="header-left">
+            <i class="bi bi-person-vcard-fill header-icon"></i>
+            <span>Patient Management</span>
+          </div>
+          <i class="bi bi-chevron-down chevron-icon" [class.rotate]="isPatientMenuOpen"></i>
+        </div>
+
+        <a *ngIf="isSidebarCollapsed" (click)="openPatientFromCollapsed()" class="menu-item root-item" style="cursor: pointer;" title="Patient Management">
+          <i class="bi bi-person-vcard-fill menu-icon"></i>
+        </a>
+
+        <div class="sub-menu" *ngIf="isPatientMenuOpen && !isSidebarCollapsed">
+          <a routerLink="/patients" class="sub-menu-item" *ngIf="canAccess('PATIENT_LIST')">
+            <i class="bi bi-people-fill sub-icon"></i>
+            <span>Patient List</span>
+            <span class="count-badge">{{ totalPatientsCount }}</span>
+          </a>
+          <a routerLink="/patient-registration" class="sub-menu-item" *ngIf="canAccess('PATIENT_REGISTRATION')">
+            <i class="bi bi-person-plus-fill sub-icon text-success"></i>
+            <span>Add Patient</span>
+          </a>
+          <a routerLink="/patient-drafts" class="sub-menu-item" *ngIf="canAccess('PATIENT_LIST')">
+            <i class="bi bi-file-earmark-text-fill sub-icon text-warning"></i>
+            <span>Patient Draft</span>
+            <span class="count-badge badge-warning" *ngIf="draftsCount > 0">{{ draftsCount }}</span>
+          </a>
+          <a routerLink="/dashboard" class="sub-menu-item" *ngIf="canAccess('DASHBOARD')">
+            <i class="bi bi-graph-up-arrow sub-icon text-primary"></i>
+            <span>Patient Analysis</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- 5.1 DOCTOR MANAGEMENT -->
+      <div class="nav-group" *ngIf="canAccess('DOCTORS')">
+        <div class="menu-header" (click)="toggleDoctorMenu()" [class.expanded]="isDoctorMenuOpen" *ngIf="!isSidebarCollapsed">
+          <div class="header-left">
+            <i class="bi bi-person-badge-fill header-icon text-cyan"></i>
+            <span>Doctor Management</span>
+          </div>
+          <i class="bi bi-chevron-down chevron-icon" [class.rotate]="isDoctorMenuOpen"></i>
+        </div>
+
+        <!-- Collapsed icon fallback -->
+        <a *ngIf="isSidebarCollapsed" (click)="openDoctorFromCollapsed()" class="menu-item root-item" style="cursor: pointer;" title="Doctor Management">
+          <i class="bi bi-person-badge-fill menu-icon" style="color: #06b6d4;"></i>
+        </a>
+
+        <div class="sub-menu" *ngIf="isDoctorMenuOpen && !isSidebarCollapsed">
+          <!-- Doctor List -->
+          <a routerLink="/doctors" class="sub-menu-item">
+            <i class="bi bi-person-lines-fill sub-icon text-cyan"></i>
+            <span>Doctor List</span>
+          </a>
+
+          <!-- Add Doctor -->
+          <a routerLink="/add-doctor" class="sub-menu-item">
+            <i class="bi bi-person-plus-fill sub-icon text-success"></i>
+            <span>Add Doctor</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- 6. USER MANAGEMENT (ACTIVE ON ACCESS) -->
+      <div class="nav-group" *ngIf="canAccess('USER_MANAGEMENT') || canAccess('ACCESS') || canAccess('ROLES')">
+        <div class="menu-header" (click)="toggleUserMenu()" [class.expanded]="isUserMenuOpen" *ngIf="!isSidebarCollapsed">
+          <div class="header-left">
+            <i class="bi bi-person-gear header-icon"></i>
+            <span>User Management</span>
+          </div>
+          <i class="bi bi-chevron-down chevron-icon" [class.rotate]="isUserMenuOpen"></i>
+        </div>
+
+        <a *ngIf="isSidebarCollapsed" (click)="openUserFromCollapsed()" class="menu-item root-item active" style="cursor: pointer;" title="User Management">
+          <i class="bi bi-person-gear menu-icon"></i>
+        </a>
+
+        <div class="sub-menu" *ngIf="isUserMenuOpen && !isSidebarCollapsed">
+          <a routerLink="/users" class="sub-menu-item" *ngIf="canAccess('USER_MANAGEMENT')">
+            <i class="bi bi-people sub-icon"></i>
+            <span>User List</span>
+            <span class="count-badge">{{ totalUsersCount }}</span>
+          </a>
+          <!-- ACCESS (CURRENT PAGE ACTIVE) -->
+          <a routerLink="/access" class="sub-menu-item active" *ngIf="canAccess('ACCESS')">
+            <i class="bi bi-key-fill sub-icon text-info"></i>
+            <span>Access</span>
+            <span class="count-badge" style="background: #0284c7;">DB</span>
+          </a>
+          <a routerLink="/roles" class="sub-menu-item" *ngIf="canAccess('ROLES')">
+            <i class="bi bi-shield-check sub-icon text-emerald"></i>
+            <span>Role</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- 7. SETTINGS & STORE MENU -->
+      <div class="nav-group" *ngIf="canAccess('STORE_SETTINGS') || canAccess('CATEGORIES') || canAccess('TAX_SETTINGS')">
+        <div class="menu-header" (click)="toggleSettingsMenu()" [class.expanded]="isSettingsMenuOpen" *ngIf="!isSidebarCollapsed">
+          <div class="header-left">
+            <i class="bi bi-gear-fill header-icon text-secondary"></i>
+            <span>Settings</span>
+          </div>
+          <i class="bi bi-chevron-down chevron-icon" [class.rotate]="isSettingsMenuOpen"></i>
+        </div>
+
+        <a *ngIf="isSidebarCollapsed" (click)="openSettingsFromCollapsed()" class="menu-item root-item" style="cursor: pointer;" title="Settings: Store Config, Category, Tax">
+          <i class="bi bi-gear-fill menu-icon"></i>
+        </a>
+
+        <div class="sub-menu" *ngIf="isSettingsMenuOpen && !isSidebarCollapsed">
+          <a routerLink="/settings" class="sub-menu-item" *ngIf="canAccess('STORE_SETTINGS')">
+            <i class="bi bi-shop-window sub-icon text-emerald"></i>
+            <span>Store Configuration</span>
+          </a>
+          <a routerLink="/category" class="sub-menu-item" *ngIf="canAccess('CATEGORIES')">
+            <i class="bi bi-tags-fill sub-icon text-primary"></i>
+            <span>Category</span>
+            <span class="count-badge" style="background: #2563eb;">DB</span>
+          </a>
+          <a routerLink="/tax" class="sub-menu-item" *ngIf="canAccess('TAX_SETTINGS')">
+            <i class="bi bi-percent sub-icon text-warning"></i>
+            <span>Tax</span>
+            <span class="count-badge" style="background: #059669;">DB</span>
+          </a>
+          <a routerLink="/warehouse" class="sub-menu-item">
+            <i class="bi bi-building-gear sub-icon text-info"></i>
+            <span>Warehouse</span>
+            <span class="count-badge" style="background: #0284c7;">DB</span>
+          </a>
+          <a routerLink="/brand" class="sub-menu-item">
+            <i class="bi bi-award-fill sub-icon text-purple"></i>
+            <span>Brand</span>
+            <span class="count-badge" style="background: #9333ea;">DB</span>
+          </a>
+          <a routerLink="/branch" class="sub-menu-item">
+            <i class="bi bi-diagram-3-fill sub-icon text-teal"></i>
+            <span>Branch</span>
+            <span class="count-badge" style="background: #0d9488;">DB</span>
+          </a>
+        </div>
+      </div>
+
+    </nav>
+
+    <!-- Sidebar Footer (User Info & Logout) -->
+    <div class="sidebar-footer">
+      <div class="user-brief" *ngIf="!isSidebarCollapsed">
+        <div class="user-avatar-sm">
+          {{ (loggedInUser || 'A').charAt(0).toUpperCase() }}
+        </div>
+        <div class="user-details-sm">
+          <span class="u-name">{{ loggedInUser }}</span>
+          <span class="u-role">{{ userRole }}</span>
+        </div>
+      </div>
+
+      <button type="button" class="sidebar-logout-btn" (click)="logout()" title="Sign Out">
+        <i class="bi bi-box-arrow-right"></i>
+        <span *ngIf="!isSidebarCollapsed">Logout</span>
+      </button>
+    </div>
+
+  </aside>
+
+  <!-- ================= MAIN CONTENT AREA ================= -->
+  <main class="main-content">
+
+    <!-- Toast Notification Banner -->
+    <div class="toast-banner" *ngIf="toastMessage" [ngClass]="'toast-' + toastType">
+      <i class="bi" [ngClass]="{
+        'bi-check-circle-fill': toastType === 'success',
+        'bi-exclamation-triangle-fill': toastType === 'danger',
+        'bi-info-circle-fill': toastType === 'info'
+      }"></i>
+      <span>{{ toastMessage }}</span>
+    </div>
+
+    <!-- ================================================================= -->
+    <!-- VIEW 1: GRID LIST VIEW (DEFAULT LISTING)                          -->
+    <!-- ================================================================= -->
+    <ng-container *ngIf="currentView === 'GRID'">
+      
+      <!-- Top Action Header -->
+      <header class="page-header">
+        <div class="header-left-bar">
+          <button type="button" class="sidebar-toggle-btn" (click)="toggleSidebar()" title="Toggle Sidebar">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <button type="button" class="btn-back" (click)="goBack()" title="Back to Previous Page">
+            <i class="bi bi-arrow-left"></i>
+            <span>Back</span>
+          </button>
+
+          <div class="page-title-box">
+            <div class="icon-circle">
+              <i class="bi bi-key-fill"></i>
+            </div>
+            <div>
+              <h1 class="page-title">Access Sets</h1>
+              <span class="page-subtitle">Configure hospital staff access sets, sales permissions, and module privileges</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="header-right-bar">
+          <div class="live-clock">
+            <i class="bi bi-clock-history text-emerald"></i>
+            <span>{{ currentDateTime }}</span>
+          </div>
+          <button 
+            type="button" 
+            class="btn-add-access" 
+            (click)="openAddForm()"
+            [disabled]="!canWriteAccess"
+            [class.action-disabled]="!canWriteAccess"
+            [title]="!canWriteAccess ? 'Write permission required' : 'Add Access Set'">
+            <i class="bi bi-plus-circle-fill"></i>
+            <span>+ Add Access Set</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- Search & Status Filter Bar -->
+      <section class="filter-card">
+        <div class="search-box">
+          <i class="bi bi-search search-icon"></i>
+          <input 
+            type="text" 
+            class="search-input" 
+            placeholder="Search access sets by name or description..."
+            [(ngModel)]="searchQuery"
+            (input)="onSearchChange()">
+        </div>
+
+        <div class="status-filters">
+          <button 
+            type="button" 
+            class="status-btn" 
+            [class.active]="filterStatus === 'ALL'"
+            (click)="setFilterStatus('ALL')">
+            All Access Sets ({{ accessList.length }})
+          </button>
+          <button 
+            type="button" 
+            class="status-btn active-filter" 
+            [class.active]="filterStatus === 'ACTIVE'"
+            (click)="setFilterStatus('ACTIVE')">
+            Active Only
+          </button>
+          <button 
+            type="button" 
+            class="status-btn inactive-filter" 
+            [class.active]="filterStatus === 'INACTIVE'"
+            (click)="setFilterStatus('INACTIVE')">
+            Inactive
+          </button>
+        </div>
+      </section>
+
+      <!-- Access Sets Data Table (Columns: Access name, Description, Action) -->
+      <div class="grid-container">
+        <div class="table-responsive">
+          <table class="access-table">
+            <thead>
+              <tr>
+                <th style="width: 240px;">Access Name</th>
+                <th>Description</th>
+                <th style="width: 220px;">Configured Modules</th>
+                <th style="width: 110px; text-align: center;">Status</th>
+                <th style="width: 120px; text-align: center;">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- Loading Skeleton -->
+              <tr *ngIf="loading">
+                <td colspan="5" class="text-center py-5">
+                  <div class="spinner-border text-info" role="status">
+                    <span class="visually-hidden">Loading access sets...</span>
+                  </div>
+                  <p class="mt-2 text-muted">Fetching access sets from database...</p>
+                </td>
+              </tr>
+
+              <!-- Empty State -->
+              <tr *ngIf="!loading && filteredList.length === 0">
+                <td colspan="5" class="empty-state-cell">
+                  <i class="bi bi-key empty-icon"></i>
+                  <h4 class="empty-title">No Access Sets Found</h4>
+                  <p class="empty-desc">
+                    {{ searchQuery ? 'No access sets match your search query.' : 'No access sets created in database yet.' }}
+                  </p>
+                  <button type="button" class="btn-empty-add" (click)="openAddForm()">
+                    <i class="bi bi-plus-lg"></i> Create First Access Set
+                  </button>
+                </td>
+              </tr>
+
+              <!-- Data Rows -->
+              <tr *ngFor="let item of filteredList" class="access-row">
+                <!-- Column: Access name -->
+                <td>
+                  <div class="name-cell">
+                    <div class="key-icon-box">
+                      <i class="bi bi-shield-lock-fill"></i>
+                    </div>
+                    <div>
+                      <strong class="item-name">{{ item.name }}</strong>
+                      <span class="item-id-tag">#ACC-{{ item.id }}</span>
+                    </div>
+                  </div>
+                </td>
+
+                <!-- Column: Description -->
+                <td>
+                  <div class="desc-cell" [title]="item.description || ''">
+                    {{ item.description || 'No description provided' }}
+                  </div>
+                </td>
+
+                <!-- Column: Configured Modules -->
+                <td>
+                  <div class="module-config-cell">
+                    <span class="badge-modules-count">
+                      <i class="bi bi-layers-fill me-1 text-emerald"></i>
+                      <strong>{{ getEnabledCount(item) }}</strong> / 13 Modules
+                    </span>
+                    <div class="mini-tags-wrap" *ngIf="getActiveModuleNames(item).length > 0">
+                      <span class="mini-tag" *ngFor="let m of getActiveModuleNames(item)">{{ m }}</span>
+                    </div>
+                  </div>
+                </td>
+
+                <!-- Column: Status -->
+                <td style="text-align: center;">
+                  <button 
+                    type="button" 
+                    class="badge-status-btn"
+                    [ngClass]="item.status === 'ACTIVE' ? 'badge-active' : 'badge-inactive'"
+                    (click)="toggleStatus(item)"
+                    title="Click to toggle status">
+                    <i class="bi" [ngClass]="item.status === 'ACTIVE' ? 'bi-check-circle-fill' : 'bi-x-circle-fill'"></i>
+                    {{ item.status }}
+                  </button>
+                </td>
+
+                <!-- Column: Action (Edit and Delete icons) -->
+                <td style="text-align: center;">
+                  <div class="action-btn-group">
+                    <!-- Edit Icon Button -->
+                    <button 
+                      *ngIf="canUpdateAccess"
+                      type="button" 
+                      class="btn-action btn-edit" 
+                      (click)="openEditForm(item)"
+                      title="Edit Access Set">
+                      <i class="bi bi-pencil-square"></i>
+                    </button>
+
+                    <!-- Delete Icon Button -->
+                    <button 
+                      *ngIf="canDeleteAccess"
+                      type="button" 
+                      class="btn-action btn-delete" 
+                      (click)="confirmDelete(item)"
+                      title="Delete Access Set">
+                      <i class="bi bi-trash3-fill"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Table Footer Summary -->
+        <div class="table-footer-bar" *ngIf="!loading && filteredList.length > 0">
+          <span class="summary-text">
+            Showing <strong>{{ filteredList.length }}</strong> of <strong>{{ accessList.length }}</strong> access sets
+          </span>
+          <span class="db-sync-indicator">
+            <i class="bi bi-database-check text-emerald"></i>
+            <span>MySQL Database Synced</span>
+          </span>
+        </div>
+      </div>
+
+    </ng-container>
+
+    <!-- ================================================================= -->
+    <!-- VIEW 2: EDIT / ADD ACCESS SET FORM (MATCHING USER SCREENSHOT)     -->
+    <!-- ================================================================= -->
+    <ng-container *ngIf="currentView === 'FORM'">
+      <div class="access-set-view-container">
+        
+        <!-- Top Navigation Bar matching screenshot: < Edit Access Set  .....  [Save] -->
+        <div class="access-set-top-bar">
+          <div class="top-bar-left" (click)="backToGrid()">
+            <i class="bi bi-chevron-left back-chevron"></i>
+            <span class="top-bar-title">{{ isEditing ? 'Edit Access Set' : 'Add Access Set' }}</span>
+          </div>
+
+          <div class="top-bar-right">
+            <button 
+              type="button" 
+              class="btn-top-save" 
+              (click)="saveAccessSet()" 
+              [disabled]="saving || (isEditing ? !canUpdateAccess : !canWriteAccess)"
+              [class.btn-disabled]="isEditing ? !canUpdateAccess : !canWriteAccess"
+              [title]="(isEditing ? !canUpdateAccess : !canWriteAccess) ? 'Write permission required' : 'Save'">
+              <span class="spinner-border spinner-border-sm me-1" *ngIf="saving"></span>
+              {{ saving ? 'Saving...' : 'Save' }}
+            </button>
+          </div>
+        </div>
+
+        <!-- Split Layout matching screenshot: Left Sub-Panel (AccessSet ✔) & Right Form Panel -->
+        <div class="access-set-split-body">
+          
+          <!-- Left Sub-Panel with Pill Tab -->
+          <div class="split-left-panel">
+            <div class="access-set-pill active">
+              <span class="pill-label">AccessSet</span>
+              <span class="pill-check-icon">
+                <i class="bi bi-check-circle-fill text-success"></i>
+              </span>
+            </div>
+          </div>
+
+          <!-- Right Content Panel -->
+          <div class="split-right-panel" [class.view-only-mode]="(isEditing && !canUpdateAccess) || (!isEditing && !canWriteAccess)">
+
+            <!-- View-Only Permission Alert Banner -->
+            <div class="permission-alert-banner" *ngIf="(isEditing && !canUpdateAccess) || (!isEditing && !canWriteAccess)">
+              <div class="banner-content">
+                <i class="bi bi-shield-lock-fill alert-icon"></i>
+                <div class="alert-texts">
+                  <strong>Read-Only Mode Active</strong>
+                  <span>You have view permission only. Modifying access matrix and saving permissions are locked. Write permission is required.</span>
+                </div>
+              </div>
+              <span class="lock-pill"><i class="bi bi-lock-fill"></i> Read Only</span>
+            </div>
+
+            <form (ngSubmit)="saveAccessSet()">
+              
+              <!-- Outlined Input 1: Access Set Name * (matching screenshot) -->
+              <div class="outlined-input-card">
+                <label class="floating-field-label">Access Set Name <span class="required">*</span></label>
+                <input 
+                  type="text" 
+                  class="floating-field-input" 
+                  placeholder="e.g. admin"
+                  [(ngModel)]="formName" 
+                  name="formName" 
+                  required>
+              </div>
+
+              <!-- Outlined Input 2: Description * (matching screenshot) -->
+              <div class="outlined-input-card mt-3">
+                <label class="floating-field-label">Description <span class="required">*</span></label>
+                <textarea 
+                  class="floating-field-textarea" 
+                  rows="2" 
+                  placeholder="e.g. admin"
+                  [(ngModel)]="formDescription" 
+                  name="formDescription"></textarea>
+              </div>
+
+              <!-- Quick Presets Toolbar -->
+              <div class="presets-toolbar mt-3 mb-4 p-3 rounded-3 border">
+                <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+                  <div class="d-flex align-items-center gap-2">
+                    <div class="preset-magic-icon">
+                      <i class="bi bi-stars"></i>
+                    </div>
+                    <div>
+                      <strong class="d-block text-dark" style="font-size: 13.5px;">Quick Permission Presets</strong>
+                      <span class="text-muted small" style="font-size: 11.5px;">Auto-fill permission rules across all 13 modules</span>
+                    </div>
+                  </div>
+                  <div class="d-flex align-items-center flex-wrap gap-2">
+                    <button type="button" class="btn-preset btn-preset-all" (click)="applyPreset('ALL')">
+                      <i class="bi bi-check-all"></i> Full Access
+                    </button>
+                    <button type="button" class="btn-preset" [class.btn-preset-active]="isColumnAllChecked('read')" (click)="applyPreset('READ_ALL')">
+                      <i class="bi bi-eye-fill text-primary"></i> READ ALL
+                    </button>
+                    <button type="button" class="btn-preset" [class.btn-preset-active]="isColumnAllChecked('write')" (click)="applyPreset('WRITE_ALL')">
+                      <i class="bi bi-pencil-square text-success"></i> WRITE ALL
+                    </button>
+                    <button type="button" class="btn-preset" [class.btn-preset-active]="isColumnAllChecked('update')" (click)="applyPreset('UPDATE_ALL')">
+                      <i class="bi bi-arrow-repeat text-warning"></i> UPDATE ALL
+                    </button>
+                    <button type="button" class="btn-preset" [class.btn-preset-active]="isColumnAllChecked('delete')" (click)="applyPreset('DELETE_ALL')">
+                      <i class="bi bi-trash3-fill text-danger"></i> DELETE ALL
+                    </button>
+                    <button type="button" class="btn-preset btn-preset-clear" (click)="applyPreset('CLEAR')">
+                      <i class="bi bi-x-circle"></i> Clear All
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Permission Section Tables matching application modules -->
+              <div class="permissions-matrices">
+                
+                <div class="permission-matrix-block mb-4" *ngFor="let section of permissionSections">
+                  
+                  <!-- Navy Blue Header with Title, Icon & Master Checkbox [✓] -->
+                  <div class="matrix-navy-header">
+                    <div class="d-flex align-items-center gap-2">
+                      <i class="bi" [ngClass]="section.icon" style="font-size: 1.1rem; opacity: 0.95;"></i>
+                      <span class="navy-header-title">{{ section.title }}</span>
+                      <span class="section-count-badge">
+                        {{ section.rows.length }} Pages
+                      </span>
+                    </div>
+                    <label class="navy-header-checkbox-label" title="Toggle all permissions for this section">
+                      <span class="navy-select-all-text">Select All</span>
+                      <input 
+                        type="checkbox" 
+                        [checked]="isSectionAllChecked(section)"
+                        (change)="toggleSectionAll(section)">
+                      <span class="custom-navy-check"></span>
+                    </label>
+                  </div>
+
+                  <!-- Table with Columns: Module Name & Route | READ | WRITE | UPDATE | DELETE | ROW ALL -->
+                  <div class="table-responsive matrix-table-wrapper">
+                    <table class="matrix-table">
+                      <thead>
+                        <tr>
+                          <th class="col-feature">Module / Page Name</th>
+                          <th class="col-perm">READ</th>
+                          <th class="col-perm">WRITE</th>
+                          <th class="col-perm">UPDATE</th>
+                          <th class="col-perm">DELETE</th>
+                          <th class="col-perm" style="width: 70px;">ALL</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr *ngFor="let row of section.rows" class="matrix-row-hover">
+                          <!-- Feature Name, Icon & Route Tag -->
+                          <td class="feature-name-cell">
+                            <div class="feature-title-wrap">
+                              <div class="module-avatar-icon">
+                                <i class="bi" [ngClass]="row.icon || 'bi-app-indicator'"></i>
+                              </div>
+                              <div>
+                                <span class="feature-name-text">{{ row.name }}</span>
+                                <span class="route-tag-badge">{{ row.route }}</span>
+                              </div>
+                            </div>
+                          </td>
+
+                          <!-- READ Checkbox -->
+                          <td class="perm-check-cell">
+                            <label class="custom-checkbox-container" title="Read / View Access">
+                              <input type="checkbox" [(ngModel)]="row.read" [name]="section.title + '_' + row.code + '_read'">
+                              <span class="checkmark"></span>
+                            </label>
+                          </td>
+
+                          <!-- WRITE Checkbox -->
+                          <td class="perm-check-cell">
+                            <label class="custom-checkbox-container" title="Create / Add Records">
+                              <input type="checkbox" [(ngModel)]="row.write" [name]="section.title + '_' + row.code + '_write'">
+                              <span class="checkmark"></span>
+                            </label>
+                          </td>
+
+                          <!-- UPDATE Checkbox -->
+                          <td class="perm-check-cell">
+                            <label class="custom-checkbox-container" title="Edit / Update Records">
+                              <input type="checkbox" [(ngModel)]="row.update" [name]="section.title + '_' + row.code + '_update'">
+                              <span class="checkmark"></span>
+                            </label>
+                          </td>
+
+                          <!-- DELETE Checkbox -->
+                          <td class="perm-check-cell">
+                            <label class="custom-checkbox-container" title="Delete Records">
+                              <input type="checkbox" [(ngModel)]="row.delete" [name]="section.title + '_' + row.code + '_delete'">
+                              <span class="checkmark"></span>
+                            </label>
+                          </td>
+
+                          <!-- ROW ALL Checkbox -->
+                          <td class="perm-check-cell">
+                            <label class="custom-checkbox-container" title="Toggle all permissions for this row">
+                              <input type="checkbox" [checked]="isRowAllChecked(row)" (change)="toggleRowAll(row)">
+                              <span class="checkmark checkmark-row-all"></span>
+                            </label>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+
+                </div>
+
+              </div>
+
+              <!-- Bottom Action Buttons for convenience -->
+              <div class="form-bottom-bar mt-4">
+                <button type="button" class="btn-bottom-cancel" (click)="backToGrid()">
+                  Cancel
+                </button>
+                <button type="submit" class="btn-bottom-save" [disabled]="saving || (isEditing ? !canUpdateAccess : !canWriteAccess)">
+                  <span class="spinner-border spinner-border-sm me-1" *ngIf="saving"></span>
+                  {{ saving ? 'Saving...' : 'Save Access Set' }}
+                </button>
+              </div>
+
+            </form>
+          </div>
+
+        </div>
+
+      </div>
+    </ng-container>
+
+  </main>
+
+  <!-- ================= DELETE CONFIRMATION MODAL ================= -->
+  <div class="modal-backdrop" *ngIf="showDeleteModal" (click)="closeDeleteModal()">
+    <div class="modal-card modal-sm" (click)="$event.stopPropagation()">
+      <div class="delete-icon-wrapper">
+        <i class="bi bi-exclamation-triangle-fill text-danger"></i>
+      </div>
+      <h3 class="delete-title">Delete Access Set?</h3>
+      <p class="delete-message">
+        Are you sure you want to delete access set <strong>"{{ deletingItem?.name }}"</strong>?
+        This action cannot be undone.
+      </p>
+
+      <div class="modal-footer justify-center">
+        <button type="button" class="btn-cancel" (click)="closeDeleteModal()" [disabled]="deleting">
+          Cancel
+        </button>
+        <button type="button" class="btn-confirm-delete" (click)="executeDelete()" [disabled]="deleting">
+          <span class="spinner-border spinner-border-sm me-2" *ngIf="deleting"></span>
+          <i class="bi bi-trash3-fill" *ngIf="!deleting"></i>
+          <span>{{ deleting ? 'Deleting...' : 'Delete Access Set' }}</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+</div>

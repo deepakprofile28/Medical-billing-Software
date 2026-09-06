@@ -1,0 +1,770 @@
+<div class="dashboard-layout-wrapper" [class.sidebar-collapsed]="isSidebarCollapsed">
+
+  <!-- ================= LEFT SIDEBAR MENU (IDENTICAL TO DASHBOARD) ================= -->
+  <aside class="app-sidebar">
+    
+    <!-- Sidebar Brand Header -->
+    <div class="sidebar-brand">
+      <div class="brand-icon-box" *ngIf="!config.logoUrl">
+        <i class="bi" [ngClass]="selectedIcon || 'bi-hospital-fill'"></i>
+      </div>
+      <img *ngIf="config.logoUrl" [src]="config.logoUrl" alt="Store Logo" class="brand-logo-img" />
+
+      <div class="brand-details" *ngIf="!isSidebarCollapsed">
+        <h2 class="brand-title">{{ config.storeName || 'PharmaCare' }}</h2>
+        <span class="brand-subtitle">{{ config.storeSubtitle || 'Clinical & Billing Hub' }}</span>
+      </div>
+    </div>
+
+    <!-- Active Store Badge -->
+    <div class="sidebar-store-pill" *ngIf="!isSidebarCollapsed">
+      <i class="bi bi-shop-window text-emerald"></i>
+      <div class="store-text">
+        <span class="store-label">Active Store</span>
+        <strong class="store-name">{{ config.storeName }} (#{{ activeStoreId }})</strong>
+      </div>
+    </div>
+
+    <!-- Sidebar Navigation Items -->
+    <nav class="sidebar-nav">
+      
+      <!-- 1. DASHBOARD -->
+      <div class="nav-group">
+        <a routerLink="/dashboard" class="menu-item root-item" title="Dashboard">
+          <i class="bi bi-grid-1x2-fill menu-icon"></i>
+          <span class="menu-text" *ngIf="!isSidebarCollapsed">Dashboard</span>
+          <span class="badge-live-pulse" *ngIf="!isSidebarCollapsed">Live</span>
+        </a>
+      </div>
+
+      <!-- 2. POS BILLING COUNTER -->
+      <div class="nav-group">
+        <a routerLink="/pos" class="menu-item root-item" title="POS Billing Counter">
+          <i class="bi bi-receipt-cutoff menu-icon text-warning"></i>
+          <span class="menu-text" *ngIf="!isSidebarCollapsed">POS Billing Counter</span>
+        </a>
+      </div>
+
+      <!-- SALES MENU -->
+      <div class="nav-group">
+        <div class="menu-header" (click)="isSalesMenuOpen = !isSalesMenuOpen" [class.expanded]="isSalesMenuOpen" *ngIf="!isSidebarCollapsed">
+          <div class="header-left">
+            <i class="bi bi-cart-check-fill header-icon text-success"></i>
+            <span>Sales Management</span>
+          </div>
+          <i class="bi bi-chevron-down chevron-icon" [class.rotate]="isSalesMenuOpen"></i>
+        </div>
+
+        <a *ngIf="isSidebarCollapsed" (click)="isSidebarCollapsed = false; isSalesMenuOpen = true" class="menu-item root-item" style="cursor: pointer;" title="Sales Management">
+          <i class="bi bi-cart-check-fill menu-icon text-success"></i>
+        </a>
+
+        <div class="sub-menu" *ngIf="isSalesMenuOpen && !isSidebarCollapsed">
+          <a routerLink="/sales-transactions" class="sub-menu-item">
+            <i class="bi bi-credit-card-2-front-fill sub-icon text-primary"></i>
+            <span>Transaction</span>
+          </a>
+          <a routerLink="/sales-orders" class="sub-menu-item">
+            <i class="bi bi-box-seam-fill sub-icon text-info"></i>
+            <span>Order</span>
+          </a>
+          <a routerLink="/sales-suspended" class="sub-menu-item">
+            <i class="bi bi-pause-circle-fill sub-icon text-warning"></i>
+            <span>Order Suspended</span>
+          </a>
+          <a routerLink="/sales-completed" class="sub-menu-item">
+            <i class="bi bi-check-circle-fill sub-icon text-success"></i>
+            <span>Completed</span>
+          </a>
+          <a routerLink="/sales-exchange" class="sub-menu-item">
+            <i class="bi bi-arrow-repeat sub-icon text-purple"></i>
+            <span>Exchange</span>
+          </a>
+          <a routerLink="/sales-returns" class="sub-menu-item">
+            <i class="bi bi-arrow-counterclockwise sub-icon text-danger"></i>
+            <span>Return and Refund</span>
+          </a>
+        </div>
+      </div>
+
+      
+      <!-- PURCHASE MENU -->
+      <div class="nav-group">
+        <div class="menu-header" (click)="isPurchaseMenuOpen = !isPurchaseMenuOpen" [class.expanded]="isPurchaseMenuOpen" *ngIf="!isSidebarCollapsed">
+          <div class="header-left">
+            <i class="bi bi-bag-check-fill header-icon" style="color: #f59e0b;"></i>
+            <span>Purchase Management</span>
+          </div>
+          <i class="bi bi-chevron-down chevron-icon" [class.rotate]="isPurchaseMenuOpen"></i>
+        </div>
+
+        <a *ngIf="isSidebarCollapsed" (click)="isSidebarCollapsed = false; isPurchaseMenuOpen = true" class="menu-item root-item" style="cursor: pointer;" title="Purchase Management">
+          <i class="bi bi-bag-check-fill menu-icon" style="color: #f59e0b;"></i>
+        </a>
+
+        <div class="sub-menu" *ngIf="isPurchaseMenuOpen && !isSidebarCollapsed">
+          <a routerLink="/purchase" class="sub-menu-item">
+            <i class="bi bi-cart-plus-fill sub-icon text-info"></i>
+            <span>Purchase</span>
+          </a>
+          <a routerLink="/purchase-returns" class="sub-menu-item">
+            <i class="bi bi-arrow-return-left sub-icon text-danger"></i>
+            <span>Purchase Return</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- 3. TABLETS & MEDICINES -->
+      <div class="nav-group">
+        <a routerLink="/tablets" class="menu-item root-item" title="Tablets & Medicines">
+          <i class="bi bi-capsule-pill menu-icon text-emerald"></i>
+          <span class="menu-text" *ngIf="!isSidebarCollapsed">Tablets & Medicines</span>
+        </a>
+      </div>
+
+      <!-- 4. AI CLINICAL ASSISTANT -->
+      <div class="nav-group">
+        <a routerLink="/ai-assistant" class="menu-item root-item" title="AI Medical Assistant">
+          <i class="bi bi-robot menu-icon" style="color: #a855f7;"></i>
+          <span class="menu-text" *ngIf="!isSidebarCollapsed">AI Clinical Assistant</span>
+          <span class="badge-pos-pulse" style="background: #7c3aed;" *ngIf="!isSidebarCollapsed">AI DB</span>
+        </a>
+      </div>
+
+      <!-- 5. PATIENT MANAGEMENT -->
+      <div class="nav-group">
+        <div class="menu-header" (click)="togglePatientMenu()" [class.expanded]="isPatientMenuOpen" *ngIf="!isSidebarCollapsed">
+          <div class="header-left">
+            <i class="bi bi-person-vcard-fill header-icon"></i>
+            <span>Patient Management</span>
+          </div>
+          <i class="bi bi-chevron-down chevron-icon" [class.rotate]="isPatientMenuOpen"></i>
+        </div>
+
+        <a *ngIf="isSidebarCollapsed" (click)="openPatientFromCollapsed()" class="menu-item root-item" style="cursor: pointer;" title="Patient Management">
+          <i class="bi bi-person-vcard-fill menu-icon"></i>
+        </a>
+
+        <div class="sub-menu" *ngIf="isPatientMenuOpen && !isSidebarCollapsed">
+          <a routerLink="/patients" class="sub-menu-item">
+            <i class="bi bi-people-fill sub-icon"></i>
+            <span>Patient List</span>
+            <span class="count-badge">{{ totalPatientsCount }}</span>
+          </a>
+          <a routerLink="/patient-registration" class="sub-menu-item">
+            <i class="bi bi-person-plus-fill sub-icon text-success"></i>
+            <span>Add Patient</span>
+          </a>
+          <a routerLink="/patients" class="sub-menu-item">
+            <i class="bi bi-file-earmark-text-fill sub-icon text-warning"></i>
+            <span>Patient Draft</span>
+          </a>
+          <a routerLink="/dashboard" class="sub-menu-item">
+            <i class="bi bi-graph-up-arrow sub-icon text-primary"></i>
+            <span>Patient Analysis</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- 5.1 DOCTOR MANAGEMENT -->
+      <div class="nav-group">
+        <div class="menu-header" (click)="toggleDoctorMenu()" [class.expanded]="isDoctorMenuOpen" *ngIf="!isSidebarCollapsed">
+          <div class="header-left">
+            <i class="bi bi-person-badge-fill header-icon text-cyan"></i>
+            <span>Doctor Management</span>
+          </div>
+          <i class="bi bi-chevron-down chevron-icon" [class.rotate]="isDoctorMenuOpen"></i>
+        </div>
+
+        <!-- Collapsed icon fallback -->
+        <a *ngIf="isSidebarCollapsed" (click)="openDoctorFromCollapsed()" class="menu-item root-item" style="cursor: pointer;" title="Doctor Management">
+          <i class="bi bi-person-badge-fill menu-icon" style="color: #06b6d4;"></i>
+        </a>
+
+        <div class="sub-menu" *ngIf="isDoctorMenuOpen && !isSidebarCollapsed">
+          <!-- Doctor List -->
+          <a routerLink="/doctors" class="sub-menu-item">
+            <i class="bi bi-person-lines-fill sub-icon text-cyan"></i>
+            <span>Doctor List</span>
+          </a>
+
+          <!-- Add Doctor -->
+          <a routerLink="/add-doctor" class="sub-menu-item">
+            <i class="bi bi-person-plus-fill sub-icon text-success"></i>
+            <span>Add Doctor</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- 6. USER MANAGEMENT -->
+      <div class="nav-group">
+        <div class="menu-header" (click)="toggleUserMenu()" [class.expanded]="isUserMenuOpen" *ngIf="!isSidebarCollapsed">
+          <div class="header-left">
+            <i class="bi bi-person-gear header-icon"></i>
+            <span>User Management</span>
+          </div>
+          <i class="bi bi-chevron-down chevron-icon" [class.rotate]="isUserMenuOpen"></i>
+        </div>
+
+        <a *ngIf="isSidebarCollapsed" (click)="openUserFromCollapsed()" class="menu-item root-item" style="cursor: pointer;" title="User Management">
+          <i class="bi bi-person-gear menu-icon"></i>
+        </a>
+
+        <div class="sub-menu" *ngIf="isUserMenuOpen && !isSidebarCollapsed">
+          <a routerLink="/users" class="sub-menu-item">
+            <i class="bi bi-people sub-icon"></i>
+            <span>User List</span>
+            <span class="count-badge">{{ totalUsersCount }}</span>
+          </a>
+          <a routerLink="/access" class="sub-menu-item">
+            <i class="bi bi-key-fill sub-icon text-info"></i>
+            <span>Access</span>
+            <span class="count-badge" style="background: #0284c7;">DB</span>
+          </a>
+          <a routerLink="/roles" class="sub-menu-item">
+            <i class="bi bi-shield-check sub-icon text-emerald"></i>
+            <span>Role</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- 7. SETTINGS & STORE MENU (ACCORDION WITH STORE SUBMENU) -->
+      <div class="nav-group">
+        <div class="menu-header" (click)="toggleSettingsMenu()" [class.expanded]="isSettingsMenuOpen" *ngIf="!isSidebarCollapsed">
+          <div class="header-left">
+            <i class="bi bi-gear-fill header-icon text-warning"></i>
+            <span>Settings</span>
+          </div>
+          <i class="bi bi-chevron-down chevron-icon" [class.rotate]="isSettingsMenuOpen"></i>
+        </div>
+
+        <a *ngIf="isSidebarCollapsed" (click)="openSettingsFromCollapsed()" class="menu-item root-item active" style="cursor: pointer;" title="Settings: Store Config, Category, Tax">
+          <i class="bi bi-gear-fill menu-icon"></i>
+        </a>
+
+        <div class="sub-menu" *ngIf="isSettingsMenuOpen && !isSidebarCollapsed">
+          <a routerLink="/settings" class="sub-menu-item active">
+            <i class="bi bi-shop-window sub-icon text-emerald"></i>
+            <span>Store Configuration</span>
+          </a>
+          <a routerLink="/category" class="sub-menu-item">
+            <i class="bi bi-tags-fill sub-icon text-primary"></i>
+            <span>Category</span>
+            <span class="count-badge" style="background: #2563eb;">DB</span>
+          </a>
+          <a routerLink="/tax" class="sub-menu-item">
+            <i class="bi bi-percent sub-icon text-warning"></i>
+            <span>Tax</span>
+            <span class="count-badge" style="background: #059669;">DB</span>
+          </a>
+          <a routerLink="/warehouse" class="sub-menu-item">
+            <i class="bi bi-building-gear sub-icon text-info"></i>
+            <span>Warehouse</span>
+            <span class="count-badge" style="background: #0284c7;">DB</span>
+          </a>
+          <a routerLink="/brand" class="sub-menu-item">
+            <i class="bi bi-award-fill sub-icon text-purple"></i>
+            <span>Brand</span>
+            <span class="count-badge" style="background: #9333ea;">DB</span>
+          </a>
+          <a routerLink="/branch" class="sub-menu-item">
+            <i class="bi bi-diagram-3-fill sub-icon text-teal"></i>
+            <span>Branch</span>
+            <span class="count-badge" style="background: #0d9488;">DB</span>
+          </a>
+        </div>
+      </div>
+
+    </nav>
+
+    <!-- Sidebar Footer (User Info & Logout) -->
+    <div class="sidebar-footer">
+      <div class="user-brief" *ngIf="!isSidebarCollapsed">
+        <div class="user-avatar-sm">
+          {{ (loggedInUser || 'A').charAt(0).toUpperCase() }}
+        </div>
+        <div class="user-details-sm">
+          <span class="u-name">{{ loggedInUser }}</span>
+          <span class="u-role">{{ userRole }}</span>
+        </div>
+      </div>
+
+      <button type="button" class="sidebar-logout-btn" (click)="logout()" title="Sign Out">
+        <i class="bi bi-box-arrow-right"></i>
+        <span *ngIf="!isSidebarCollapsed">Logout</span>
+      </button>
+    </div>
+
+  </aside>
+
+  <!-- ================= RIGHT MAIN CONTENT AREA ================= -->
+  <main class="app-main-content">
+
+    <!-- Top Navigation Card (IDENTICAL TO DASHBOARD) -->
+    <header class="top-nav-card">
+      <div class="top-nav-left">
+        <button type="button" class="btn-sidebar-toggle" (click)="toggleSidebar()" title="Toggle Navigation Menu">
+          <i class="bi bi-list"></i>
+        </button>
+        <div class="page-title-wrap">
+          <h2>Store Configuration & System Setup</h2>
+          <div class="breadcrumb-sub">
+            <span>Home</span> / <span>Settings</span> / <strong>Store Profile & MySQL Configuration</strong>
+          </div>
+        </div>
+      </div>
+
+      <!-- Actions & Sync Status -->
+      <div class="top-nav-right">
+        <div class="live-clock-pill">
+          <i class="bi bi-clock-fill text-primary"></i>
+          <span>{{ currentDateTime }}</span>
+        </div>
+
+        <button 
+          type="button" 
+          class="btn-save-top" 
+          (click)="saveConfiguration()" 
+          [disabled]="isSaving"
+          title="Save Store Configuration directly to MySQL">
+          <i class="bi bi-cloud-arrow-up-fill me-1"></i>
+          <span>{{ isSaving ? 'Saving DB...' : 'Save Changes' }}</span>
+        </button>
+
+        <div class="top-user-pill">
+          <div class="avatar-circle">
+            {{ (loggedInUser || 'A').charAt(0).toUpperCase() }}
+          </div>
+          <div class="user-info-text">
+            <strong>{{ loggedInUser }}</strong>
+            <span class="badge-role">{{ userRole }}</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Toast Notification Banner -->
+    <div *ngIf="toastMessage" class="toast-floating">
+      <i class="bi bi-check-circle-fill me-2"></i>
+      <span>{{ toastMessage }}</span>
+    </div>
+
+    <!-- ================= 2-COLUMN SETTINGS WORKSPACE ================= -->
+    <div class="settings-workspace-grid">
+
+      <!-- ================= LEFT (65%): CONFIGURATION TABS & FORM ================= -->
+      <section class="settings-form-panel">
+        
+        <!-- Tab Navigation Bar -->
+        <div class="settings-nav-tabs">
+          <button 
+            type="button" 
+            class="tab-btn" 
+            [class.active]="activeTab === 'profile'" 
+            (click)="activeTab = 'profile'">
+            <i class="bi bi-shop me-2"></i>
+            <span>Store Profile & Identity</span>
+          </button>
+
+          <button 
+            type="button" 
+            class="tab-btn" 
+            [class.active]="activeTab === 'tax'" 
+            (click)="activeTab = 'tax'">
+            <i class="bi bi-shield-check me-2"></i>
+            <span>Tax, D.L. & Currency</span>
+          </button>
+
+          <button 
+            type="button" 
+            class="tab-btn" 
+            [class.active]="activeTab === 'receipt'" 
+            (click)="activeTab = 'receipt'">
+            <i class="bi bi-receipt me-2"></i>
+            <span>POS Bill & Thermal Setup</span>
+          </button>
+        </div>
+
+        <!-- ================= TAB 1: STORE PROFILE & IDENTITY ================= -->
+        <div class="settings-card-body" *ngIf="activeTab === 'profile'">
+          
+          <div class="section-title-wrap">
+            <h3><i class="bi bi-hospital text-emerald me-2"></i>Pharmacy Identity & Brand</h3>
+            <p>Define your store name, logo, contact information, and pharmacy branding details.</p>
+          </div>
+
+          <!-- Logo & Brand Icon Customizer -->
+          <div class="brand-customizer-box">
+            <div class="brand-preview-avatar">
+              <img *ngIf="config.logoUrl" [src]="config.logoUrl" alt="Store Logo" class="uploaded-logo-preview" />
+              <div *ngIf="!config.logoUrl" class="icon-avatar-preview">
+                <i class="bi" [ngClass]="selectedIcon"></i>
+              </div>
+            </div>
+
+            <div class="brand-upload-controls">
+              <label class="control-label">Store Logo / Brand Icon</label>
+              <div class="upload-btn-row">
+                <label class="btn-file-upload">
+                  <i class="bi bi-upload me-1"></i> Upload Image Logo
+                  <input type="file" (change)="onLogoUpload($event)" accept="image/*" style="display: none;" />
+                </label>
+                <button type="button" class="btn-remove-logo" *ngIf="config.logoUrl" (click)="removeLogo()">
+                  <i class="bi bi-trash3 me-1"></i> Remove
+                </button>
+              </div>
+
+              <!-- Preset Icon selector -->
+              <div class="preset-icons-row">
+                <span class="preset-label">Or choose pharmacy icon:</span>
+                <div class="icon-chips-wrap">
+                  <button 
+                    type="button" 
+                    *ngFor="let p of iconPresets" 
+                    class="icon-chip-btn" 
+                    [class.active]="selectedIcon === p.icon && !config.logoUrl"
+                    (click)="selectIcon(p.icon)"
+                    [title]="p.name">
+                    <i class="bi" [ngClass]="p.icon"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- General Store Details Form Grid -->
+          <div class="form-grid-2">
+            <div class="form-group">
+              <label>Pharmacy / Store Name <span class="text-danger">*</span></label>
+              <div class="input-with-icon">
+                <i class="bi bi-building"></i>
+                <input 
+                  type="text" 
+                  class="modern-input" 
+                  [(ngModel)]="config.storeName" 
+                  placeholder="e.g. Apollo Pharmacy Hub" 
+                  required />
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>Store Subtitle / Tagline</label>
+              <div class="input-with-icon">
+                <i class="bi bi-quote"></i>
+                <input 
+                  type="text" 
+                  class="modern-input" 
+                  [(ngModel)]="config.storeSubtitle" 
+                  placeholder="e.g. Clinical & 24/7 Billing Hub" />
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>Phone / Mobile Number</label>
+              <div class="input-with-icon">
+                <i class="bi bi-telephone"></i>
+                <input 
+                  type="text" 
+                  class="modern-input" 
+                  [(ngModel)]="config.phone" 
+                  placeholder="e.g. +91 7358441198" />
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>Official Email Address</label>
+              <div class="input-with-icon">
+                <i class="bi bi-envelope"></i>
+                <input 
+                  type="email" 
+                  class="modern-input" 
+                  [(ngModel)]="config.email" 
+                  placeholder="e.g. store@apollo.in" />
+              </div>
+            </div>
+
+            <div class="form-group full-width">
+              <label>Physical Street Address</label>
+              <div class="input-with-icon">
+                <i class="bi bi-geo-alt"></i>
+                <input 
+                  type="text" 
+                  class="modern-input" 
+                  [(ngModel)]="config.address" 
+                  placeholder="e.g. Muthu Mari Amman Koil St, Adhi Nagar" />
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>City</label>
+              <input type="text" class="modern-input" [(ngModel)]="config.city" placeholder="e.g. Chennai" />
+            </div>
+
+            <div class="form-group">
+              <label>State & Pincode</label>
+              <div class="sub-split-grid">
+                <input type="text" class="modern-input" [(ngModel)]="config.state" placeholder="Tamil Nadu" />
+                <input type="text" class="modern-input" [(ngModel)]="config.pincode" placeholder="600001" />
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- ================= TAB 2: TAX, D.L. & CURRENCY ================= -->
+        <div class="settings-card-body" *ngIf="activeTab === 'tax'">
+          
+          <div class="section-title-wrap">
+            <h3><i class="bi bi-currency-exchange text-primary me-2"></i>Currency & Legal Licenses</h3>
+            <p>Set the currency symbol shown across all billing tables, and official licenses for tax compliance.</p>
+          </div>
+
+          <!-- Currency Selector Box -->
+          <div class="currency-selector-card">
+            <label class="control-label"><i class="bi bi-coin me-1"></i>Currency Symbol & Currency Code</label>
+            <p class="small text-muted">Select your pharmacy currency. This symbol will appear on POS terminals, invoices, and product price tags.</p>
+
+            <div class="currency-chips-grid">
+              <button 
+                type="button" 
+                *ngFor="let c of currencyPresets" 
+                class="currency-chip-btn" 
+                [class.active]="config.currencySymbol === c.symbol"
+                (click)="selectCurrency(c)">
+                <strong>{{ c.symbol }}</strong>
+                <span>{{ c.code }}</span>
+              </button>
+            </div>
+
+            <div class="form-grid-2 mt-3">
+              <div class="form-group">
+                <label>Custom Currency Symbol</label>
+                <input type="text" class="modern-input" [(ngModel)]="config.currencySymbol" placeholder="₹" maxlength="5" />
+              </div>
+              <div class="form-group">
+                <label>Currency ISO Code</label>
+                <input type="text" class="modern-input" [(ngModel)]="config.currencyCode" placeholder="INR" maxlength="5" />
+              </div>
+            </div>
+          </div>
+
+          <!-- Legal & Taxes Grid -->
+          <div class="form-grid-2 mt-4">
+            <div class="form-group">
+              <label>GSTIN / Tax Identification No.</label>
+              <div class="input-with-icon">
+                <i class="bi bi-file-earmark-text"></i>
+                <input 
+                  type="text" 
+                  class="modern-input font-mono" 
+                  [(ngModel)]="config.gstin" 
+                  placeholder="e.g. 33AABCA1234F1Z8" />
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>Drug License Number (D.L. No)</label>
+              <div class="input-with-icon">
+                <i class="bi bi-award"></i>
+                <input 
+                  type="text" 
+                  class="modern-input font-mono" 
+                  [(ngModel)]="config.drugLicenseNo" 
+                  placeholder="e.g. TN/CHN/20B/2026/0091" />
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>Default GST Rate (%)</label>
+              <select class="modern-select" [(ngModel)]="config.defaultGstRate">
+                <option [ngValue]="0">None (0% - No GST / Exempted)</option>
+                <option *ngFor="let t of taxes" [ngValue]="t.gstRate">
+                  {{ t.gstRate }}% - {{ t.taxName }} ({{ t.taxType === 'INCLUSIVE' ? 'Inclusive MRP' : 'Exclusive +GST' }})
+                </option>
+              </select>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- ================= TAB 3: POS RECEIPT & INVOICE SETUP ================= -->
+        <div class="settings-card-body" *ngIf="activeTab === 'receipt'">
+          
+          <div class="section-title-wrap">
+            <h3><i class="bi bi-receipt text-warning me-2"></i>POS Bill & Thermal Printing Preferences</h3>
+            <p>Customize the printed slip given to patients, greeting message, and invoice sequence.</p>
+          </div>
+
+          <div class="form-grid-2">
+            <div class="form-group">
+              <label>Default Receipt Printing Format</label>
+              <div class="receipt-format-radios">
+                <label class="format-card" [class.selected]="config.defaultReceiptType === 'thermal'">
+                  <input type="radio" name="receiptType" value="thermal" [(ngModel)]="config.defaultReceiptType" />
+                  <div class="format-content">
+                    <i class="bi bi-receipt"></i>
+                    <strong>80mm Thermal Paper</strong>
+                    <small>Standard POS Roll Slip</small>
+                  </div>
+                </label>
+
+                <label class="format-card" [class.selected]="config.defaultReceiptType === 'a4'">
+                  <input type="radio" name="receiptType" value="a4" [(ngModel)]="config.defaultReceiptType" />
+                  <div class="format-content">
+                    <i class="bi bi-file-earmark-text"></i>
+                    <strong>A4 Laser Sheet</strong>
+                    <small>Detailed Full-Page Invoice</small>
+                  </div>
+                </label>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>Invoice Number Prefix</label>
+              <input type="text" class="modern-input" [(ngModel)]="config.invoicePrefix" placeholder="INV-" />
+              <small class="text-muted">Invoices will be formatted like <strong>{{ config.invoicePrefix || 'INV-' }}20260903-8821</strong></small>
+
+              <div class="toggle-switch-box mt-3">
+                <label class="switch-label">
+                  <input type="checkbox" [(ngModel)]="config.enableRoundOff" />
+                  <span class="switch-slider"></span>
+                </label>
+                <div class="switch-text">
+                  <strong>Enable Auto Round-Off</strong>
+                  <small>Rounds off decimal cents to nearest ₹1.00</small>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group full-width">
+              <label>Bill Greeting (Printed at Bottom of Slip)</label>
+              <input 
+                type="text" 
+                class="modern-input" 
+                [(ngModel)]="config.billGreeting" 
+                placeholder="*** WISHING YOU A SPEEDY RECOVERY! GET WELL SOON ***" />
+            </div>
+
+            <div class="form-group full-width">
+              <label>Return Policy & Terms of Sale</label>
+              <textarea 
+                class="modern-textarea" 
+                rows="3" 
+                [(ngModel)]="config.returnPolicyTerms" 
+                placeholder="Goods once sold cannot be returned without original receipt."></textarea>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Sticky Save Button Footer -->
+        <div class="settings-save-footer">
+          <div class="save-status-info">
+            <i class="bi bi-database-check text-emerald me-1"></i>
+            <span>Directly synched with MySQL <strong>store_configurations</strong> table</span>
+          </div>
+
+          <button 
+            type="button" 
+            class="btn-save-main" 
+            (click)="saveConfiguration()" 
+            [disabled]="isSaving">
+            <i class="bi bi-check2-circle me-1"></i>
+            <span>{{ isSaving ? 'Saving to Database...' : 'Save Store Configuration' }}</span>
+          </button>
+        </div>
+
+      </section>
+
+      <!-- ================= RIGHT (35%): LIVE INTERACTIVE PREVIEW CARD ================= -->
+      <section class="settings-preview-panel">
+        
+        <div class="preview-card-header">
+          <i class="bi bi-eye text-primary me-2"></i>
+          <strong>Live Store & Bill Preview</strong>
+        </div>
+
+        <!-- 1. Live Store Badge Card -->
+        <div class="live-badge-card">
+          <div class="live-badge-top">
+            <div class="live-logo-box" *ngIf="!config.logoUrl">
+              <i class="bi" [ngClass]="selectedIcon || 'bi-hospital-fill'"></i>
+            </div>
+            <img *ngIf="config.logoUrl" [src]="config.logoUrl" alt="Store Logo" class="live-logo-img" />
+
+            <div class="live-store-text">
+              <h4>{{ config.storeName || 'Pharmacy Name' }}</h4>
+              <p>{{ config.storeSubtitle || 'Clinical & Billing Hub' }}</p>
+            </div>
+          </div>
+
+          <div class="live-badge-info">
+            <div><i class="bi bi-geo-alt me-1"></i>{{ config.address || 'Chennai, Tamil Nadu' }}</div>
+            <div><i class="bi bi-telephone me-1"></i>{{ config.phone || '+91 7358441198' }}</div>
+            <div class="badge-tag-row">
+              <span class="pill-legal">GST: {{ config.gstin || '33AABCA1234F1Z8' }}</span>
+              <span class="pill-legal">DL: {{ config.drugLicenseNo || 'TN/CHN/20B' }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. Live Receipt Preview -->
+        <div class="thermal-receipt-preview">
+          <div class="receipt-header-center">
+            <h5 class="receipt-store-title">{{ config.storeName | uppercase }}</h5>
+            <div class="receipt-sub">{{ config.address }}</div>
+            <div class="receipt-licenses">
+              <span>GSTIN: {{ config.gstin }}</span> • <span>D.L.: {{ config.drugLicenseNo }}</span>
+            </div>
+            <div class="receipt-type-tag">TAX INVOICE / RETAIL CASH MEMO</div>
+          </div>
+
+          <div class="receipt-dashed-line"></div>
+
+          <div class="receipt-dummy-items">
+            <div class="item-line">
+              <span>1. Paracip 500 Tablet (x2)</span>
+              <strong>{{ config.currencySymbol }}45.00</strong>
+            </div>
+            <div class="item-line">
+              <span>2. Pan 40 Gastro Tablet (x1)</span>
+              <strong>{{ config.currencySymbol }}145.00</strong>
+            </div>
+            <div class="item-line">
+              <span>3. Azithral 500 Strip (x1)</span>
+              <strong>{{ config.currencySymbol }}119.50</strong>
+            </div>
+          </div>
+
+          <div class="receipt-dashed-line"></div>
+
+          <div class="receipt-totals">
+            <div class="tot-row">
+              <span>Subtotal:</span>
+              <span>{{ config.currencySymbol }}309.50</span>
+            </div>
+            <div class="tot-row">
+              <span>GST ({{ config.defaultGstRate }}%):</span>
+              <span>{{ config.currencySymbol }}37.14</span>
+            </div>
+            <div class="tot-row grand">
+              <span>NET PAYABLE:</span>
+              <span>{{ config.currencySymbol }}347.00</span>
+            </div>
+          </div>
+
+          <div class="receipt-dashed-line"></div>
+
+          <div class="receipt-footer-center">
+            <div class="greeting-text">{{ config.billGreeting }}</div>
+            <div class="terms-text">{{ config.returnPolicyTerms }}</div>
+          </div>
+        </div>
+
+      </section>
+
+    </div>
+
+  </main>
+
+</div>

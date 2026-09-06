@@ -8,6 +8,7 @@ import {
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule, ActivatedRoute } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
+import { AccessService } from '../../services/access.service';
 
 @Component({
   selector: 'app-login',
@@ -35,6 +36,7 @@ export class Login implements OnInit {
     private router: Router,
     private route: ActivatedRoute,
     private authService: AuthService,
+    private accessService: AccessService,
     private cdr: ChangeDetectorRef
   ) {}
 
@@ -131,6 +133,9 @@ export class Login implements OnInit {
         next: (response) => {
           this.loading = false;
           console.log('Login Success:', response);
+          if (response && response.role) {
+            this.accessService.syncRolePermissions(response.role, response.companyId || undefined);
+          }
           this.router.navigate(['/dashboard']);
         },
 

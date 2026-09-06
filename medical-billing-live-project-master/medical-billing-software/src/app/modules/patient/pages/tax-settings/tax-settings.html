@@ -1,0 +1,821 @@
+<div class="dashboard-layout-wrapper" [class.sidebar-collapsed]="isSidebarCollapsed">
+
+  <!-- ================= LEFT SIDEBAR MENU ================= -->
+  <aside class="app-sidebar">
+    
+    <!-- Sidebar Brand Header -->
+    <div class="sidebar-brand">
+      <div class="brand-icon-box">
+        <i class="bi bi-hospital-fill"></i>
+      </div>
+      <div class="brand-details" *ngIf="!isSidebarCollapsed">
+        <h2 class="brand-title">{{ activeStoreName || 'PharmaCare' }}</h2>
+        <span class="brand-subtitle">Clinical & Billing Hub</span>
+      </div>
+    </div>
+
+    <!-- Active Store Badge -->
+    <div class="sidebar-store-pill" *ngIf="!isSidebarCollapsed">
+      <i class="bi bi-shop-window text-emerald"></i>
+      <div class="store-text">
+        <span class="store-label">Active Store</span>
+        <strong class="store-name">{{ activeStoreName }} (#{{ activeStoreId }})</strong>
+      </div>
+    </div>
+
+    <!-- Sidebar Navigation Items -->
+    <nav class="sidebar-nav">
+      
+      <!-- 1. DASHBOARD -->
+      <div class="nav-group">
+        <a routerLink="/dashboard" class="menu-item root-item" title="Dashboard">
+          <i class="bi bi-grid-1x2-fill menu-icon"></i>
+          <span class="menu-text" *ngIf="!isSidebarCollapsed">Dashboard</span>
+          <span class="badge-live-pulse" *ngIf="!isSidebarCollapsed">Live</span>
+        </a>
+      </div>
+
+      <!-- 2. POS BILLING COUNTER -->
+      <div class="nav-group">
+        <a routerLink="/pos" class="menu-item root-item" title="POS Billing Counter">
+          <i class="bi bi-receipt-cutoff menu-icon text-warning"></i>
+          <span class="menu-text" *ngIf="!isSidebarCollapsed">POS Billing Counter</span>
+        </a>
+      </div>
+
+      <!-- SALES MENU -->
+      <div class="nav-group">
+        <div class="menu-header" (click)="isSalesMenuOpen = !isSalesMenuOpen" [class.expanded]="isSalesMenuOpen" *ngIf="!isSidebarCollapsed">
+          <div class="header-left">
+            <i class="bi bi-cart-check-fill header-icon text-success"></i>
+            <span>Sales Management</span>
+          </div>
+          <i class="bi bi-chevron-down chevron-icon" [class.rotate]="isSalesMenuOpen"></i>
+        </div>
+
+        <a *ngIf="isSidebarCollapsed" (click)="isSidebarCollapsed = false; isSalesMenuOpen = true" class="menu-item root-item" style="cursor: pointer;" title="Sales Management">
+          <i class="bi bi-cart-check-fill menu-icon text-success"></i>
+        </a>
+
+        <div class="sub-menu" *ngIf="isSalesMenuOpen && !isSidebarCollapsed">
+          <a routerLink="/sales-transactions" class="sub-menu-item">
+            <i class="bi bi-credit-card-2-front-fill sub-icon text-primary"></i>
+            <span>Transaction</span>
+          </a>
+          <a routerLink="/sales-orders" class="sub-menu-item">
+            <i class="bi bi-box-seam-fill sub-icon text-info"></i>
+            <span>Order</span>
+          </a>
+          <a routerLink="/sales-suspended" class="sub-menu-item">
+            <i class="bi bi-pause-circle-fill sub-icon text-warning"></i>
+            <span>Order Suspended</span>
+          </a>
+          <a routerLink="/sales-completed" class="sub-menu-item">
+            <i class="bi bi-check-circle-fill sub-icon text-success"></i>
+            <span>Completed</span>
+          </a>
+          <a routerLink="/sales-exchange" class="sub-menu-item">
+            <i class="bi bi-arrow-repeat sub-icon text-purple"></i>
+            <span>Exchange</span>
+          </a>
+          <a routerLink="/sales-returns" class="sub-menu-item">
+            <i class="bi bi-arrow-counterclockwise sub-icon text-danger"></i>
+            <span>Return and Refund</span>
+          </a>
+        </div>
+      </div>
+
+      
+      <!-- PURCHASE MENU -->
+      <div class="nav-group">
+        <div class="menu-header" (click)="isPurchaseMenuOpen = !isPurchaseMenuOpen" [class.expanded]="isPurchaseMenuOpen" *ngIf="!isSidebarCollapsed">
+          <div class="header-left">
+            <i class="bi bi-bag-check-fill header-icon" style="color: #f59e0b;"></i>
+            <span>Purchase Management</span>
+          </div>
+          <i class="bi bi-chevron-down chevron-icon" [class.rotate]="isPurchaseMenuOpen"></i>
+        </div>
+
+        <a *ngIf="isSidebarCollapsed" (click)="isSidebarCollapsed = false; isPurchaseMenuOpen = true" class="menu-item root-item" style="cursor: pointer;" title="Purchase Management">
+          <i class="bi bi-bag-check-fill menu-icon" style="color: #f59e0b;"></i>
+        </a>
+
+        <div class="sub-menu" *ngIf="isPurchaseMenuOpen && !isSidebarCollapsed">
+          <a routerLink="/purchase" class="sub-menu-item">
+            <i class="bi bi-cart-plus-fill sub-icon text-info"></i>
+            <span>Purchase</span>
+          </a>
+          <a routerLink="/purchase-returns" class="sub-menu-item">
+            <i class="bi bi-arrow-return-left sub-icon text-danger"></i>
+            <span>Purchase Return</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- 3. TABLETS & MEDICINES -->
+      <div class="nav-group">
+        <a routerLink="/tablets" class="menu-item root-item" title="Tablets & Medicines">
+          <i class="bi bi-capsule-pill menu-icon text-emerald"></i>
+          <span class="menu-text" *ngIf="!isSidebarCollapsed">Tablets & Medicines</span>
+        </a>
+      </div>
+
+      <!-- 4. AI CLINICAL ASSISTANT -->
+      <div class="nav-group">
+        <a routerLink="/ai-assistant" class="menu-item root-item" title="AI Medical Assistant">
+          <i class="bi bi-robot menu-icon" style="color: #a855f7;"></i>
+          <span class="menu-text" *ngIf="!isSidebarCollapsed">AI Clinical Assistant</span>
+          <span class="badge-pos-pulse" style="background: #7c3aed;" *ngIf="!isSidebarCollapsed">AI DB</span>
+        </a>
+      </div>
+
+      <!-- 5. PATIENT MANAGEMENT -->
+      <div class="nav-group">
+        <div class="menu-header" (click)="togglePatientMenu()" [class.expanded]="isPatientMenuOpen" *ngIf="!isSidebarCollapsed">
+          <div class="header-left">
+            <i class="bi bi-person-vcard-fill header-icon"></i>
+            <span>Patient Management</span>
+          </div>
+          <i class="bi bi-chevron-down chevron-icon" [class.rotate]="isPatientMenuOpen"></i>
+        </div>
+
+        <a *ngIf="isSidebarCollapsed" (click)="openPatientFromCollapsed()" class="menu-item root-item" style="cursor: pointer;" title="Patient Management">
+          <i class="bi bi-person-vcard-fill menu-icon"></i>
+        </a>
+
+        <div class="sub-menu" *ngIf="isPatientMenuOpen && !isSidebarCollapsed">
+          <a routerLink="/patients" class="sub-menu-item">
+            <i class="bi bi-people-fill sub-icon"></i>
+            <span>Patient List</span>
+            <span class="count-badge">{{ totalPatientsCount }}</span>
+          </a>
+          <a routerLink="/patient-registration" class="sub-menu-item">
+            <i class="bi bi-person-plus-fill sub-icon text-success"></i>
+            <span>Add Patient</span>
+          </a>
+          <a routerLink="/patients" class="sub-menu-item">
+            <i class="bi bi-file-earmark-text-fill sub-icon text-warning"></i>
+            <span>Patient Draft</span>
+          </a>
+          <a routerLink="/dashboard" class="sub-menu-item">
+            <i class="bi bi-graph-up-arrow sub-icon text-primary"></i>
+            <span>Patient Analysis</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- 5.1 DOCTOR MANAGEMENT -->
+      <div class="nav-group">
+        <div class="menu-header" (click)="toggleDoctorMenu()" [class.expanded]="isDoctorMenuOpen" *ngIf="!isSidebarCollapsed">
+          <div class="header-left">
+            <i class="bi bi-person-badge-fill header-icon text-cyan"></i>
+            <span>Doctor Management</span>
+          </div>
+          <i class="bi bi-chevron-down chevron-icon" [class.rotate]="isDoctorMenuOpen"></i>
+        </div>
+
+        <!-- Collapsed icon fallback -->
+        <a *ngIf="isSidebarCollapsed" (click)="openDoctorFromCollapsed()" class="menu-item root-item" style="cursor: pointer;" title="Doctor Management">
+          <i class="bi bi-person-badge-fill menu-icon" style="color: #06b6d4;"></i>
+        </a>
+
+        <div class="sub-menu" *ngIf="isDoctorMenuOpen && !isSidebarCollapsed">
+          <!-- Doctor List -->
+          <a routerLink="/doctors" class="sub-menu-item">
+            <i class="bi bi-person-lines-fill sub-icon text-cyan"></i>
+            <span>Doctor List</span>
+          </a>
+
+          <!-- Add Doctor -->
+          <a routerLink="/add-doctor" class="sub-menu-item">
+            <i class="bi bi-person-plus-fill sub-icon text-success"></i>
+            <span>Add Doctor</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- 6. USER MANAGEMENT -->
+      <div class="nav-group">
+        <div class="menu-header" (click)="toggleUserMenu()" [class.expanded]="isUserMenuOpen" *ngIf="!isSidebarCollapsed">
+          <div class="header-left">
+            <i class="bi bi-person-gear header-icon"></i>
+            <span>User Management</span>
+          </div>
+          <i class="bi bi-chevron-down chevron-icon" [class.rotate]="isUserMenuOpen"></i>
+        </div>
+
+        <a *ngIf="isSidebarCollapsed" (click)="openUserFromCollapsed()" class="menu-item root-item" style="cursor: pointer;" title="User Management">
+          <i class="bi bi-person-gear menu-icon"></i>
+        </a>
+
+        <div class="sub-menu" *ngIf="isUserMenuOpen && !isSidebarCollapsed">
+          <a routerLink="/users" class="sub-menu-item">
+            <i class="bi bi-people sub-icon"></i>
+            <span>User List</span>
+            <span class="count-badge">{{ totalUsersCount }}</span>
+          </a>
+          <a routerLink="/access" class="sub-menu-item">
+            <i class="bi bi-key-fill sub-icon text-info"></i>
+            <span>Access</span>
+            <span class="count-badge" style="background: #0284c7;">DB</span>
+          </a>
+          <a routerLink="/roles" class="sub-menu-item">
+            <i class="bi bi-shield-check sub-icon text-emerald"></i>
+            <span>Role</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- 7. SETTINGS & TAX MENU (ACCORDION) -->
+      <div class="nav-group">
+        <div class="menu-header" (click)="toggleSettingsMenu()" [class.expanded]="isSettingsMenuOpen" *ngIf="!isSidebarCollapsed">
+          <div class="header-left">
+            <i class="bi bi-gear-fill header-icon text-warning"></i>
+            <span>Settings</span>
+          </div>
+          <i class="bi bi-chevron-down chevron-icon" [class.rotate]="isSettingsMenuOpen"></i>
+        </div>
+
+        <a *ngIf="isSidebarCollapsed" (click)="openSettingsFromCollapsed()" class="menu-item root-item active" style="cursor: pointer;" title="Settings: Store Config, Category, Tax">
+          <i class="bi bi-gear-fill menu-icon"></i>
+        </a>
+
+        <div class="sub-menu" *ngIf="isSettingsMenuOpen && !isSidebarCollapsed">
+          <a routerLink="/settings" class="sub-menu-item">
+            <i class="bi bi-shop-window sub-icon text-emerald"></i>
+            <span>Store Configuration</span>
+          </a>
+          <a routerLink="/category" class="sub-menu-item">
+            <i class="bi bi-tags-fill sub-icon text-primary"></i>
+            <span>Category</span>
+            <span class="count-badge" style="background: #2563eb;">DB</span>
+          </a>
+          <a routerLink="/tax" class="sub-menu-item active">
+            <i class="bi bi-percent sub-icon text-warning"></i>
+            <span>Tax</span>
+            <span class="count-badge" style="background: #059669;">DB</span>
+          </a>
+          <a routerLink="/warehouse" class="sub-menu-item">
+            <i class="bi bi-building-gear sub-icon text-info"></i>
+            <span>Warehouse</span>
+            <span class="count-badge" style="background: #0284c7;">DB</span>
+          </a>
+          <a routerLink="/brand" class="sub-menu-item">
+            <i class="bi bi-award-fill sub-icon text-purple"></i>
+            <span>Brand</span>
+            <span class="count-badge" style="background: #9333ea;">DB</span>
+          </a>
+          <a routerLink="/branch" class="sub-menu-item">
+            <i class="bi bi-diagram-3-fill sub-icon text-teal"></i>
+            <span>Branch</span>
+            <span class="count-badge" style="background: #0d9488;">DB</span>
+          </a>
+        </div>
+      </div>
+
+    </nav>
+
+    <!-- Sidebar Footer -->
+    <div class="sidebar-footer">
+      <div class="user-brief" *ngIf="!isSidebarCollapsed">
+        <div class="user-avatar-sm">
+          {{ (loggedInUser || 'A').charAt(0).toUpperCase() }}
+        </div>
+        <div class="user-details-sm">
+          <span class="u-name">{{ loggedInUser }}</span>
+          <span class="u-role">{{ userRole }}</span>
+        </div>
+      </div>
+
+      <button type="button" class="sidebar-logout-btn" (click)="logout()" title="Sign Out">
+        <i class="bi bi-box-arrow-right"></i>
+        <span *ngIf="!isSidebarCollapsed">Logout</span>
+      </button>
+    </div>
+
+  </aside>
+
+  <!-- ================= RIGHT MAIN CONTENT AREA ================= -->
+  <main class="app-main-content">
+
+    <!-- Top Navigation Card -->
+    <header class="top-nav-card">
+      <div class="top-nav-left">
+        <button type="button" class="btn-sidebar-toggle" (click)="toggleSidebar()" title="Toggle Navigation Menu">
+          <i class="bi bi-list"></i>
+        </button>
+        <div class="page-title-wrap">
+          <h2>Tax & GST Configuration</h2>
+          <div class="breadcrumb-sub">
+            <span>Home</span> / <span>Settings</span> / <strong>Tax Master (MySQL Live Table)</strong>
+          </div>
+        </div>
+      </div>
+
+      <!-- Actions & Sync Status -->
+      <div class="top-nav-right">
+        <div class="live-clock-pill">
+          <i class="bi bi-clock-fill text-primary"></i>
+          <span>{{ currentDateTime }}</span>
+        </div>
+
+        <button 
+          type="button" 
+          class="btn-add-gst-top" 
+          (click)="openAddModal()"
+          title="Add New GST Tax Bracket">
+          <i class="bi bi-plus-circle-fill me-1"></i>
+          <span>Add GST</span>
+        </button>
+
+        <div class="top-user-pill">
+          <div class="avatar-circle">
+            {{ (loggedInUser || 'A').charAt(0).toUpperCase() }}
+          </div>
+          <div class="user-info-text">
+            <strong>{{ loggedInUser }}</strong>
+            <span class="badge-role">{{ userRole }}</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Toast Notification Banner -->
+    <div *ngIf="toastMessage" class="toast-floating">
+      <i class="bi bi-check-circle-fill me-2"></i>
+      <span>{{ toastMessage }}</span>
+    </div>
+
+    <!-- Summary Metrics Cards Row -->
+    <div class="tax-stats-row">
+      <div class="stat-card">
+        <div class="stat-icon-wrap bg-emerald-light text-emerald">
+          <i class="bi bi-percent"></i>
+        </div>
+        <div class="stat-content">
+          <span class="stat-label">Total GST Slabs</span>
+          <strong class="stat-value">{{ taxes.length }}</strong>
+          <span class="stat-sub">Persisted in MySQL</span>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon-wrap bg-primary-light text-primary">
+          <i class="bi bi-check-circle-fill"></i>
+        </div>
+        <div class="stat-content">
+          <span class="stat-label">Active Brackets</span>
+          <strong class="stat-value">
+            {{ (taxes | slice:0).filter(t => t.status === 'ACTIVE').length }}
+          </strong>
+          <span class="stat-sub">Ready for POS Billing</span>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon-wrap bg-warning-light text-warning">
+          <i class="bi bi-layers-fill"></i>
+        </div>
+        <div class="stat-content">
+          <span class="stat-label">Standard Pharma Rate</span>
+          <strong class="stat-value">12% GST</strong>
+          <span class="stat-sub">CGST 6% + SGST 6%</span>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon-wrap bg-blue-light text-blue">
+          <i class="bi bi-receipt"></i>
+        </div>
+        <div class="stat-content">
+          <span class="stat-label">Tax Calculation Mode</span>
+          <strong class="stat-value">Inclusive & Exclusive</strong>
+          <span class="stat-sub">Configurable per item</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================= LIVE BACKEND GST CALCULATOR (INCLUSIVE vs EXCLUSIVE) ================= -->
+    <div class="calculator-panel-card">
+      <div class="calc-card-header" (click)="showCalculator = !showCalculator">
+        <div class="header-left-calc">
+          <div class="calc-badge-icon">
+            <i class="bi bi-calculator-fill"></i>
+          </div>
+          <div>
+            <h4>Live Backend Tax Calculation Engine</h4>
+            <p>Test real-time Inclusive vs Exclusive GST formula processed directly by Spring Boot REST API</p>
+          </div>
+        </div>
+        <button type="button" class="btn-toggle-calc">
+          <span>{{ showCalculator ? 'Hide Calculator' : 'Open Calculation Engine' }}</span>
+          <i class="bi" [ngClass]="showCalculator ? 'bi-chevron-up' : 'bi-chevron-down'"></i>
+        </button>
+      </div>
+
+      <div class="calc-card-body" *ngIf="showCalculator">
+        <div class="calc-input-row">
+          
+          <div class="calc-input-group">
+            <label>Item Price / MRP (₹)</label>
+            <input 
+              type="number" 
+              class="calc-input font-mono" 
+              [(ngModel)]="calcAmount" 
+              (ngModelChange)="runLiveCalculation()"
+              min="0" step="1" />
+          </div>
+
+          <div class="calc-input-group">
+            <label>Quantity</label>
+            <input 
+              type="number" 
+              class="calc-input font-mono" 
+              [(ngModel)]="calcQty" 
+              (ngModelChange)="runLiveCalculation()"
+              min="1" />
+          </div>
+
+          <div class="calc-input-group">
+            <label>GST Rate (%)</label>
+            <select class="calc-select" [(ngModel)]="calcGstRate" (ngModelChange)="runLiveCalculation()">
+              <option [ngValue]="0">0% (Nil Rated)</option>
+              <option [ngValue]="5">5% (Essential Drugs)</option>
+              <option [ngValue]="12">12% (Standard Pharma)</option>
+              <option [ngValue]="18">18% (Healthcare Supplements)</option>
+              <option [ngValue]="28">28% (Luxury / Special)</option>
+            </select>
+          </div>
+
+          <div class="calc-input-group">
+            <label>Tax Calculation Type</label>
+            <div class="calc-type-buttons">
+              <button 
+                type="button" 
+                class="type-btn-toggle" 
+                [class.active]="calcType === 'INCLUSIVE'" 
+                (click)="calcType = 'INCLUSIVE'; runLiveCalculation()">
+                <i class="bi bi-check2-circle me-1"></i> Inclusive (MRP)
+              </button>
+              <button 
+                type="button" 
+                class="type-btn-toggle" 
+                [class.active]="calcType === 'EXCLUSIVE'" 
+                (click)="calcType = 'EXCLUSIVE'; runLiveCalculation()">
+                <i class="bi bi-plus-circle me-1"></i> Exclusive (+GST)
+              </button>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Real-time Backend Calculation Breakdown -->
+        <div class="calc-result-box" *ngIf="calcResult">
+          <div class="calc-result-metrics">
+            
+            <div class="res-metric-item">
+              <span class="m-label">Gross Amount:</span>
+              <strong class="m-val">₹{{ calcResult.grossAmount | number:'1.2-2' }}</strong>
+            </div>
+
+            <div class="res-metric-item">
+              <span class="m-label">Taxable Base Price:</span>
+              <strong class="m-val text-primary">₹{{ calcResult.taxableAmount | number:'1.2-2' }}</strong>
+            </div>
+
+            <div class="res-metric-item">
+              <span class="m-label">CGST ({{ calcResult.cgstRate }}%):</span>
+              <strong class="m-val text-warning">₹{{ calcResult.cgstAmount | number:'1.2-2' }}</strong>
+            </div>
+
+            <div class="res-metric-item">
+              <span class="m-label">SGST ({{ calcResult.sgstRate }}%):</span>
+              <strong class="m-val text-warning">₹{{ calcResult.sgstAmount | number:'1.2-2' }}</strong>
+            </div>
+
+            <div class="res-metric-item">
+              <span class="m-label">Total GST Tax:</span>
+              <strong class="m-val text-danger">₹{{ calcResult.totalTaxAmount | number:'1.2-2' }}</strong>
+            </div>
+
+            <div class="res-metric-item grand">
+              <span class="m-label">Net Payable:</span>
+              <strong class="m-val text-emerald">₹{{ calcResult.netTotal | number:'1.2-2' }}</strong>
+            </div>
+
+          </div>
+
+          <div class="calc-formula-footer">
+            <i class="bi bi-cpu-fill text-emerald me-1"></i>
+            <span>Backend Spring Boot Formula: <code>{{ calcResult.formulaDescription }}</code></span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ================= SINGLE GRID PAGE FOR TAX ================= -->
+    <div class="tax-grid-card">
+      
+      <!-- Table Filter & Action Toolbar -->
+      <div class="grid-toolbar">
+        <div class="search-box-wrap">
+          <i class="bi bi-search search-icon"></i>
+          <input 
+            type="text" 
+            class="search-input" 
+            [(ngModel)]="searchQuery" 
+            placeholder="Search by tax name, rate (e.g. 12, 18), or type..." />
+          <button *ngIf="searchQuery" class="clear-search-btn" (click)="searchQuery = ''">
+            <i class="bi bi-x-circle-fill"></i>
+          </button>
+        </div>
+
+        <div class="filter-controls-group">
+          <!-- Type Filter -->
+          <div class="filter-pill-selector">
+            <button 
+              type="button" 
+              class="filter-pill-btn" 
+              [class.active]="filterType === 'ALL'" 
+              (click)="filterType = 'ALL'">All Types</button>
+            <button 
+              type="button" 
+              class="filter-pill-btn" 
+              [class.active]="filterType === 'EXCLUSIVE'" 
+              (click)="filterType = 'EXCLUSIVE'">Exclusive</button>
+            <button 
+              type="button" 
+              class="filter-pill-btn" 
+              [class.active]="filterType === 'INCLUSIVE'" 
+              (click)="filterType = 'INCLUSIVE'">Inclusive</button>
+          </div>
+
+          <!-- Status Filter -->
+          <div class="filter-pill-selector">
+            <button 
+              type="button" 
+              class="filter-pill-btn" 
+              [class.active]="filterStatus === 'ALL'" 
+              (click)="filterStatus = 'ALL'">All Status</button>
+            <button 
+              type="button" 
+              class="filter-pill-btn" 
+              [class.active]="filterStatus === 'ACTIVE'" 
+              (click)="filterStatus = 'ACTIVE'">Active</button>
+            <button 
+              type="button" 
+              class="filter-pill-btn" 
+              [class.active]="filterStatus === 'INACTIVE'" 
+              (click)="filterStatus = 'INACTIVE'">Inactive</button>
+          </div>
+
+          <!-- Primary Add GST Button -->
+          <button type="button" class="btn-primary-add" (click)="openAddModal()">
+            <i class="bi bi-plus-lg me-1"></i> Add GST
+          </button>
+        </div>
+      </div>
+
+      <!-- Loading State -->
+      <div *ngIf="loading" class="grid-loading-state">
+        <div class="spinner-border text-emerald" role="status"></div>
+        <span>Loading Tax Configurations from MySQL database...</span>
+      </div>
+
+      <!-- Empty State -->
+      <div *ngIf="!loading && filteredTaxes.length === 0" class="grid-empty-state">
+        <i class="bi bi-receipt-cutoff empty-icon text-muted"></i>
+        <h4>No Tax Slabs Found</h4>
+        <p>No tax configurations match your current search or filter criteria.</p>
+        <button type="button" class="btn-primary-add mt-2" (click)="openAddModal()">
+          <i class="bi bi-plus-lg me-1"></i> Add First GST Slab
+        </button>
+      </div>
+
+      <!-- ================= TAX DATA GRID TABLE ================= -->
+      <div class="table-responsive" *ngIf="!loading && filteredTaxes.length > 0">
+        <table class="tax-data-table">
+          <thead>
+            <tr>
+              <th style="width: 50px;" class="text-center">#</th>
+              <th>Tax Name & Description</th>
+              <th style="width: 200px;">Gst percentage</th>
+              <th style="width: 180px;">Tax Type [inclusive / Exclusive ]</th>
+              <th style="width: 160px;" class="text-center">Status [Active / inActive]</th>
+              <th style="width: 160px;" class="text-end">Action [Edit and Delete]</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let tax of filteredTaxes; let i = index" [class.row-inactive]="tax.status === 'INACTIVE'">
+              
+              <!-- Index -->
+              <td class="text-center font-mono text-muted">{{ i + 1 }}</td>
+
+              <!-- Tax Name -->
+              <td>
+                <div class="tax-title-cell">
+                  <div class="name-row">
+                    <strong class="tax-name-text">{{ tax.taxName }}</strong>
+                    <span *ngIf="tax.isDefault" class="badge-default-tax" title="Default Tax for Billing">DEFAULT</span>
+                  </div>
+                  <small class="tax-desc-text" *ngIf="tax.description">{{ tax.description }}</small>
+                </div>
+              </td>
+
+              <!-- Column: GST Percentage -->
+              <td>
+                <div class="gst-rate-cell">
+                  <span class="rate-badge-main">{{ tax.gstRate }}%</span>
+                  <div class="split-rate-sub">
+                    <span>CGST: <strong>{{ tax.cgstRate || (tax.gstRate / 2) }}%</strong></span>
+                    <span class="dot-sep">•</span>
+                    <span>SGST: <strong>{{ tax.sgstRate || (tax.gstRate / 2) }}%</strong></span>
+                  </div>
+                </div>
+              </td>
+
+              <!-- Column: Tax Type [inclusive / Exclusive ] -->
+              <td>
+                <span 
+                  class="pill-tax-type" 
+                  [ngClass]="tax.taxType === 'INCLUSIVE' ? 'pill-inclusive' : 'pill-exclusive'">
+                  <i class="bi" [ngClass]="tax.taxType === 'INCLUSIVE' ? 'bi-check2-circle' : 'bi-plus-circle'"></i>
+                  {{ tax.taxType === 'INCLUSIVE' ? 'Inclusive (MRP)' : 'Exclusive (+GST)' }}
+                </span>
+              </td>
+
+              <!-- Column: Status [Active / inActive] -->
+              <td class="text-center">
+                <button 
+                  type="button" 
+                  class="status-toggle-btn" 
+                  [class.status-active]="tax.status === 'ACTIVE'"
+                  [class.status-inactive]="tax.status === 'INACTIVE'"
+                  (click)="toggleStatus(tax)"
+                  [title]="'Click to mark ' + (tax.status === 'ACTIVE' ? 'Inactive' : 'Active')">
+                  <span class="status-dot"></span>
+                  <span>{{ tax.status === 'ACTIVE' ? 'Active' : 'Inactive' }}</span>
+                </button>
+              </td>
+
+              <!-- Column: Action [Edit and Delete] -->
+              <td class="text-end">
+                <div class="action-buttons-group">
+                  <button 
+                    *ngIf="canUpdateTax"
+                    type="button" 
+                    class="btn-action-edit" 
+                    (click)="openEditModal(tax)" 
+                    title="Edit GST Configuration">
+                    <i class="bi bi-pencil-fill"></i>
+                    <span>Edit</span>
+                  </button>
+
+                  <button 
+                    *ngIf="canDeleteTax"
+                    type="button" 
+                    class="btn-action-delete" 
+                    (click)="deleteTax(tax)" 
+                    title="Delete GST Tax">
+                    <i class="bi bi-trash3-fill"></i>
+                    <span>Delete</span>
+                  </button>
+                </div>
+              </td>
+
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Grid Footer Info -->
+      <div class="grid-table-footer" *ngIf="!loading && filteredTaxes.length > 0">
+        <span class="text-muted">
+          Showing <strong>{{ filteredTaxes.length }}</strong> of <strong>{{ taxes.length }}</strong> GST tax configuration records in MySQL
+        </span>
+        <span class="badge-db-sync">
+          <i class="bi bi-database-check me-1"></i> MySQL Table: <code>tax_configurations</code>
+        </span>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- ================= ADD / EDIT GST MODAL ================= -->
+  <div class="modal-backdrop-custom" *ngIf="showModal" (click)="closeModal()">
+    <div class="modal-dialog-custom" (click)="$event.stopPropagation()">
+      
+      <div class="modal-header-custom">
+        <div class="modal-title-left">
+          <div class="modal-icon-badge">
+            <i class="bi bi-percent"></i>
+          </div>
+          <div>
+            <h3>{{ isEditing ? 'Edit GST Tax Bracket' : 'Add New GST Tax Bracket' }}</h3>
+            <p>Configure tax rate, calculation type, and active status in MySQL database.</p>
+          </div>
+        </div>
+        <button type="button" class="btn-close-modal" (click)="closeModal()">
+          <i class="bi bi-x-lg"></i>
+        </button>
+      </div>
+
+      <div class="modal-body-custom">
+        
+        <div class="form-group-modal">
+          <label>Tax Name / Display Label <span class="text-danger">*</span></label>
+          <input 
+            type="text" 
+            class="modal-input" 
+            [(ngModel)]="taxForm.taxName" 
+            placeholder="e.g. GST 12% Standard Pharma Medicines" />
+          <small class="text-muted">Descriptive title shown in product catalogs and billing screens.</small>
+        </div>
+
+        <div class="form-row-2">
+          <!-- GST Percentage -->
+          <div class="form-group-modal">
+            <label>GST Percentage (%) <span class="text-danger">*</span></label>
+            <div class="input-with-suffix">
+              <input 
+                type="number" 
+                class="modal-input font-mono text-center font-bold" 
+                [(ngModel)]="taxForm.gstRate" 
+                (ngModelChange)="onGstRateChange()"
+                min="0" 
+                max="100" 
+                step="0.5" 
+                placeholder="12" 
+                required />
+              <span class="input-suffix">%</span>
+            </div>
+            <!-- Live breakdown -->
+            <div class="split-preview-badge mt-1">
+              <span>CGST: <strong>{{ taxForm.cgstRate }}%</strong></span>
+              <span>•</span>
+              <span>SGST: <strong>{{ taxForm.sgstRate }}%</strong></span>
+            </div>
+          </div>
+
+          <!-- Tax Type [inclusive / Exclusive] -->
+          <div class="form-group-modal">
+            <label>Tax Type <span class="text-danger">*</span></label>
+            <select class="modal-select" [(ngModel)]="taxForm.taxType">
+              <option value="EXCLUSIVE">Exclusive (Added on top of Price)</option>
+              <option value="INCLUSIVE">Inclusive (Already Included in MRP)</option>
+            </select>
+            <small class="text-muted">How tax is added to patient invoices.</small>
+          </div>
+        </div>
+
+        <div class="form-row-2">
+          <!-- Status [Active / Inactive] -->
+          <div class="form-group-modal">
+            <label>Status <span class="text-danger">*</span></label>
+            <select class="modal-select" [(ngModel)]="taxForm.status">
+              <option value="ACTIVE">Active (Available for Billing)</option>
+              <option value="INACTIVE">Inactive (Hidden from POS)</option>
+            </select>
+          </div>
+
+          <!-- Default Tax Checkbox -->
+          <div class="form-group-modal justify-end">
+            <label class="custom-checkbox-row">
+              <input type="checkbox" [(ngModel)]="taxForm.isDefault" />
+              <span class="checkbox-label-text">Set as Default Tax for new products</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="form-group-modal">
+          <label>Description / Usage Note</label>
+          <input 
+            type="text" 
+            class="modal-input" 
+            [(ngModel)]="taxForm.description" 
+            placeholder="e.g. Standard rate for antibiotics, tablets, and oral liquids" />
+        </div>
+
+      </div>
+
+      <div class="modal-footer-custom">
+        <button type="button" class="btn-cancel-modal" (click)="closeModal()">
+          Cancel
+        </button>
+        <button 
+          type="button" 
+          class="btn-save-modal" 
+          (click)="saveTax()" 
+          [disabled]="saving">
+          <i class="bi bi-cloud-arrow-up-fill me-1"></i>
+          <span>{{ saving ? 'Saving to DB...' : (isEditing ? 'Update Tax' : 'Save GST Bracket') }}</span>
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+

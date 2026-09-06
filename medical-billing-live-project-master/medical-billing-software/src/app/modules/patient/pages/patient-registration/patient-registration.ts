@@ -18,10 +18,12 @@ import {
 import { PatientForm } from '../../components/patient-form/patient-form';
 
 import { PatientService } from '../../../services/patient.service';
+import { AccessService } from '../../../services/access.service';
 
 import {
   ActivatedRoute,
-  Router
+  Router,
+  RouterModule
 } from '@angular/router';
 
 @Component({
@@ -30,12 +32,93 @@ import {
   imports: [
     CommonModule,
     ReactiveFormsModule,
+    RouterModule,
     PatientForm
   ],
   templateUrl: './patient-registration.html',
   styleUrl: './patient-registration.css'
 })
 export class PatientRegistration implements OnInit, AfterViewInit {
+  isPurchaseMenuOpen = false;
+
+  // ==========================================
+  // SIDEBAR NAVIGATION & LAYOUT STATE
+  // ==========================================
+  isSidebarCollapsed = false;
+  isPatientMenuOpen = true; // Auto-expanded on Patient Hub
+  isDoctorMenuOpen = false;
+  isUserMenuOpen = false;
+  isSettingsMenuOpen = false;
+  isSalesMenuOpen = false;
+
+  loggedInUser = localStorage.getItem('userName') || sessionStorage.getItem('userName') || 'Deepak Raj';
+  userRole = (localStorage.getItem('userRole') || sessionStorage.getItem('userRole') || 'PHARMACIST').toUpperCase();
+  activeStoreName = localStorage.getItem('companyName') || sessionStorage.getItem('signupCompanyName') || 'Apollo';
+  activeStoreId = localStorage.getItem('companyId') || '1';
+  totalPatientsCount = 3;
+  draftsCount = 0;
+  totalUsersCount = 2;
+
+  toggleSidebar(): void {
+    this.isSidebarCollapsed = !this.isSidebarCollapsed;
+    if (!this.isSidebarCollapsed) {
+      this.isPatientMenuOpen = true;
+    }
+  }
+
+  openSettingsFromCollapsed(): void {
+    this.isSidebarCollapsed = false;
+    this.isSettingsMenuOpen = true;
+    this.cdr.detectChanges();
+  }
+
+  openPatientFromCollapsed(): void {
+    this.isSidebarCollapsed = false;
+    this.isPatientMenuOpen = true;
+    this.cdr.detectChanges();
+  }
+
+  openUserFromCollapsed(): void {
+    this.isSidebarCollapsed = false;
+    this.isUserMenuOpen = true;
+    this.cdr.detectChanges();
+  }
+
+  openDoctorFromCollapsed(): void {
+    this.isSidebarCollapsed = false;
+    this.isDoctorMenuOpen = true;
+    this.cdr.detectChanges();
+  }
+
+  togglePatientMenu(): void {
+    this.isPatientMenuOpen = !this.isPatientMenuOpen;
+  }
+
+  toggleDoctorMenu(): void {
+    this.isDoctorMenuOpen = !this.isDoctorMenuOpen;
+  }
+
+  toggleUserMenu(): void {
+    this.isUserMenuOpen = !this.isUserMenuOpen;
+  }
+
+  toggleSettingsMenu(): void {
+    this.isSettingsMenuOpen = !this.isSettingsMenuOpen;
+  }
+
+  goBack(): void {
+    if (window.history.length > 1) {
+      window.history.back();
+    } else {
+      this.router.navigate(['/patients']);
+    }
+  }
+
+  logout(): void {
+    if (confirm('Are you sure you want to sign out?')) {
+      this.router.navigate(['/login']);
+    }
+  }
 
   // =====================================================
   // STEP
@@ -57,12 +140,16 @@ export class PatientRegistration implements OnInit, AfterViewInit {
   customSelectOpen: Record<string, boolean> = {};
 
   // =====================================================
-  // EDIT MODE
+  // EDIT MODE & PERMISSION GUARDS
   // =====================================================
 
   isEditMode = false;
 
   editPatientId: number | null = null;
+
+  canWritePatient = true;
+
+  canUpdatePatient = true;
 
   // =====================================================
   // TOAST
@@ -92,6 +179,7 @@ export class PatientRegistration implements OnInit, AfterViewInit {
   constructor(
     private fb: FormBuilder,
     private patientService: PatientService,
+    private accessService: AccessService,
     private router: Router,
     private route: ActivatedRoute,
     private cdr: ChangeDetectorRef
@@ -180,6 +268,8 @@ export class PatientRegistration implements OnInit, AfterViewInit {
   }
 
   toggleCustomSelect(columnKey: string): void {
+    const isAllowed = this.isEditMode ? this.canUpdatePatient : this.canWritePatient;
+    if (!isAllowed) return;
     this.customSelectOpen[columnKey] = !this.customSelectOpen[columnKey];
   }
 
@@ -189,6 +279,9 @@ export class PatientRegistration implements OnInit, AfterViewInit {
   }
 
   toggleCustomOption(columnKey: string, option: string): void {
+    const isAllowed = this.isEditMode ? this.canUpdatePatient : this.canWritePatient;
+    if (!isAllowed) return;
+
     const control = this.patientForm.get(columnKey);
     const selectedValues = Array.isArray(control?.value)
       ? [...control.value]
@@ -216,12 +309,28 @@ export class PatientRegistration implements OnInit, AfterViewInit {
   // =====================================================
 
   ngOnInit(): void {
+    console.log('Patient Registration component initialized');
 
-    console.log(
-      'Patient Registration component initialized'
-    );
+    this.canWritePatient = this.accessService.canWrite('PATIENT_REGISTRATION');
+    this.canUpdatePatient = this.accessService.canUpdate('PATIENT_REGISTRATION') || this.accessService.canUpdate('PATIENT_LIST');
+
+    this.accessService.permissions$.subscribe(() => {
+      this.canWritePatient = this.accessService.canWrite('PATIENT_REGISTRATION');
+      this.canUpdatePatient = this.accessService.canUpdate('PATIENT_REGISTRATION') || this.accessService.canUpdate('PATIENT_LIST');
+      this.applyFormPermissionState();
+    });
 
     this.loadPatientForEdit();
+  }
+
+  applyFormPermissionState(): void {
+    const isAllowed = this.isEditMode ? this.canUpdatePatient : this.canWritePatient;
+    if (!isAllowed) {
+      this.patientForm.disable({ emitEvent: false });
+    } else {
+      this.patientForm.enable({ emitEvent: false });
+    }
+    this.cdr.detectChanges();
   }
 
   // =====================================================
@@ -252,6 +361,8 @@ export class PatientRegistration implements OnInit, AfterViewInit {
         this.isEditMode = false;
 
         this.editPatientId = null;
+
+        this.applyFormPermissionState();
 
         return;
       }
@@ -466,6 +577,8 @@ export class PatientRegistration implements OnInit, AfterViewInit {
               'EDIT PATIENT ID:',
               this.editPatientId
             );
+
+            this.applyFormPermissionState();
           },
 
           // =============================================
@@ -709,6 +822,15 @@ export class PatientRegistration implements OnInit, AfterViewInit {
   // =====================================================
 
   savePatient(): void {
+    if (this.isEditMode && !this.canUpdatePatient) {
+      this.showToast('Read-Only Mode: You do not have permission to modify patient records.', 'error');
+      return;
+    }
+
+    if (!this.isEditMode && !this.canWritePatient) {
+      this.showToast('Read-Only Mode: Write permission is required to enter or register patient details.', 'error');
+      return;
+    }
 
     // =================================================
     // PREPARE PATIENT DATA
@@ -872,6 +994,16 @@ export class PatientRegistration implements OnInit, AfterViewInit {
   // =====================================================
 
   saveDraft(): void {
+    if (this.isEditMode && !this.canUpdatePatient) {
+      this.showToast('Read-Only Mode: You do not have permission to modify drafts.', 'error');
+      return;
+    }
+
+    if (!this.isEditMode && !this.canWritePatient) {
+      this.showToast('Read-Only Mode: Write permission is required to save patient drafts.', 'error');
+      return;
+    }
+
     console.log('Saving patient as draft...');
     const raw = this.patientForm.getRawValue();
     const nameVal = (raw.name || '').trim();

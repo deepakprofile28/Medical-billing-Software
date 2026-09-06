@@ -1,0 +1,653 @@
+<div class="dashboard-layout-wrapper" [class.sidebar-collapsed]="isSidebarCollapsed">
+
+  <!-- ================= LEFT SIDEBAR MENU ================= -->
+  <aside class="app-sidebar">
+    
+    <!-- Sidebar Brand Header -->
+    <div class="sidebar-brand">
+      <div class="brand-icon-box">
+        <i class="bi bi-hospital-fill"></i>
+      </div>
+      <div class="brand-details" *ngIf="!isSidebarCollapsed">
+        <h2 class="brand-title">PharmaCare</h2>
+        <span class="brand-subtitle">Clinical & Billing Hub</span>
+      </div>
+    </div>
+
+    <!-- Active Store Badge -->
+    <div class="sidebar-store-pill" *ngIf="!isSidebarCollapsed">
+      <i class="bi bi-shop-window text-emerald"></i>
+      <div class="store-text">
+        <span class="store-label">Active Store</span>
+        <strong class="store-name">{{ activeStoreName }} (#{{ activeStoreId }})</strong>
+      </div>
+    </div>
+
+    <!-- Sidebar Navigation Items -->
+    <nav class="sidebar-nav">
+      
+      <!-- 1. DASHBOARD -->
+      <div class="nav-group">
+        <a routerLink="/dashboard" class="menu-item root-item" title="Dashboard">
+          <i class="bi bi-grid-1x2-fill menu-icon"></i>
+          <span class="menu-text" *ngIf="!isSidebarCollapsed">Dashboard</span>
+          <span class="badge-live-pulse" *ngIf="!isSidebarCollapsed">Live</span>
+        </a>
+      </div>
+
+      <!-- 2. POS BILLING COUNTER -->
+      <div class="nav-group">
+        <a routerLink="/pos" class="menu-item root-item" title="POS Billing Counter">
+          <i class="bi bi-receipt-cutoff menu-icon text-warning"></i>
+          <span class="menu-text" *ngIf="!isSidebarCollapsed">POS Billing Counter</span>
+        </a>
+      </div>
+
+      <!-- 2.5 SALES MENU -->
+      <div class="nav-group">
+        <div class="menu-header" (click)="isSalesMenuOpen = !isSalesMenuOpen" [class.expanded]="isSalesMenuOpen" *ngIf="!isSidebarCollapsed">
+          <div class="header-left">
+            <i class="bi bi-cart-check-fill header-icon text-success"></i>
+            <span>Sales Management</span>
+          </div>
+          <i class="bi bi-chevron-down chevron-icon" [class.rotate]="isSalesMenuOpen"></i>
+        </div>
+
+        <a *ngIf="isSidebarCollapsed" (click)="isSidebarCollapsed = false; isSalesMenuOpen = true" class="menu-item root-item" style="cursor: pointer;" title="Sales Management">
+          <i class="bi bi-cart-check-fill menu-icon text-success"></i>
+        </a>
+
+        <div class="sub-menu" *ngIf="isSalesMenuOpen && !isSidebarCollapsed">
+          <a routerLink="/sales-transactions" class="sub-menu-item">
+            <i class="bi bi-credit-card-2-front-fill sub-icon text-primary"></i>
+            <span>Transaction</span>
+          </a>
+          <a routerLink="/sales-orders" class="sub-menu-item">
+            <i class="bi bi-box-seam-fill sub-icon text-info"></i>
+            <span>Order</span>
+          </a>
+          <a routerLink="/sales-suspended" class="sub-menu-item">
+            <i class="bi bi-pause-circle-fill sub-icon text-warning"></i>
+            <span>Order Suspended</span>
+          </a>
+          <a routerLink="/sales-completed" class="sub-menu-item">
+            <i class="bi bi-check-circle-fill sub-icon text-success"></i>
+            <span>Completed</span>
+          </a>
+          <a routerLink="/sales-exchange" class="sub-menu-item">
+            <i class="bi bi-arrow-repeat sub-icon text-purple"></i>
+            <span>Exchange</span>
+          </a>
+          <a routerLink="/sales-returns" class="sub-menu-item">
+            <i class="bi bi-arrow-counterclockwise sub-icon text-danger"></i>
+            <span>Return and Refund</span>
+          </a>
+        </div>
+      </div>
+
+      
+      <!-- PURCHASE MENU -->
+      <div class="nav-group">
+        <div class="menu-header" (click)="isPurchaseMenuOpen = !isPurchaseMenuOpen" [class.expanded]="isPurchaseMenuOpen" *ngIf="!isSidebarCollapsed">
+          <div class="header-left">
+            <i class="bi bi-bag-check-fill header-icon" style="color: #f59e0b;"></i>
+            <span>Purchase Management</span>
+          </div>
+          <i class="bi bi-chevron-down chevron-icon" [class.rotate]="isPurchaseMenuOpen"></i>
+        </div>
+
+        <a *ngIf="isSidebarCollapsed" (click)="isSidebarCollapsed = false; isPurchaseMenuOpen = true" class="menu-item root-item" style="cursor: pointer;" title="Purchase Management">
+          <i class="bi bi-bag-check-fill menu-icon" style="color: #f59e0b;"></i>
+        </a>
+
+        <div class="sub-menu" *ngIf="isPurchaseMenuOpen && !isSidebarCollapsed">
+          <a routerLink="/purchase" class="sub-menu-item">
+            <i class="bi bi-cart-plus-fill sub-icon text-info"></i>
+            <span>Purchase</span>
+          </a>
+          <a routerLink="/purchase-returns" class="sub-menu-item">
+            <i class="bi bi-arrow-return-left sub-icon text-danger"></i>
+            <span>Purchase Return</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- 3. TABLETS & MEDICINES -->
+      <div class="nav-group">
+        <a routerLink="/tablets" class="menu-item root-item" title="Tablets & Medicines">
+          <i class="bi bi-capsule-pill menu-icon text-emerald"></i>
+          <span class="menu-text" *ngIf="!isSidebarCollapsed">Tablets & Medicines</span>
+        </a>
+      </div>
+
+      <!-- 4. AI CLINICAL ASSISTANT -->
+      <div class="nav-group">
+        <a routerLink="/ai-assistant" class="menu-item root-item" title="AI Medical Assistant">
+          <i class="bi bi-robot menu-icon" style="color: #a855f7;"></i>
+          <span class="menu-text" *ngIf="!isSidebarCollapsed">AI Clinical Assistant</span>
+          <span class="badge-pos-pulse" style="background: #7c3aed;" *ngIf="!isSidebarCollapsed">AI DB</span>
+        </a>
+      </div>
+
+      <!-- 5. PATIENT MANAGEMENT -->
+      <div class="nav-group">
+        <div class="menu-header" (click)="togglePatientMenu()" [class.expanded]="isPatientMenuOpen" *ngIf="!isSidebarCollapsed">
+          <div class="header-left">
+            <i class="bi bi-person-vcard-fill header-icon"></i>
+            <span>Patient Management</span>
+          </div>
+          <i class="bi bi-chevron-down chevron-icon" [class.rotate]="isPatientMenuOpen"></i>
+        </div>
+
+        <!-- Collapsed icon fallback -->
+        <a *ngIf="isSidebarCollapsed" (click)="openPatientFromCollapsed()" class="menu-item root-item" style="cursor: pointer;" title="Patient Management">
+          <i class="bi bi-person-vcard-fill menu-icon"></i>
+        </a>
+
+        <div class="sub-menu" *ngIf="isPatientMenuOpen && !isSidebarCollapsed">
+          <!-- Patient List -->
+          <a routerLink="/patients" class="sub-menu-item">
+            <i class="bi bi-people-fill sub-icon"></i>
+            <span>Patient List</span>
+            <span class="count-badge">{{ totalPatientsCount }}</span>
+          </a>
+
+          <!-- Add Patient -->
+          <a routerLink="/patient-registration" class="sub-menu-item">
+            <i class="bi bi-person-plus-fill sub-icon text-success"></i>
+            <span>Add Patient</span>
+          </a>
+
+          <!-- Patient Draft -->
+          <a routerLink="/patient-drafts" class="sub-menu-item">
+            <i class="bi bi-file-earmark-text-fill sub-icon text-warning"></i>
+            <span>Patient Draft</span>
+            <span class="count-badge badge-warning" *ngIf="draftsCount > 0">{{ draftsCount }}</span>
+          </a>
+
+          <!-- Patient Analysis -->
+          <a routerLink="/dashboard" class="sub-menu-item">
+            <i class="bi bi-graph-up-arrow sub-icon text-primary"></i>
+            <span>Patient Analysis</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- 6. DOCTOR MANAGEMENT (ACTIVE ON ADD DOCTOR) -->
+      <div class="nav-group">
+        <div class="menu-header" (click)="toggleDoctorMenu()" [class.expanded]="isDoctorMenuOpen" *ngIf="!isSidebarCollapsed">
+          <div class="header-left">
+            <i class="bi bi-person-badge-fill header-icon text-cyan"></i>
+            <span>Doctor Management</span>
+          </div>
+          <i class="bi bi-chevron-down chevron-icon" [class.rotate]="isDoctorMenuOpen"></i>
+        </div>
+
+        <!-- Collapsed icon fallback -->
+        <a *ngIf="isSidebarCollapsed" (click)="openDoctorFromCollapsed()" class="menu-item root-item active" style="cursor: pointer;" title="Doctor Management">
+          <i class="bi bi-person-badge-fill menu-icon" style="color: #06b6d4;"></i>
+        </a>
+
+        <div class="sub-menu" *ngIf="isDoctorMenuOpen && !isSidebarCollapsed">
+          <!-- Doctor List -->
+          <a routerLink="/doctors" class="sub-menu-item">
+            <i class="bi bi-person-lines-fill sub-icon text-cyan"></i>
+            <span>Doctor List</span>
+          </a>
+
+          <!-- Add Doctor -->
+          <a routerLink="/add-doctor" routerLinkActive="active" class="sub-menu-item">
+            <i class="bi bi-person-plus-fill sub-icon text-success"></i>
+            <span>{{ isEditing ? 'Edit Doctor' : 'Add Doctor' }}</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- 7. USER MANAGEMENT -->
+      <div class="nav-group">
+        <div class="menu-header" (click)="toggleUserMenu()" [class.expanded]="isUserMenuOpen" *ngIf="!isSidebarCollapsed">
+          <div class="header-left">
+            <i class="bi bi-person-gear header-icon"></i>
+            <span>User Management</span>
+          </div>
+          <i class="bi bi-chevron-down chevron-icon" [class.rotate]="isUserMenuOpen"></i>
+        </div>
+
+        <!-- Collapsed icon fallback -->
+        <a *ngIf="isSidebarCollapsed" (click)="openUserFromCollapsed()" class="menu-item root-item" style="cursor: pointer;" title="User Management">
+          <i class="bi bi-person-gear menu-icon"></i>
+        </a>
+
+        <div class="sub-menu" *ngIf="isUserMenuOpen && !isSidebarCollapsed">
+          <!-- User List -->
+          <a routerLink="/users" class="sub-menu-item">
+            <i class="bi bi-people sub-icon"></i>
+            <span>User List</span>
+            <span class="count-badge">{{ totalUsersCount }}</span>
+          </a>
+
+          <!-- Access Permissions -->
+          <a routerLink="/access" class="sub-menu-item">
+            <i class="bi bi-key-fill sub-icon text-info"></i>
+            <span>Access</span>
+            <span class="count-badge" style="background: #0284c7;">DB</span>
+          </a>
+
+          <!-- Role Assignment -->
+          <a routerLink="/roles" class="sub-menu-item">
+            <i class="bi bi-shield-check sub-icon text-emerald"></i>
+            <span>Role</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- 8. SETTINGS & STORE MENU -->
+      <div class="nav-group">
+        <div class="menu-header" (click)="toggleSettingsMenu()" [class.expanded]="isSettingsMenuOpen" *ngIf="!isSidebarCollapsed">
+          <div class="header-left">
+            <i class="bi bi-gear-fill header-icon text-secondary"></i>
+            <span>Settings</span>
+          </div>
+          <i class="bi bi-chevron-down chevron-icon" [class.rotate]="isSettingsMenuOpen"></i>
+        </div>
+
+        <a *ngIf="isSidebarCollapsed" (click)="openSettingsFromCollapsed()" class="menu-item root-item" style="cursor: pointer;" title="Settings: Store Config, Category, Tax">
+          <i class="bi bi-gear-fill menu-icon"></i>
+        </a>
+
+        <div class="sub-menu" *ngIf="isSettingsMenuOpen && !isSidebarCollapsed">
+          <a routerLink="/settings" class="sub-menu-item">
+            <i class="bi bi-shop-window sub-icon text-emerald"></i>
+            <span>Store Configuration</span>
+          </a>
+          <a routerLink="/category" class="sub-menu-item">
+            <i class="bi bi-tags-fill sub-icon text-primary"></i>
+            <span>Category</span>
+            <span class="count-badge" style="background: #2563eb;">DB</span>
+          </a>
+          <a routerLink="/tax" class="sub-menu-item">
+            <i class="bi bi-percent sub-icon text-warning"></i>
+            <span>Tax</span>
+            <span class="count-badge" style="background: #059669;">DB</span>
+          </a>
+          <a routerLink="/warehouse" class="sub-menu-item">
+            <i class="bi bi-building-gear sub-icon text-info"></i>
+            <span>Warehouse</span>
+            <span class="count-badge" style="background: #0284c7;">DB</span>
+          </a>
+          <a routerLink="/brand" class="sub-menu-item">
+            <i class="bi bi-award-fill sub-icon text-purple"></i>
+            <span>Brand</span>
+            <span class="count-badge" style="background: #9333ea;">DB</span>
+          </a>
+          <a routerLink="/branch" class="sub-menu-item">
+            <i class="bi bi-diagram-3-fill sub-icon text-teal"></i>
+            <span>Branch</span>
+            <span class="count-badge" style="background: #0d9488;">DB</span>
+          </a>
+        </div>
+      </div>
+
+    </nav>
+
+    <!-- Sidebar Footer (User Info & Logout) -->
+    <div class="sidebar-footer">
+      <div class="user-brief" *ngIf="!isSidebarCollapsed">
+        <div class="user-avatar-sm">
+          {{ (loggedInUser || 'A').charAt(0).toUpperCase() }}
+        </div>
+        <div class="user-details-sm">
+          <span class="u-name">{{ loggedInUser }}</span>
+          <span class="u-role">{{ userRole }}</span>
+        </div>
+      </div>
+
+      <button type="button" class="sidebar-logout-btn" (click)="logout()" title="Sign Out">
+        <i class="bi bi-box-arrow-right"></i>
+        <span *ngIf="!isSidebarCollapsed">Logout</span>
+      </button>
+    </div>
+
+  </aside>
+
+  <!-- ================= MAIN CONTENT AREA ================= -->
+  <main class="dashboard-main-content">
+    
+    <!-- Top App Navbar -->
+    <header class="main-top-navbar">
+      <div class="navbar-left">
+        <button type="button" class="sidebar-toggle-btn" (click)="toggleSidebar()" title="Toggle Sidebar">
+          <i class="bi bi-list"></i>
+        </button>
+        <div class="breadcrumb-trail">
+          <a routerLink="/dashboard" class="bc-link"><i class="bi bi-house-door me-1"></i>Home</a>
+          <span class="bc-sep">/</span>
+          <a routerLink="/doctors" class="bc-link">Doctor Management</a>
+          <span class="bc-sep">/</span>
+          <span class="bc-curr">{{ isEditing ? 'Edit Doctor Profile' : 'Add New Doctor' }}</span>
+        </div>
+      </div>
+
+      <div class="navbar-right">
+        <div class="live-clock-pill">
+          <i class="bi bi-clock-history me-1 text-emerald"></i>
+          <span>{{ currentDateTime }}</span>
+        </div>
+        <button type="button" class="btn-top-back" (click)="goBack()">
+          <i class="bi bi-arrow-left me-1"></i> Back to Directory
+        </button>
+      </div>
+    </header>
+
+    <!-- Scrollable Form Body -->
+    <div class="main-content-scrollable">
+      
+      <!-- Toast Alert -->
+      <div class="toast-floating-container" *ngIf="showToast">
+        <div class="custom-toast alert" [ngClass]="'alert-' + toastType">
+          <i class="bi" [ngClass]="toastType === 'success' ? 'bi-check-circle-fill' : 'bi-exclamation-triangle-fill'"></i>
+          <span>{{ toastMessage }}</span>
+        </div>
+      </div>
+
+      <!-- Header Hero Card -->
+      <div class="registration-hero-card">
+        <div class="hero-content">
+          <div class="hero-icon-box">
+            <i class="bi bi-person-badge-fill"></i>
+          </div>
+          <div>
+            <h1 class="hero-title">{{ isEditing ? 'Edit Doctor Profile' : 'Doctor Registration & Onboarding' }}</h1>
+            <p class="hero-subtitle">
+              Register medical specialists, OPD consultation fees, available schedules, and medical council credentials in MySQL.
+            </p>
+          </div>
+        </div>
+        <div class="hero-actions">
+          <span class="badge-db-sync"><i class="bi bi-database-check me-1"></i> MySQL Table: <code>doctors</code></span>
+        </div>
+      </div>
+
+      <!-- Registration Form -->
+      <form [formGroup]="doctorForm" (ngSubmit)="onSubmit()" class="doctor-form-container">
+        
+        <!-- SECTION 1: Personal & Professional Identity -->
+        <div class="form-section-card">
+          <div class="section-card-header">
+            <div class="section-icon text-emerald">
+              <i class="bi bi-person-lines-fill"></i>
+            </div>
+            <div>
+              <h3 class="section-title">Doctor Credentials & Contact Information</h3>
+              <p class="section-desc">Basic identification, medical qualifications, and direct contact details</p>
+            </div>
+          </div>
+
+          <div class="form-grid-3">
+            
+            <!-- Doctor Name -->
+            <div class="form-field-group">
+              <label class="form-label">Doctor Full Name <span class="required">*</span></label>
+              <div class="input-wrap">
+                <i class="bi bi-person-fill input-icon"></i>
+                <input 
+                  type="text" 
+                  class="form-control" 
+                  formControlName="name" 
+                  placeholder="e.g. Dr. A. Anand Raman">
+              </div>
+              <span class="form-hint text-danger" *ngIf="doctorForm.get('name')?.invalid && doctorForm.get('name')?.touched">
+                Doctor Name is required (min 3 characters).
+              </span>
+            </div>
+
+            <!-- Specialization -->
+            <div class="form-field-group">
+              <label class="form-label">Specialization / Discipline <span class="required">*</span></label>
+              <div class="input-wrap">
+                <i class="bi bi-heart-pulse-fill input-icon text-teal"></i>
+                <select class="form-control form-select" formControlName="specialization">
+                  <option *ngFor="let spec of specializations" [value]="spec">{{ spec }}</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Qualification -->
+            <div class="form-field-group">
+              <label class="form-label">Medical Qualification / Degree <span class="required">*</span></label>
+              <div class="input-wrap">
+                <i class="bi bi-mortarboard-fill input-icon text-primary"></i>
+                <input 
+                  type="text" 
+                  class="form-control" 
+                  formControlName="qualification" 
+                  placeholder="e.g. MBBS, MD, DNB">
+              </div>
+            </div>
+
+            <!-- Registration Number -->
+            <div class="form-field-group">
+              <label class="form-label">Medical Council Reg. No. <span class="required">*</span></label>
+              <div class="input-wrap">
+                <i class="bi bi-shield-check input-icon text-warning"></i>
+                <input 
+                  type="text" 
+                  class="form-control" 
+                  formControlName="registrationNumber" 
+                  placeholder="e.g. TNMC-45892 / MCI-9921">
+              </div>
+              <span class="form-hint text-danger" *ngIf="doctorForm.get('registrationNumber')?.invalid && doctorForm.get('registrationNumber')?.touched">
+                Council Registration Number is required.
+              </span>
+            </div>
+
+            <!-- Mobile Phone -->
+            <div class="form-field-group">
+              <label class="form-label">Mobile Number <span class="required">*</span></label>
+              <div class="input-wrap">
+                <i class="bi bi-telephone-fill input-icon text-success"></i>
+                <input 
+                  type="tel" 
+                  class="form-control" 
+                  formControlName="phone" 
+                  placeholder="10-digit mobile number"
+                  maxlength="10">
+              </div>
+              <span class="form-hint text-danger" *ngIf="doctorForm.get('phone')?.invalid && doctorForm.get('phone')?.touched">
+                Valid 10-digit mobile number required.
+              </span>
+            </div>
+
+            <!-- Email Address -->
+            <div class="form-field-group">
+              <label class="form-label">Email Address</label>
+              <div class="input-wrap">
+                <i class="bi bi-envelope-fill input-icon text-info"></i>
+                <input 
+                  type="email" 
+                  class="form-control" 
+                  formControlName="email" 
+                  placeholder="e.g. dr.anand@hospital.com">
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- SECTION 2: Clinical Details & OPD Chamber -->
+        <div class="form-section-card">
+          <div class="section-card-header">
+            <div class="section-icon text-primary">
+              <i class="bi bi-hospital"></i>
+            </div>
+            <div>
+              <h3 class="section-title">Clinical Department, Room & Fees</h3>
+              <p class="section-desc">Hospital wing allocation, consultation charges, and clinical experience</p>
+            </div>
+          </div>
+
+          <div class="form-grid-4">
+            
+            <!-- Department -->
+            <div class="form-field-group">
+              <label class="form-label">Department / Wing</label>
+              <div class="input-wrap">
+                <i class="bi bi-building input-icon"></i>
+                <input 
+                  type="text" 
+                  class="form-control" 
+                  formControlName="department" 
+                  placeholder="e.g. General OPD / Cardiology Wing">
+              </div>
+            </div>
+
+            <!-- Room / Chamber Number -->
+            <div class="form-field-group">
+              <label class="form-label">OPD Room / Chamber No.</label>
+              <div class="input-wrap">
+                <i class="bi bi-door-open-fill input-icon"></i>
+                <input 
+                  type="text" 
+                  class="form-control" 
+                  formControlName="roomNumber" 
+                  placeholder="e.g. Room 102 (1st Floor)">
+              </div>
+            </div>
+
+            <!-- Consultation Fee -->
+            <div class="form-field-group">
+              <label class="form-label">Consultation Fee (₹)</label>
+              <div class="input-wrap">
+                <i class="bi bi-currency-rupee input-icon text-success fw-bold"></i>
+                <input 
+                  type="number" 
+                  class="form-control" 
+                  formControlName="consultationFee" 
+                  placeholder="e.g. 500" 
+                  min="0">
+              </div>
+            </div>
+
+            <!-- Experience (Years) -->
+            <div class="form-field-group">
+              <label class="form-label">Experience (Years)</label>
+              <div class="input-wrap">
+                <i class="bi bi-award-fill input-icon text-warning"></i>
+                <input 
+                  type="number" 
+                  class="form-control" 
+                  formControlName="experienceYears" 
+                  placeholder="e.g. 10" 
+                  min="0">
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- SECTION 3: Availability Schedule & Timings -->
+        <div class="form-section-card">
+          <div class="section-card-header">
+            <div class="section-icon text-warning">
+              <i class="bi bi-calendar2-week-fill"></i>
+            </div>
+            <div>
+              <h3 class="section-title">OPD Schedule & Availability Timings</h3>
+              <p class="section-desc">Select working days and duty timings for patient appointments</p>
+            </div>
+          </div>
+
+          <!-- Working Days Selector -->
+          <div class="mb-4">
+            <label class="form-label d-block mb-2">Available Consultation Days <span class="required">*</span></label>
+            <div class="days-chips-wrapper">
+              <button 
+                type="button" 
+                class="day-chip" 
+                *ngFor="let day of daysOfWeek" 
+                [class.selected]="isDaySelected(day)"
+                (click)="toggleDay(day)">
+                <i class="bi" [ngClass]="isDaySelected(day) ? 'bi-check-circle-fill' : 'bi-circle'"></i>
+                <span>{{ day }}</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="form-grid-3">
+            
+            <!-- Start Time -->
+            <div class="form-field-group">
+              <label class="form-label">OPD Start Time <span class="required">*</span></label>
+              <div class="input-wrap">
+                <i class="bi bi-clock input-icon"></i>
+                <input 
+                  type="text" 
+                  class="form-control" 
+                  formControlName="availableTimeStart" 
+                  placeholder="e.g. 09:00 AM">
+              </div>
+            </div>
+
+            <!-- End Time -->
+            <div class="form-field-group">
+              <label class="form-label">OPD End Time <span class="required">*</span></label>
+              <div class="input-wrap">
+                <i class="bi bi-clock-fill input-icon"></i>
+                <input 
+                  type="text" 
+                  class="form-control" 
+                  formControlName="availableTimeEnd" 
+                  placeholder="e.g. 01:00 PM, 05:00 PM - 09:00 PM">
+              </div>
+            </div>
+
+            <!-- Status -->
+            <div class="form-field-group">
+              <label class="form-label">Doctor Practice Status <span class="required">*</span></label>
+              <div class="input-wrap">
+                <i class="bi bi-activity input-icon"></i>
+                <select class="form-control form-select" formControlName="status">
+                  <option value="ACTIVE">Active & Available</option>
+                  <option value="ON_LEAVE">On Leave</option>
+                  <option value="INACTIVE">Inactive / Resigned</option>
+                </select>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Notes / Bio -->
+          <div class="mt-3">
+            <label class="form-label">Clinical Notes / Special Interests</label>
+            <textarea 
+              class="form-control" 
+              formControlName="notes" 
+              rows="3" 
+              placeholder="e.g. Available for Emergency Callouts; Specialist in pediatric trauma & diabetes care."></textarea>
+          </div>
+
+        </div>
+
+        <!-- Form Submission Footer -->
+        <div class="form-actions-bar">
+          <button type="button" class="btn-form-cancel" (click)="goBack()">
+            <i class="bi bi-x-lg me-1"></i> Cancel
+          </button>
+          
+          <button 
+            type="submit" 
+            class="btn-form-submit" 
+            [disabled]="doctorForm.invalid || saving">
+            <i class="bi" [ngClass]="saving ? 'bi-arrow-repeat spin' : 'bi-check2-circle me-1'"></i>
+            <span>{{ saving ? 'Saving Doctor...' : (isEditing ? 'Update Doctor Profile' : 'Save & Register Doctor') }}</span>
+          </button>
+        </div>
+
+      </form>
+
+    </div>
+
+  </main>
+
+</div>
+

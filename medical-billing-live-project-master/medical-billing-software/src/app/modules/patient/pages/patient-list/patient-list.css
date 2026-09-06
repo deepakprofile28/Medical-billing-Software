@@ -42,9 +42,6 @@
    ========================================================================== */
 .patient-list-page {
   font-family: var(--font-family);
-  background-color: var(--background);
-  min-height: 100vh;
-  padding: 24px;
   color: var(--text-main);
   box-sizing: border-box;
 }
@@ -80,28 +77,39 @@ button:disabled {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  flex-wrap: wrap;
-  gap: 16px;
+  gap: 20px;
+  flex-wrap: nowrap;
 }
 
 .header-main {
   display: flex;
   align-items: center;
-  gap: 24px;
+  gap: 14px;
+  flex-wrap: nowrap;
+  min-width: 0;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
 }
 
 .header-content h2 {
   margin: 0;
-  font-size: 24px;
-  font-weight: 700;
+  font-size: 20px;
+  font-weight: 800;
   color: var(--text-main);
-  letter-spacing: -0.5px;
+  letter-spacing: -0.3px;
+  white-space: nowrap;
 }
 
 .header-content p {
-  margin: 4px 0 0 0;
-  font-size: 14px;
+  margin: 2px 0 0 0;
+  font-size: 13px;
   color: var(--text-muted);
+  white-space: nowrap;
 }
 
 .patient-summary {
@@ -1094,4 +1102,39 @@ tbody tr:hover {
   .header-actions button { flex: 1; justify-content: center; }
   
   .patient-preview-panel { max-width: 90%; }
+}
+
+/* ==========================================================================
+   PERMISSION ACTION GUARDS & DISABLED BUTTON STYLES
+   ========================================================================== */
+
+.action-disabled,
+.action-disabled:hover {
+  opacity: 0.38 !important;
+  cursor: not-allowed !important;
+  pointer-events: auto !important;
+  filter: grayscale(85%) !important;
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+.btn-disabled,
+button.btn-disabled {
+  opacity: 0.45 !important;
+  cursor: not-allowed !important;
+  filter: grayscale(80%) !important;
+  pointer-events: auto !important;
+}
+
+.badge-lock-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(255, 255, 255, 0.25);
+  font-size: 11px;
+  padding: 2px 7px;
+  border-radius: 12px;
+  margin-left: 6px;
+  letter-spacing: 0.3px;
+  font-weight: 700;
 }

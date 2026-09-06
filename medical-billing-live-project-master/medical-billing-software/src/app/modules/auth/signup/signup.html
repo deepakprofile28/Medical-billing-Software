@@ -197,11 +197,8 @@
               </label>
               <div class="input-icon-wrap">
                 <select formControlName="role" id="su-role" class="form-select custom-input">
-                  <option value="PHARMACIST">Pharmacist / Billing Staff</option>
-                  <option value="BILLING_OFFICER">Medical Billing Specialist</option>
-                  <option value="DOCTOR">Doctor / Physician</option>
-                  <option value="RECEPTIONIST">Front Desk / Receptionist</option>
-                  <option value="ADMIN">Store Administrator / Co-Admin</option>
+                  <option value="" disabled *ngIf="roles.length === 0">No roles found in DB (Create in Role Settings)</option>
+                  <option *ngFor="let r of roles" [value]="r.value">{{ r.label }}</option>
                 </select>
               </div>
             </div>

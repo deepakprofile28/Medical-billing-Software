@@ -9,7 +9,7 @@ import {
 
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import * as XLSX from 'xlsx';
 
 import {
@@ -22,18 +22,100 @@ import {
   PatientService,
   Patient
 } from '../../../services/patient.service';
+import { AccessService } from '../../../services/access.service';
 
 @Component({
   selector: 'app-patient-list',
   standalone: true,
   imports: [
     CommonModule,
-    FormsModule
+    FormsModule,
+    RouterModule
   ],
   templateUrl: './patient-list.html',
   styleUrl: './patient-list.css'
 })
 export class PatientList implements OnInit {
+  isPurchaseMenuOpen = false;
+
+  // ==========================================
+  // SIDEBAR NAVIGATION & LAYOUT STATE
+  // ==========================================
+  isSidebarCollapsed = false;
+  isPatientMenuOpen = true; // Auto-expanded for Patient Hub
+  isDoctorMenuOpen = false;
+  isUserMenuOpen = false;
+  isSettingsMenuOpen = false;
+  isSalesMenuOpen = false;
+
+  loggedInUser = localStorage.getItem('userName') || sessionStorage.getItem('userName') || 'Deepak Raj';
+  userRole = (localStorage.getItem('userRole') || sessionStorage.getItem('userRole') || 'PHARMACIST').toUpperCase();
+  activeStoreName = localStorage.getItem('companyName') || sessionStorage.getItem('signupCompanyName') || 'Apollo';
+  activeStoreId = localStorage.getItem('companyId') || '1';
+  totalPatientsCount = 3;
+  draftsCount = 0;
+  totalUsersCount = 2;
+
+  toggleSidebar(): void {
+    this.isSidebarCollapsed = !this.isSidebarCollapsed;
+    if (!this.isSidebarCollapsed) {
+      this.isPatientMenuOpen = true;
+    }
+  }
+
+  openSettingsFromCollapsed(): void {
+    this.isSidebarCollapsed = false;
+    this.isSettingsMenuOpen = true;
+    this.cdr.detectChanges();
+  }
+
+  openPatientFromCollapsed(): void {
+    this.isSidebarCollapsed = false;
+    this.isPatientMenuOpen = true;
+    this.cdr.detectChanges();
+  }
+
+  openDoctorFromCollapsed(): void {
+    this.isSidebarCollapsed = false;
+    this.isDoctorMenuOpen = true;
+    this.cdr.detectChanges();
+  }
+
+  openUserFromCollapsed(): void {
+    this.isSidebarCollapsed = false;
+    this.isUserMenuOpen = true;
+    this.cdr.detectChanges();
+  }
+
+  togglePatientMenu(): void {
+    this.isPatientMenuOpen = !this.isPatientMenuOpen;
+  }
+
+  toggleDoctorMenu(): void {
+    this.isDoctorMenuOpen = !this.isDoctorMenuOpen;
+  }
+
+  toggleUserMenu(): void {
+    this.isUserMenuOpen = !this.isUserMenuOpen;
+  }
+
+  toggleSettingsMenu(): void {
+    this.isSettingsMenuOpen = !this.isSettingsMenuOpen;
+  }
+
+  goBack(): void {
+    if (window.history.length > 1) {
+      window.history.back();
+    } else {
+      this.router.navigate(['/dashboard']);
+    }
+  }
+
+  logout(): void {
+    if (confirm('Are you sure you want to sign out?')) {
+      this.router.navigate(['/login']);
+    }
+  }
 
   // ==========================================
   // PATIENT DATA
@@ -113,8 +195,17 @@ export class PatientList implements OnInit {
     }
   }
 
+  // ==========================================
+  // GRANULAR PERMISSION FLAGS
+  // ==========================================
+  canReadPatient = true;
+  canWritePatient = true;
+  canUpdatePatient = true;
+  canDeletePatient = true;
+
   constructor(
     private patientService: PatientService,
+    private accessService: AccessService,
     private cdr: ChangeDetectorRef,
     private router: Router
   ) {
@@ -500,10 +591,20 @@ export class PatientList implements OnInit {
   // ==========================================
 
   ngOnInit(): void {
+    console.log('PatientList component initialized');
 
-    console.log(
-      'PatientList component initialized'
-    );
+    this.canReadPatient = this.accessService.canRead('PATIENT_LIST');
+    this.canWritePatient = this.accessService.canWrite('PATIENT_REGISTRATION');
+    this.canUpdatePatient = this.accessService.canUpdate('PATIENT_LIST');
+    this.canDeletePatient = this.accessService.canDelete('PATIENT_LIST');
+
+    this.accessService.permissions$.subscribe(() => {
+      this.canReadPatient = this.accessService.canRead('PATIENT_LIST');
+      this.canWritePatient = this.accessService.canWrite('PATIENT_REGISTRATION');
+      this.canUpdatePatient = this.accessService.canUpdate('PATIENT_LIST');
+      this.canDeletePatient = this.accessService.canDelete('PATIENT_LIST');
+      this.cdr.detectChanges();
+    });
 
     this.loadPatients();
   }
@@ -1408,6 +1509,10 @@ removeDraft(id: number | undefined): void {
   // ==========================================
 
   editPatient(patient: Patient): void {
+    if (!this.canUpdatePatient) {
+      this.showToast('Permission Denied: Update permission required to edit patient records.', 'warning');
+      return;
+    }
 
     if (!patient?.id) {
 
@@ -1438,6 +1543,10 @@ removeDraft(id: number | undefined): void {
   // DELETE SINGLE PATIENT
   // ==========================================
 deletePatient(id: number | undefined): void {
+  if (!this.canDeletePatient) {
+    this.showToast('Permission Denied: Delete permission required.', 'warning');
+    return;
+  }
 
   if (!id) {
     this.showToast('Patient ID not found', 'error');
@@ -1486,6 +1595,10 @@ deletePatient(id: number | undefined): void {
   // ==========================================
 
   deleteAllPatients(): void {
+    if (!this.canDeletePatient) {
+      this.showToast('Permission Denied: Delete permission required.', 'warning');
+      return;
+    }
 
     if (
       this.patients.length === 0

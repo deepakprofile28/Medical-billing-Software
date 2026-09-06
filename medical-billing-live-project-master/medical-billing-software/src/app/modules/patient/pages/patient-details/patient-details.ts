@@ -5,20 +5,105 @@ import {
 } from '@angular/core';
 
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 
 import { PatientService } from '../../../services/patient.service';
+import { AccessService } from '../../../services/access.service';
 
 @Component({
   selector: 'app-patient-details',
   standalone: true,
   imports: [
-    CommonModule
+    CommonModule,
+    RouterModule
   ],
   templateUrl: './patient-details.html',
   styleUrl: './patient-details.css'
 })
 export class PatientDetails implements OnInit {
+  isPurchaseMenuOpen = false;
+
+  // Permissions
+  canUpdatePatient = true;
+
+  // ==========================================
+  // SIDEBAR NAVIGATION & LAYOUT STATE
+  // ==========================================
+  isSidebarCollapsed = false;
+  isPatientMenuOpen = true; // Auto-expanded on Patient Hub
+  isDoctorMenuOpen = false;
+  isUserMenuOpen = false;
+  isSettingsMenuOpen = false;
+  isSalesMenuOpen = false;
+
+  loggedInUser = localStorage.getItem('userName') || sessionStorage.getItem('userName') || 'Deepak Raj';
+  userRole = (localStorage.getItem('userRole') || sessionStorage.getItem('userRole') || 'PHARMACIST').toUpperCase();
+  activeStoreName = localStorage.getItem('companyName') || sessionStorage.getItem('signupCompanyName') || 'Apollo';
+  activeStoreId = localStorage.getItem('companyId') || '1';
+  totalPatientsCount = 3;
+  draftsCount = 0;
+  totalUsersCount = 2;
+
+  toggleSidebar(): void {
+    this.isSidebarCollapsed = !this.isSidebarCollapsed;
+    if (!this.isSidebarCollapsed) {
+      this.isPatientMenuOpen = true;
+    }
+  }
+
+  openSettingsFromCollapsed(): void {
+    this.isSidebarCollapsed = false;
+    this.isSettingsMenuOpen = true;
+    this.cdr.detectChanges();
+  }
+
+  openPatientFromCollapsed(): void {
+    this.isSidebarCollapsed = false;
+    this.isPatientMenuOpen = true;
+    this.cdr.detectChanges();
+  }
+
+  openUserFromCollapsed(): void {
+    this.isSidebarCollapsed = false;
+    this.isUserMenuOpen = true;
+    this.cdr.detectChanges();
+  }
+
+  openDoctorFromCollapsed(): void {
+    this.isSidebarCollapsed = false;
+    this.isDoctorMenuOpen = true;
+    this.cdr.detectChanges();
+  }
+
+  togglePatientMenu(): void {
+    this.isPatientMenuOpen = !this.isPatientMenuOpen;
+  }
+
+  toggleDoctorMenu(): void {
+    this.isDoctorMenuOpen = !this.isDoctorMenuOpen;
+  }
+
+  toggleUserMenu(): void {
+    this.isUserMenuOpen = !this.isUserMenuOpen;
+  }
+
+  toggleSettingsMenu(): void {
+    this.isSettingsMenuOpen = !this.isSettingsMenuOpen;
+  }
+
+  goBack(): void {
+    if (window.history.length > 1) {
+      window.history.back();
+    } else {
+      this.router.navigate(['/patients']);
+    }
+  }
+
+  logout(): void {
+    if (confirm('Are you sure you want to sign out?')) {
+      this.router.navigate(['/login']);
+    }
+  }
 
   // ==========================================
   // PATIENT
@@ -46,6 +131,7 @@ export class PatientDetails implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private patientService: PatientService,
+    private accessService: AccessService,
     private cdr: ChangeDetectorRef
   ) {}
 
@@ -58,6 +144,12 @@ export class PatientDetails implements OnInit {
     console.log(
       'PatientDetails component initialized'
     );
+
+    this.canUpdatePatient = this.accessService.canUpdate('PATIENT_LIST');
+    this.accessService.permissions$.subscribe(() => {
+      this.canUpdatePatient = this.accessService.canUpdate('PATIENT_LIST');
+      this.cdr.detectChanges();
+    });
 
     // Get ID from query parameter
     this.route.queryParams.subscribe(params => {
@@ -171,6 +263,11 @@ export class PatientDetails implements OnInit {
   // ==========================================
 
   editPatient(): void {
+
+    if (!this.canUpdatePatient) {
+      alert('Permission Denied: Update permission required to edit patient records.');
+      return;
+    }
 
     if (!this.patient?.id) {
 

@@ -6,7 +6,10 @@ export interface Patient {
   id?: number;
 
   name: string;
+  firstName?: string;
+  lastName?: string;
   mobile: string;
+  mobileNumber?: string;
   email: string;
   dob: string;
   gender: string;

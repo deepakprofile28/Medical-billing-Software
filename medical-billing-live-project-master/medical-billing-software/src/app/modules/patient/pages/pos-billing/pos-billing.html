@@ -1,0 +1,951 @@
+<div class="dashboard-layout-wrapper" [class.sidebar-collapsed]="isSidebarCollapsed">
+
+  <!-- ================= LEFT SIDEBAR MENU (IDENTICAL TO DASHBOARD) ================= -->
+  <aside class="app-sidebar">
+    
+    <!-- Sidebar Brand Header -->
+    <div class="sidebar-brand">
+      <div class="brand-icon-box">
+        <i class="bi bi-hospital-fill"></i>
+      </div>
+      <div class="brand-details" *ngIf="!isSidebarCollapsed">
+        <h2 class="brand-title">PharmaCare</h2>
+        <span class="brand-subtitle">Clinical & Billing Hub</span>
+      </div>
+    </div>
+
+    <!-- Active Store Badge -->
+    <div class="sidebar-store-pill" *ngIf="!isSidebarCollapsed">
+      <i class="bi bi-shop-window text-emerald"></i>
+      <div class="store-text">
+        <span class="store-label">Active Store</span>
+        <strong class="store-name">{{ activeStoreName }} (#{{ activeStoreId }})</strong>
+      </div>
+    </div>
+
+    <!-- Sidebar Navigation Items -->
+    <nav class="sidebar-nav">
+      
+      <!-- 1. DASHBOARD -->
+      <div class="nav-group">
+        <a routerLink="/dashboard" class="menu-item root-item" title="Dashboard">
+          <i class="bi bi-grid-1x2-fill menu-icon"></i>
+          <span class="menu-text" *ngIf="!isSidebarCollapsed">Dashboard</span>
+          <span class="badge-live-pulse" *ngIf="!isSidebarCollapsed">Live</span>
+        </a>
+      </div>
+
+      <!-- 2. POS BILLING COUNTER (ACTIVE) -->
+      <div class="nav-group">
+        <a routerLink="/pos" routerLinkActive="active" class="menu-item root-item" title="POS Billing Counter">
+          <i class="bi bi-receipt-cutoff menu-icon text-warning"></i>
+          <span class="menu-text" *ngIf="!isSidebarCollapsed">POS Billing Counter</span>
+        </a>
+      </div>
+
+      <!-- SALES MENU -->
+      <div class="nav-group">
+        <div class="menu-header" (click)="isSalesMenuOpen = !isSalesMenuOpen" [class.expanded]="isSalesMenuOpen" *ngIf="!isSidebarCollapsed">
+          <div class="header-left">
+            <i class="bi bi-cart-check-fill header-icon text-success"></i>
+            <span>Sales Management</span>
+          </div>
+          <i class="bi bi-chevron-down chevron-icon" [class.rotate]="isSalesMenuOpen"></i>
+        </div>
+
+        <a *ngIf="isSidebarCollapsed" (click)="isSidebarCollapsed = false; isSalesMenuOpen = true" class="menu-item root-item" style="cursor: pointer;" title="Sales Management">
+          <i class="bi bi-cart-check-fill menu-icon text-success"></i>
+        </a>
+
+        <div class="sub-menu" *ngIf="isSalesMenuOpen && !isSidebarCollapsed">
+          <a routerLink="/sales-transactions" class="sub-menu-item">
+            <i class="bi bi-credit-card-2-front-fill sub-icon text-primary"></i>
+            <span>Transaction</span>
+          </a>
+          <a routerLink="/sales-orders" class="sub-menu-item">
+            <i class="bi bi-box-seam-fill sub-icon text-info"></i>
+            <span>Order</span>
+          </a>
+          <a routerLink="/sales-suspended" class="sub-menu-item">
+            <i class="bi bi-pause-circle-fill sub-icon text-warning"></i>
+            <span>Order Suspended</span>
+          </a>
+          <a routerLink="/sales-completed" class="sub-menu-item">
+            <i class="bi bi-check-circle-fill sub-icon text-success"></i>
+            <span>Completed</span>
+          </a>
+          <a routerLink="/sales-exchange" class="sub-menu-item">
+            <i class="bi bi-arrow-repeat sub-icon text-purple"></i>
+            <span>Exchange</span>
+          </a>
+          <a routerLink="/sales-returns" class="sub-menu-item">
+            <i class="bi bi-arrow-counterclockwise sub-icon text-danger"></i>
+            <span>Return and Refund</span>
+          </a>
+        </div>
+      </div>
+
+      
+      <!-- PURCHASE MENU -->
+      <div class="nav-group">
+        <div class="menu-header" (click)="isPurchaseMenuOpen = !isPurchaseMenuOpen" [class.expanded]="isPurchaseMenuOpen" *ngIf="!isSidebarCollapsed">
+          <div class="header-left">
+            <i class="bi bi-bag-check-fill header-icon" style="color: #f59e0b;"></i>
+            <span>Purchase Management</span>
+          </div>
+          <i class="bi bi-chevron-down chevron-icon" [class.rotate]="isPurchaseMenuOpen"></i>
+        </div>
+
+        <a *ngIf="isSidebarCollapsed" (click)="isSidebarCollapsed = false; isPurchaseMenuOpen = true" class="menu-item root-item" style="cursor: pointer;" title="Purchase Management">
+          <i class="bi bi-bag-check-fill menu-icon" style="color: #f59e0b;"></i>
+        </a>
+
+        <div class="sub-menu" *ngIf="isPurchaseMenuOpen && !isSidebarCollapsed">
+          <a routerLink="/purchase" class="sub-menu-item">
+            <i class="bi bi-cart-plus-fill sub-icon text-info"></i>
+            <span>Purchase</span>
+          </a>
+          <a routerLink="/purchase-returns" class="sub-menu-item">
+            <i class="bi bi-arrow-return-left sub-icon text-danger"></i>
+            <span>Purchase Return</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- 3. TABLETS & MEDICINES -->
+      <div class="nav-group">
+        <a routerLink="/tablets" class="menu-item root-item" title="Tablets & Medicines">
+          <i class="bi bi-capsule-pill menu-icon text-emerald"></i>
+          <span class="menu-text" *ngIf="!isSidebarCollapsed">Tablets & Medicines</span>
+        </a>
+      </div>
+
+      <!-- 4. AI CLINICAL ASSISTANT -->
+      <div class="nav-group">
+        <a routerLink="/ai-assistant" class="menu-item root-item" title="AI Medical Assistant">
+          <i class="bi bi-robot menu-icon" style="color: #a855f7;"></i>
+          <span class="menu-text" *ngIf="!isSidebarCollapsed">AI Clinical Assistant</span>
+          <span class="badge-pos-pulse" style="background: #7c3aed;" *ngIf="!isSidebarCollapsed">AI DB</span>
+        </a>
+      </div>
+
+      <!-- 5. PATIENT MANAGEMENT -->
+      <div class="nav-group">
+        <div class="menu-header" (click)="togglePatientMenu()" [class.expanded]="isPatientMenuOpen" *ngIf="!isSidebarCollapsed">
+          <div class="header-left">
+            <i class="bi bi-person-vcard-fill header-icon"></i>
+            <span>Patient Management</span>
+          </div>
+          <i class="bi bi-chevron-down chevron-icon" [class.rotate]="isPatientMenuOpen"></i>
+        </div>
+
+        <a *ngIf="isSidebarCollapsed" (click)="openPatientFromCollapsed()" class="menu-item root-item" style="cursor: pointer;" title="Patient Management">
+          <i class="bi bi-person-vcard-fill menu-icon"></i>
+        </a>
+
+        <div class="sub-menu" *ngIf="isPatientMenuOpen && !isSidebarCollapsed">
+          <a routerLink="/patients" class="sub-menu-item">
+            <i class="bi bi-people-fill sub-icon"></i>
+            <span>Patient List</span>
+            <span class="count-badge">{{ totalPatientsCount }}</span>
+          </a>
+          <a routerLink="/patient-registration" class="sub-menu-item">
+            <i class="bi bi-person-plus-fill sub-icon text-success"></i>
+            <span>Add Patient</span>
+          </a>
+          <a routerLink="/patients" class="sub-menu-item">
+            <i class="bi bi-file-earmark-text-fill sub-icon text-warning"></i>
+            <span>Patient Draft</span>
+          </a>
+          <a routerLink="/dashboard" class="sub-menu-item">
+            <i class="bi bi-graph-up-arrow sub-icon text-primary"></i>
+            <span>Patient Analysis</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- 5.1 DOCTOR MANAGEMENT -->
+      <div class="nav-group">
+        <div class="menu-header" (click)="toggleDoctorMenu()" [class.expanded]="isDoctorMenuOpen" *ngIf="!isSidebarCollapsed">
+          <div class="header-left">
+            <i class="bi bi-person-badge-fill header-icon text-cyan"></i>
+            <span>Doctor Management</span>
+          </div>
+          <i class="bi bi-chevron-down chevron-icon" [class.rotate]="isDoctorMenuOpen"></i>
+        </div>
+
+        <!-- Collapsed icon fallback -->
+        <a *ngIf="isSidebarCollapsed" (click)="openDoctorFromCollapsed()" class="menu-item root-item" style="cursor: pointer;" title="Doctor Management">
+          <i class="bi bi-person-badge-fill menu-icon" style="color: #06b6d4;"></i>
+        </a>
+
+        <div class="sub-menu" *ngIf="isDoctorMenuOpen && !isSidebarCollapsed">
+          <!-- Doctor List -->
+          <a routerLink="/doctors" class="sub-menu-item">
+            <i class="bi bi-person-lines-fill sub-icon text-cyan"></i>
+            <span>Doctor List</span>
+          </a>
+
+          <!-- Add Doctor -->
+          <a routerLink="/add-doctor" class="sub-menu-item">
+            <i class="bi bi-person-plus-fill sub-icon text-success"></i>
+            <span>Add Doctor</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- 6. USER MANAGEMENT -->
+      <div class="nav-group">
+        <div class="menu-header" (click)="toggleUserMenu()" [class.expanded]="isUserMenuOpen" *ngIf="!isSidebarCollapsed">
+          <div class="header-left">
+            <i class="bi bi-person-gear header-icon"></i>
+            <span>User Management</span>
+          </div>
+          <i class="bi bi-chevron-down chevron-icon" [class.rotate]="isUserMenuOpen"></i>
+        </div>
+
+        <a *ngIf="isSidebarCollapsed" (click)="openUserFromCollapsed()" class="menu-item root-item" style="cursor: pointer;" title="User Management">
+          <i class="bi bi-person-gear menu-icon"></i>
+        </a>
+
+        <div class="sub-menu" *ngIf="isUserMenuOpen && !isSidebarCollapsed">
+          <a routerLink="/users" class="sub-menu-item">
+            <i class="bi bi-people sub-icon"></i>
+            <span>User List</span>
+            <span class="count-badge">{{ totalUsersCount }}</span>
+          </a>
+          <a routerLink="/access" class="sub-menu-item">
+            <i class="bi bi-key-fill sub-icon text-info"></i>
+            <span>Access</span>
+            <span class="count-badge" style="background: #0284c7;">DB</span>
+          </a>
+          <a routerLink="/roles" class="sub-menu-item">
+            <i class="bi bi-shield-check sub-icon text-emerald"></i>
+            <span>Role</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- 7. SETTINGS & STORE MENU -->
+      <div class="nav-group">
+        <div class="menu-header" (click)="toggleSettingsMenu()" [class.expanded]="isSettingsMenuOpen" *ngIf="!isSidebarCollapsed">
+          <div class="header-left">
+            <i class="bi bi-gear-fill header-icon text-secondary"></i>
+            <span>Settings</span>
+          </div>
+          <i class="bi bi-chevron-down chevron-icon" [class.rotate]="isSettingsMenuOpen"></i>
+        </div>
+
+        <a *ngIf="isSidebarCollapsed" (click)="openSettingsFromCollapsed()" class="menu-item root-item" style="cursor: pointer;" title="Settings: Store Config, Category, Tax">
+          <i class="bi bi-gear-fill menu-icon"></i>
+        </a>
+
+        <div class="sub-menu" *ngIf="isSettingsMenuOpen && !isSidebarCollapsed">
+          <a routerLink="/settings" class="sub-menu-item">
+            <i class="bi bi-shop-window sub-icon text-emerald"></i>
+            <span>Store Configuration</span>
+          </a>
+          <a routerLink="/category" class="sub-menu-item">
+            <i class="bi bi-tags-fill sub-icon text-primary"></i>
+            <span>Category</span>
+            <span class="count-badge" style="background: #2563eb;">DB</span>
+          </a>
+          <a routerLink="/tax" class="sub-menu-item">
+            <i class="bi bi-percent sub-icon text-warning"></i>
+            <span>Tax</span>
+            <span class="count-badge" style="background: #059669;">DB</span>
+          </a>
+          <a routerLink="/warehouse" class="sub-menu-item">
+            <i class="bi bi-building-gear sub-icon text-info"></i>
+            <span>Warehouse</span>
+            <span class="count-badge" style="background: #0284c7;">DB</span>
+          </a>
+          <a routerLink="/brand" class="sub-menu-item">
+            <i class="bi bi-award-fill sub-icon text-purple"></i>
+            <span>Brand</span>
+            <span class="count-badge" style="background: #9333ea;">DB</span>
+          </a>
+          <a routerLink="/branch" class="sub-menu-item">
+            <i class="bi bi-diagram-3-fill sub-icon text-teal"></i>
+            <span>Branch</span>
+            <span class="count-badge" style="background: #0d9488;">DB</span>
+          </a>
+        </div>
+      </div>
+
+    </nav>
+
+    <!-- Sidebar Footer -->
+    <div class="sidebar-footer">
+      <div class="user-brief" *ngIf="!isSidebarCollapsed">
+        <div class="user-avatar-sm">
+          {{ (cashierName || 'A').charAt(0).toUpperCase() }}
+        </div>
+        <div class="user-details-sm">
+          <span class="u-name">{{ cashierName }}</span>
+          <span class="u-role">{{ cashierRole }}</span>
+        </div>
+      </div>
+
+      <button type="button" class="sidebar-logout-btn" (click)="logout()" title="Sign Out">
+        <i class="bi bi-box-arrow-right"></i>
+        <span *ngIf="!isSidebarCollapsed">Logout</span>
+      </button>
+    </div>
+
+  </aside>
+
+  <!-- ================= RIGHT MAIN CONTENT AREA ================= -->
+  <main class="app-main-content pos-workspace-container">
+
+    <!-- Top Navigation Card (EXACT MATCH TO DASHBOARD) -->
+    <header class="top-nav-card">
+      <div class="top-nav-left">
+        <button type="button" class="btn-sidebar-toggle" (click)="toggleSidebar()" title="Toggle Navigation Menu">
+          <i class="bi bi-list"></i>
+        </button>
+        <div class="page-title-wrap">
+          <h2>Point of Sale (POS Terminal)</h2>
+          <div class="breadcrumb-sub">
+            <span>Billing Counter #1</span> / <strong>Live Pharmacy Checkout Terminal</strong>
+          </div>
+        </div>
+      </div>
+
+      <!-- Top Actions -->
+      <div class="top-nav-right">
+        <div class="live-clock-pill">
+          <i class="bi bi-clock-fill text-primary"></i>
+          <span>{{ currentDateTime }}</span>
+        </div>
+
+        <button 
+          type="button" 
+          class="btn-sync-db" 
+          (click)="loadCatalog()" 
+          title="Sync live medicines from MySQL">
+          <i class="bi bi-arrow-clockwise"></i>
+          <span>Sync DB</span>
+        </button>
+
+        <button type="button" class="btn-new-sale-pill" (click)="startNewSale()" title="Start New Bill">
+          <i class="bi bi-arrow-repeat me-1"></i>
+          <span>New Sale</span>
+        </button>
+
+        <button type="button" class="btn-custom-drug-pill" (click)="openAddMedModal()" title="Add Custom Medicine">
+          <i class="bi bi-plus-circle-fill me-1"></i>
+          <span>+ Custom Drug</span>
+        </button>
+
+        <div class="top-user-pill">
+          <div class="avatar-circle">
+            {{ (cashierName || 'A').charAt(0).toUpperCase() }}
+          </div>
+          <div class="user-info-text">
+            <strong>{{ cashierName }}</strong>
+            <span class="badge-role">{{ cashierRole }}</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Toast Notification Banner -->
+    <div *ngIf="toastMessage" class="toast-floating">
+      <i class="bi bi-check-circle-fill me-2"></i>
+      <span>{{ toastMessage }}</span>
+    </div>
+
+    <!-- ================= 2-COLUMN MODERN POS INTERFACE ================= -->
+    <div class="pos-dual-grid">
+
+      <!-- ================= LEFT COLUMN: MEDICINE CATALOG & SEARCH ================= -->
+      <section class="pos-catalog-panel">
+        
+        <!-- Search & Filter Card -->
+        <div class="catalog-search-card">
+          <div class="catalog-search-input-wrap">
+            <i class="bi bi-search search-icon"></i>
+            <input 
+              type="text" 
+              class="pos-search-input" 
+              placeholder="Search medicine name, generic formula, batch, or manufacturer..." 
+              [(ngModel)]="searchQuery" 
+              (input)="onSearchChange()" />
+            <span class="search-count-pill" *ngIf="filteredMedicines.length > 0">
+              {{ filteredMedicines.length }} items
+            </span>
+          </div>
+
+          <!-- Category Pills -->
+          <div class="category-pills-scroll">
+            <button 
+              type="button" 
+              *ngFor="let cat of categories" 
+              class="cat-chip" 
+              [class.active]="selectedCategory === cat" 
+              (click)="filterByCategory(cat)">
+              {{ cat }}
+            </button>
+          </div>
+        </div>
+
+        <!-- Drug Cards Grid -->
+        <div class="drug-catalog-grid" *ngIf="filteredMedicines.length > 0">
+          <div 
+            class="drug-card" 
+            *ngFor="let med of filteredMedicines" 
+            (click)="addToCart(med)">
+            
+            <div class="drug-card-top">
+              <span class="drug-cat-tag">{{ med.category || 'General' }}</span>
+              <span class="drug-stock-pill" [class.low-stock]="(med.stockQty || 0) < 50">
+                <i class="bi bi-box-seam me-1"></i>{{ med.stockQty || 0 }} in stock
+              </span>
+            </div>
+
+            <div class="drug-card-body">
+              <h4 class="drug-name" title="{{ med.name }}">{{ med.name }}</h4>
+              <p class="drug-generic" *ngIf="med.genericName">{{ med.genericName }}</p>
+              
+              <div class="drug-meta-chips">
+                <span class="meta-chip"><i class="bi bi-qr-code me-1"></i>{{ med.batchNo || 'N/A' }}</span>
+                <span class="meta-chip"><i class="bi bi-calendar-event me-1"></i>{{ med.expiryDate || 'N/A' }}</span>
+              </div>
+            </div>
+
+            <div class="drug-card-bottom">
+              <div class="drug-price-wrap">
+                <strong class="drug-selling-price">₹{{ (med.unitPrice || 0).toFixed(2) }}</strong>
+                <span class="drug-mrp-price" *ngIf="med.mrp">MRP ₹{{ (med.mrp || 0).toFixed(2) }}</span>
+              </div>
+
+              <button type="button" class="btn-add-drug" (click)="addToCart(med); $event.stopPropagation()">
+                <i class="bi bi-plus-lg"></i>
+                <span>Add</span>
+              </button>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Empty Catalog State -->
+        <div class="empty-catalog-card" *ngIf="filteredMedicines.length === 0">
+          <div class="empty-icon-box">
+            <i class="bi bi-capsule"></i>
+          </div>
+          <h4>No Medicines Found</h4>
+          <p *ngIf="searchQuery">No medicines match your search for "<strong>{{ searchQuery }}</strong>".</p>
+          <p *ngIf="!searchQuery">Your catalog is currently empty. Add your medicines to start billing customers.</p>
+
+          <div class="empty-action-btns">
+            <button type="button" class="btn-empty-add" (click)="openAddMedModal()">
+              <i class="bi bi-plus-circle-fill me-1"></i> + Add Custom Drug
+            </button>
+            <a routerLink="/tablets" class="btn-empty-manage">
+              <i class="bi bi-database me-1"></i> Open Tablets Page
+            </a>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ================= RIGHT COLUMN: ACTIVE CHECKOUT SLIP ================= -->
+      <section class="pos-checkout-panel">
+
+        
+        <!-- Warehouse Selector -->
+        <div class="patient-selector-card mb-2" style="padding-bottom: 15px;">
+          <label class="form-label font-weight-bold mb-2"><i class="bi bi-building-gear me-1"></i> Select Warehouse</label>
+          <select class="form-select" [(ngModel)]="selectedWarehouseId" (change)="onWarehouseChange()">
+            <option value="">-- Choose Warehouse --</option>
+            <option *ngFor="let w of warehouses" [value]="w.id">{{ w.name }}</option>
+          </select>
+        </div>
+
+        <!-- 1. Customer & Doctor Selector -->
+        <div class="patient-selector-card">
+          <div class="patient-type-tabs">
+            <button 
+              type="button" 
+              class="p-tab-btn" 
+              [class.active]="isWalkInCustomer" 
+              (click)="togglePatientType(true)">
+              <i class="bi bi-person me-1"></i> Walk-in Customer
+            </button>
+            <button 
+              type="button" 
+              class="p-tab-btn" 
+              [class.active]="!isWalkInCustomer" 
+              (click)="togglePatientType(false)">
+              <i class="bi bi-person-check-fill me-1"></i> Registered Patient
+            </button>
+          </div>
+
+          <div class="patient-fields-row">
+            <!-- Walk-in mode -->
+            <div class="patient-input-wrap" *ngIf="isWalkInCustomer">
+              <label>Customer Name / Phone</label>
+              <div class="input-icon-box">
+                <i class="bi bi-person"></i>
+                <input 
+                  type="text" 
+                  class="p-input" 
+                  [(ngModel)]="customerName" 
+                  placeholder="Walk-in Customer" />
+              </div>
+            </div>
+
+            <!-- Registered Patient Mode -->
+            <div class="patient-input-wrap" *ngIf="!isWalkInCustomer">
+              <div class="label-with-link">
+                <label>Select Patient</label>
+                <a routerLink="/patient-registration" class="new-patient-link">+ New</a>
+              </div>
+              <div class="input-icon-box">
+                <i class="bi bi-people-fill"></i>
+                <select 
+                  class="p-select" 
+                  [(ngModel)]="selectedPatient" 
+                  (change)="onPatientSelectChange()">
+                  <option *ngFor="let p of patientsList" [ngValue]="p">
+                    {{ p.name || ((p.firstName || '') + ' ' + (p.lastName || '')).trim() || 'Patient' }} ({{ p.mobile || p.mobileNumber || 'No Mobile' }})
+                  </option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Doctor / Prescribed By (Connected to MySQL Doctors Table) -->
+            <div class="patient-input-wrap">
+              <div class="label-with-link">
+                <label>Prescribed By (Doctor)</label>
+                <a routerLink="/add-doctor" class="new-patient-link">+ New Doctor</a>
+              </div>
+              <div class="input-icon-box">
+                <i class="bi bi-heart-pulse-fill text-danger"></i>
+                <select 
+                  class="p-select" 
+                  [(ngModel)]="doctorName">
+                  <option value="Dr. Self / General">Dr. Self / General (OTC)</option>
+                  <option *ngFor="let doc of doctorsList" [value]="doc.name">
+                    {{ doc.name }} ({{ doc.specialization }})
+                  </option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. Active Cart Items Table -->
+        <div class="cart-items-card">
+          <div class="cart-card-header">
+            <div class="cart-header-title">
+              <i class="bi bi-cart3 text-primary me-2"></i>
+              <strong>Active Sale Items</strong>
+              <span class="cart-badge-count">{{ cart.length }}</span>
+            </div>
+
+            <button 
+              type="button" 
+              class="btn-clear-cart" 
+              (click)="clearCart()" 
+              *ngIf="cart.length > 0" 
+              title="Clear all cart items">
+              <i class="bi bi-trash3 me-1"></i> Clear
+            </button>
+          </div>
+
+          <!-- Empty Cart State -->
+          <div class="cart-empty-state" *ngIf="cart.length === 0">
+            <i class="bi bi-cart-x empty-cart-icon"></i>
+            <h5>Cart is Empty</h5>
+            <p>Click on any medicine card on the left to add items to this bill.</p>
+          </div>
+
+          <!-- Cart Items Scrollable List -->
+          <div class="cart-items-table-wrap" *ngIf="cart.length > 0">
+            <table class="cart-table">
+              <thead>
+                <tr>
+                  <th>Item Details</th>
+                  <th class="text-end">Rate</th>
+                  <th class="text-center">Qty</th>
+                  <th class="text-end">Total</th>
+                  <th class="text-center"></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let item of cart">
+                  <td>
+                    <strong class="item-title">{{ item.medicine.name }}</strong>
+                    <div class="item-meta-sub">
+                      <span>Batch: {{ item.medicine.batchNo }}</span> • 
+                      <span>GST {{ item.gstRate }}%</span>
+                    </div>
+                  </td>
+                  <td class="text-end font-semibold">₹{{ item.unitPrice.toFixed(2) }}</td>
+                  <td class="text-center">
+                    <div class="qty-stepper">
+                      <button type="button" class="btn-qty" (click)="decreaseQty(item)">−</button>
+                      <input 
+                        type="number" 
+                        class="qty-input" 
+                        [(ngModel)]="item.quantity" 
+                        (change)="onQtyInputChange(item)" 
+                        min="1" />
+                      <button type="button" class="btn-qty" (click)="increaseQty(item)">+</button>
+                    </div>
+                  </td>
+                  <td class="text-end item-total-price">₹{{ item.totalAmount.toFixed(2) }}</td>
+                  <td class="text-center">
+                    <button type="button" class="btn-remove-row" (click)="removeFromCart(item)" title="Remove item">
+                      <i class="bi bi-x-lg"></i>
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- 3. Billing Totals & Discount -->
+        <div class="checkout-summary-card">
+          <div class="summary-line">
+            <span class="text-muted">Gross Subtotal:</span>
+            <strong>₹{{ subtotal.toFixed(2) }}</strong>
+          </div>
+
+          <div class="summary-line discount-line">
+            <div class="discount-label">
+              <span class="text-muted">Extra Discount (%):</span>
+              <input 
+                type="number" 
+                class="discount-input" 
+                [(ngModel)]="overallDiscountPercent" 
+                (input)="onDiscountChange()" 
+                min="0" 
+                max="100" />
+            </div>
+            <strong class="text-danger">- ₹{{ discountTotal.toFixed(2) }}</strong>
+          </div>
+
+          <div class="summary-line">
+            <span class="text-muted">Taxable Value:</span>
+            <span>₹{{ taxableAmount.toFixed(2) }}</span>
+          </div>
+
+          <div class="summary-line">
+            <span class="text-muted">Taxes (CGST + SGST):</span>
+            <span>₹{{ (cgstTotal + sgstTotal).toFixed(2) }}</span>
+          </div>
+
+          <!-- GRAND TOTAL BANNER (MODERN GRADIENT) -->
+          <div class="grand-total-banner">
+            <div class="gt-left">
+              <span class="gt-label">NET PAYABLE AMOUNT</span>
+              <small class="gt-items">{{ cart.length }} items in bill</small>
+            </div>
+            <div class="gt-amount">
+              ₹{{ grandTotal.toFixed(2) }}
+            </div>
+          </div>
+
+          <!-- 4. Payment Method Selection -->
+          <div class="payment-methods-box">
+            <label class="pay-section-label">Payment Method</label>
+            <div class="payment-options-grid">
+              <button 
+                type="button" 
+                class="pay-btn" 
+                [class.selected]="paymentMethod === 'Cash'" 
+                (click)="setPaymentMethod('Cash')">
+                <i class="bi bi-cash-stack"></i>
+                <span>Cash</span>
+              </button>
+
+              <button 
+                type="button" 
+                class="pay-btn" 
+                [class.selected]="paymentMethod === 'UPI'" 
+                (click)="setPaymentMethod('UPI')">
+                <i class="bi bi-qr-code-scan"></i>
+                <span>UPI / QR</span>
+              </button>
+
+              <button 
+                type="button" 
+                class="pay-btn" 
+                [class.selected]="paymentMethod === 'Card'" 
+                (click)="setPaymentMethod('Card')">
+                <i class="bi bi-credit-card-2-front"></i>
+                <span>Card</span>
+              </button>
+
+              <button 
+                type="button" 
+                class="pay-btn" 
+                [class.selected]="paymentMethod === 'Credit'" 
+                (click)="setPaymentMethod('Credit')">
+                <i class="bi bi-journal-bookmark"></i>
+                <span>Credit</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- 5. Tendered & Change Return -->
+          <div class="cash-tender-row" *ngIf="paymentMethod === 'Cash'">
+            <div class="tender-field">
+              <label>Amount Received (₹)</label>
+              <input 
+                type="number" 
+                class="tender-input" 
+                [(ngModel)]="amountReceived" 
+                (input)="onAmountReceivedChange()" 
+                min="0" />
+            </div>
+
+            <div class="change-field">
+              <label>Change to Return</label>
+              <div class="change-amount-pill">
+                ₹{{ changeDue.toFixed(2) }}
+              </div>
+            </div>
+          </div>
+
+          <!-- 6. Complete Sale & Print Action -->
+          <button 
+            type="button" 
+            class="btn-complete-sale" 
+            (click)="completeSale()" 
+            [disabled]="cart.length === 0">
+            <i class="bi bi-printer-fill me-2"></i>
+            <span>COMPLETE SALE & PRINT BILL (₹{{ grandTotal.toFixed(2) }})</span>
+          </button>
+
+        </div>
+
+      </section>
+
+    </div>
+
+  </main>
+
+  <!-- ================= PRINTABLE INVOICE RECEIPT MODAL ================= -->
+  <div class="invoice-modal-backdrop" *ngIf="showInvoiceModal">
+    <div class="invoice-modal-dialog" [ngClass]="'print-' + printReceiptType">
+      
+      <!-- Top Action Bar -->
+      <div class="modal-top-actions no-print">
+        <div class="receipt-type-pills">
+          <button 
+            type="button" 
+            class="pill-type" 
+            [class.active]="printReceiptType === 'thermal'" 
+            (click)="printReceiptType = 'thermal'">
+            <i class="bi bi-receipt me-1"></i> 80mm Thermal Slip
+          </button>
+          <button 
+            type="button" 
+            class="pill-type" 
+            [class.active]="printReceiptType === 'a4'" 
+            (click)="printReceiptType = 'a4'">
+            <i class="bi bi-file-earmark-text me-1"></i> A4 Standard Paper
+          </button>
+        </div>
+
+        <div class="modal-buttons">
+          <button type="button" class="btn-print-now" (click)="printInvoice()">
+            <i class="bi bi-printer-fill me-1"></i> Print Invoice
+          </button>
+          <button type="button" class="btn-close-modal" (click)="closeInvoiceModal()">
+            <i class="bi bi-x-lg"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Printable Invoice Sheet Container -->
+      <div class="invoice-sheet-container" *ngIf="currentInvoice as inv">
+        <div class="invoice-printable-content" id="printable-invoice">
+          
+          <!-- Store Header -->
+          <div class="inv-header">
+            <h2 class="inv-store-name">{{ inv.storeName }}</h2>
+            <div class="inv-address">{{ inv.storeAddress }}</div>
+            <div class="inv-licenses">
+              <span *ngIf="inv.storeGstin">GSTIN: {{ inv.storeGstin }}</span>
+              <span *ngIf="inv.storeDlNo"> | D.L. No: {{ inv.storeDlNo }}</span>
+            </div>
+            <div class="inv-sub-line">TAX INVOICE / CASH BILL</div>
+          </div>
+
+          <div class="inv-divider-dash"></div>
+
+          <!-- Metadata -->
+          <div class="inv-meta-grid">
+            <div>
+              <div><strong>Invoice:</strong> {{ inv.invoiceNumber }}</div>
+              <div><strong>Date:</strong> {{ inv.invoiceDate | date:'dd-MM-yyyy hh:mm a' }}</div>
+              <div><strong>Cashier:</strong> {{ inv.cashierName }}</div>
+            </div>
+            <div class="text-end">
+              <div><strong>Patient:</strong> {{ inv.customerName }}</div>
+              <div *ngIf="inv.customerMobile"><strong>Mobile:</strong> {{ inv.customerMobile }}</div>
+              <div *ngIf="inv.doctorName"><strong>Doctor:</strong> {{ inv.doctorName }}</div>
+            </div>
+          </div>
+
+          <div class="inv-divider-dash"></div>
+
+          <!-- Items Table -->
+          <table class="inv-items-table">
+            <thead>
+              <tr>
+                <th>Item</th>
+                <th>Batch</th>
+                <th class="text-center">Qty</th>
+                <th class="text-end">Rate</th>
+                <th class="text-end">Total</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let it of inv.items">
+                <td>
+                  <div>{{ it.medicine.name }}</div>
+                  <div class="inv-sub-detail">{{ it.medicine.genericName }}</div>
+                </td>
+                <td>{{ it.medicine.batchNo }}</td>
+                <td class="text-center">{{ it.quantity }}</td>
+                <td class="text-end">₹{{ it.unitPrice.toFixed(2) }}</td>
+                <td class="text-end font-bold">₹{{ it.totalAmount.toFixed(2) }}</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="inv-divider-dash"></div>
+
+          <!-- Financial Breakdown -->
+          <div class="inv-totals-box">
+            <div class="inv-total-row">
+              <span>Gross Subtotal:</span>
+              <span>₹{{ (inv.subtotal || 0).toFixed(2) }}</span>
+            </div>
+
+            <div class="inv-total-row" *ngIf="(inv.discountTotal || 0) > 0">
+              <span>Discount Total:</span>
+              <span>- ₹{{ (inv.discountTotal || 0).toFixed(2) }}</span>
+            </div>
+
+            <div class="inv-total-row">
+              <span>Taxable Value:</span>
+              <span>₹{{ (inv.taxableAmount || 0).toFixed(2) }}</span>
+            </div>
+
+            <div class="inv-total-row">
+              <span>Total GST:</span>
+              <span>₹{{ ((inv.cgstTotal || 0) + (inv.sgstTotal || 0)).toFixed(2) }}</span>
+            </div>
+
+            <div class="inv-total-row grand-row">
+              <span>GRAND TOTAL:</span>
+              <span>₹{{ (inv.grandTotal || 0).toFixed(2) }}</span>
+            </div>
+
+            <div class="inv-total-row mt-1">
+              <span>Paid by: {{ inv.paymentMethod }}</span>
+              <span>Cash Received: ₹{{ (inv.amountReceived || 0).toFixed(2) }}</span>
+            </div>
+            <div class="inv-total-row" *ngIf="(inv.changeDue || 0) > 0">
+              <span>Change Returned:</span>
+              <span>₹{{ (inv.changeDue || 0).toFixed(2) }}</span>
+            </div>
+          </div>
+
+          <div class="inv-divider-dash"></div>
+
+          <!-- Footer Policy -->
+          <div class="inv-footer">
+            <div class="inv-greeting">*** WISHING YOU A SPEEDY RECOVERY! ***</div>
+            <div>Medicines once sold cannot be returned without original cash receipt.</div>
+            <div class="inv-brand-tag">Powered by PharmaCare POS Terminal</div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ================= ADD CUSTOM MEDICINE MODAL ================= -->
+  <div class="invoice-modal-backdrop" *ngIf="showAddMedModal">
+    <div class="add-med-dialog">
+      <div class="modal-header">
+        <h3><i class="bi bi-plus-circle-fill text-success me-2"></i>Add Custom Medicine to POS</h3>
+        <button type="button" class="btn-close-modal" (click)="closeAddMedModal()">
+          <i class="bi bi-x-lg"></i>
+        </button>
+      </div>
+
+      <form (ngSubmit)="saveCustomMedicine()">
+        <div class="form-grid-2">
+          <div class="form-group" style="grid-column: span 2;">
+            <label>Medicine Name <span class="text-danger">*</span></label>
+            <input type="text" class="form-input" [(ngModel)]="newMed.name" name="name" required placeholder="e.g. Paracip 500 Tablet" />
+          </div>
+
+          <div class="form-group">
+            <label>Generic Composition</label>
+            <input type="text" class="form-input" [(ngModel)]="newMed.genericName" name="genericName" placeholder="e.g. Paracetamol 500mg" />
+          </div>
+
+          <div class="form-group">
+            <label>Category</label>
+            <select class="form-select" [(ngModel)]="newMed.category" name="category">
+              <option *ngFor="let cat of categories | slice:1" [value]="cat">{{ cat }}</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Batch No</label>
+            <input type="text" class="form-input" [(ngModel)]="newMed.batchNo" name="batchNo" />
+          </div>
+
+          <div class="form-group">
+            <label>Expiry Date</label>
+            <input type="text" class="form-input" [(ngModel)]="newMed.expiryDate" name="expiryDate" placeholder="YYYY-MM" />
+          </div>
+
+          <div class="form-group">
+            <label>Selling Price (₹) <span class="text-danger">*</span></label>
+            <input type="number" class="form-input" [(ngModel)]="newMed.unitPrice" name="unitPrice" required min="0.1" step="0.01" />
+          </div>
+
+          <div class="form-group">
+            <label>MRP (₹)</label>
+            <input type="number" class="form-input" [(ngModel)]="newMed.mrp" name="mrp" min="0.1" step="0.01" />
+          </div>
+
+          <div class="form-group">
+            <label>GST Rate (%)</label>
+            <select class="form-select" [(ngModel)]="newMed.gstRate" name="gstRate">
+              <option [ngValue]="0">0% (Nil)</option>
+              <option [ngValue]="5">5%</option>
+              <option [ngValue]="12">12%</option>
+              <option [ngValue]="18">18%</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Stock Qty</label>
+            <input type="number" class="form-input" [(ngModel)]="newMed.stockQty" name="stockQty" min="1" />
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn-cancel" (click)="closeAddMedModal()">Cancel</button>
+          <button type="submit" class="btn-save-med" [disabled]="!newMed.name || newMed.unitPrice <= 0">Save & Add to Bill</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+</div>

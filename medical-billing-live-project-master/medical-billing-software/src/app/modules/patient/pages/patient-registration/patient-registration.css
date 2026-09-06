@@ -18,9 +18,6 @@
   --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
   
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  background-color: var(--bg-main);
-  min-height: 100vh;
-  padding: 2rem;
   color: var(--text-main);
   box-sizing: border-box;
 }
@@ -665,4 +662,89 @@
   .btn-primary, .btn-secondary {
     width: 100%;
   }
+}
+
+/* ==========================================================================
+   PERMISSION GUARDS & READ-ONLY MODE STYLES
+   ========================================================================== */
+
+.permission-alert-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+  border: 1.5px solid #f59e0b;
+  border-left: 5px solid #d97706;
+  border-radius: 12px;
+  padding: 14px 20px;
+  margin-bottom: 22px;
+  box-shadow: 0 4px 14px rgba(217, 119, 6, 0.12);
+  animation: fadeInBanner 0.3s ease;
+}
+
+@keyframes fadeInBanner {
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.permission-alert-banner .banner-content {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.permission-alert-banner .alert-icon {
+  font-size: 26px;
+  color: #d97706;
+  flex-shrink: 0;
+}
+
+.permission-alert-banner .alert-texts {
+  display: flex;
+  flex-direction: column;
+}
+
+.permission-alert-banner .alert-texts strong {
+  font-size: 14px;
+  font-weight: 700;
+  color: #92400e;
+}
+
+.permission-alert-banner .alert-texts span {
+  font-size: 12.5px;
+  color: #b45309;
+  margin-top: 2px;
+}
+
+.permission-alert-banner .lock-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #d97706;
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 5px 12px;
+  border-radius: 20px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  flex-shrink: 0;
+}
+
+.view-only-mode input:disabled,
+.view-only-mode select:disabled,
+.view-only-mode textarea:disabled {
+  background-color: #f8fafc !important;
+  color: #64748b !important;
+  border-color: #e2e8f0 !important;
+  cursor: not-allowed !important;
+  user-select: none !important;
+}
+
+.btn-disabled,
+button:disabled {
+  opacity: 0.5 !important;
+  cursor: not-allowed !important;
+  pointer-events: auto !important;
 }

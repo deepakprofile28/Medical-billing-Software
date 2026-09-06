@@ -1,0 +1,839 @@
+<div class="dashboard-layout-wrapper" [class.sidebar-collapsed]="isSidebarCollapsed">
+
+  <!-- ================= LEFT SIDEBAR MENU (IDENTICAL TO DASHBOARD) ================= -->
+  <aside class="app-sidebar">
+    
+    <!-- Sidebar Brand Header -->
+    <div class="sidebar-brand">
+      <div class="brand-icon-box">
+        <i class="bi bi-hospital-fill"></i>
+      </div>
+      <div class="brand-details" *ngIf="!isSidebarCollapsed">
+        <h2 class="brand-title">PharmaCare</h2>
+        <span class="brand-subtitle">Clinical & Billing Hub</span>
+      </div>
+    </div>
+
+    <!-- Active Store Badge -->
+    <div class="sidebar-store-pill" *ngIf="!isSidebarCollapsed">
+      <i class="bi bi-shop-window text-emerald"></i>
+      <div class="store-text">
+        <span class="store-label">Active Store</span>
+        <strong class="store-name">{{ activeStoreName }} (#{{ activeStoreId }})</strong>
+      </div>
+    </div>
+
+    <!-- Sidebar Navigation Items -->
+    <nav class="sidebar-nav">
+      
+      <!-- 1. DASHBOARD -->
+      <div class="nav-group">
+        <a routerLink="/dashboard" class="menu-item root-item">
+          <i class="bi bi-grid-1x2-fill menu-icon"></i>
+          <span class="menu-text" *ngIf="!isSidebarCollapsed">Dashboard</span>
+          <span class="badge-live-pulse" *ngIf="!isSidebarCollapsed">Live</span>
+        </a>
+      </div>
+
+      <!-- 2. POS BILLING COUNTER -->
+      <div class="nav-group">
+        <a routerLink="/pos" class="menu-item root-item">
+          <i class="bi bi-receipt-cutoff menu-icon text-warning"></i>
+          <span class="menu-text" *ngIf="!isSidebarCollapsed">POS Billing Counter</span>
+        </a>
+      </div>
+
+      <!-- SALES MENU -->
+      <div class="nav-group">
+        <div class="menu-header" (click)="isSalesMenuOpen = !isSalesMenuOpen" [class.expanded]="isSalesMenuOpen" *ngIf="!isSidebarCollapsed">
+          <div class="header-left">
+            <i class="bi bi-cart-check-fill header-icon text-success"></i>
+            <span>Sales Management</span>
+          </div>
+          <i class="bi bi-chevron-down chevron-icon" [class.rotate]="isSalesMenuOpen"></i>
+        </div>
+
+        <a *ngIf="isSidebarCollapsed" (click)="isSidebarCollapsed = false; isSalesMenuOpen = true" class="menu-item root-item" style="cursor: pointer;" title="Sales Management">
+          <i class="bi bi-cart-check-fill menu-icon text-success"></i>
+        </a>
+
+        <div class="sub-menu" *ngIf="isSalesMenuOpen && !isSidebarCollapsed">
+          <a routerLink="/sales-transactions" class="sub-menu-item">
+            <i class="bi bi-credit-card-2-front-fill sub-icon text-primary"></i>
+            <span>Transaction</span>
+          </a>
+          <a routerLink="/sales-orders" class="sub-menu-item">
+            <i class="bi bi-box-seam-fill sub-icon text-info"></i>
+            <span>Order</span>
+          </a>
+          <a routerLink="/sales-suspended" class="sub-menu-item">
+            <i class="bi bi-pause-circle-fill sub-icon text-warning"></i>
+            <span>Order Suspended</span>
+          </a>
+          <a routerLink="/sales-completed" class="sub-menu-item">
+            <i class="bi bi-check-circle-fill sub-icon text-success"></i>
+            <span>Completed</span>
+          </a>
+          <a routerLink="/sales-exchange" class="sub-menu-item">
+            <i class="bi bi-arrow-repeat sub-icon text-purple"></i>
+            <span>Exchange</span>
+          </a>
+          <a routerLink="/sales-returns" class="sub-menu-item">
+            <i class="bi bi-arrow-counterclockwise sub-icon text-danger"></i>
+            <span>Return and Refund</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- 3. TABLETS & MEDICINES (ACTIVE) -->
+      <div class="nav-group">
+        
+      <!-- PURCHASE MENU -->
+      <div class="nav-group">
+        <div class="menu-header" (click)="isPurchaseMenuOpen = !isPurchaseMenuOpen" [class.expanded]="isPurchaseMenuOpen" *ngIf="!isSidebarCollapsed">
+          <div class="header-left">
+            <i class="bi bi-bag-check-fill header-icon" style="color: #f59e0b;"></i>
+            <span>Purchase Management</span>
+          </div>
+          <i class="bi bi-chevron-down chevron-icon" [class.rotate]="isPurchaseMenuOpen"></i>
+        </div>
+
+        <a *ngIf="isSidebarCollapsed" (click)="isSidebarCollapsed = false; isPurchaseMenuOpen = true" class="menu-item root-item" style="cursor: pointer;" title="Purchase Management">
+          <i class="bi bi-bag-check-fill menu-icon" style="color: #f59e0b;"></i>
+        </a>
+
+        <div class="sub-menu" *ngIf="isPurchaseMenuOpen && !isSidebarCollapsed">
+          <a routerLink="/purchase" class="sub-menu-item">
+            <i class="bi bi-cart-plus-fill sub-icon text-info"></i>
+            <span>Purchase</span>
+          </a>
+          <a routerLink="/purchase-returns" class="sub-menu-item">
+            <i class="bi bi-arrow-return-left sub-icon text-danger"></i>
+            <span>Purchase Return</span>
+          </a>
+        </div>
+      </div>
+
+      <a routerLink="/tablets" routerLinkActive="active" class="menu-item root-item">
+          <i class="bi bi-capsule-pill menu-icon text-emerald"></i>
+          <span class="menu-text" *ngIf="!isSidebarCollapsed">Tablets & Medicines</span>
+        </a>
+      </div>
+
+      <!-- 4. AI CLINICAL ASSISTANT -->
+      <div class="nav-group">
+        <a routerLink="/ai-assistant" class="menu-item root-item" title="AI Medical Assistant">
+          <i class="bi bi-robot menu-icon" style="color: #a855f7;"></i>
+          <span class="menu-text" *ngIf="!isSidebarCollapsed">AI Clinical Assistant</span>
+          <span class="badge-pos-pulse" style="background: #7c3aed;" *ngIf="!isSidebarCollapsed">AI DB</span>
+        </a>
+      </div>
+
+      <!-- 5. PATIENT MANAGEMENT -->
+      <div class="nav-group">
+        <div class="menu-header" (click)="togglePatientMenu()" [class.expanded]="isPatientMenuOpen" *ngIf="!isSidebarCollapsed">
+          <div class="header-left">
+            <i class="bi bi-person-vcard-fill header-icon"></i>
+            <span>Patient Management</span>
+          </div>
+          <i class="bi bi-chevron-down chevron-icon" [class.rotate]="isPatientMenuOpen"></i>
+        </div>
+
+        <!-- Collapsed icon fallback -->
+        <a *ngIf="isSidebarCollapsed" (click)="openPatientFromCollapsed()" class="menu-item root-item" style="cursor: pointer;" title="Patient Management">
+          <i class="bi bi-person-vcard-fill menu-icon"></i>
+        </a>
+
+        <div class="sub-menu" *ngIf="isPatientMenuOpen && !isSidebarCollapsed">
+          <!-- Patient List -->
+          <a routerLink="/patients" class="sub-menu-item">
+            <i class="bi bi-people-fill sub-icon"></i>
+            <span>Patient List</span>
+            <span class="count-badge">{{ totalPatientsCount }}</span>
+          </a>
+
+          <!-- Add Patient -->
+          <a routerLink="/patient-registration" class="sub-menu-item">
+            <i class="bi bi-person-plus-fill sub-icon text-success"></i>
+            <span>Add Patient</span>
+          </a>
+
+          <!-- Patient Draft -->
+          <a routerLink="/patients" class="sub-menu-item">
+            <i class="bi bi-file-earmark-text-fill sub-icon text-warning"></i>
+            <span>Patient Draft</span>
+            <span class="count-badge badge-warning" *ngIf="draftsCount > 0">{{ draftsCount }}</span>
+          </a>
+
+          <!-- Patient Analysis -->
+          <a routerLink="/dashboard" class="sub-menu-item">
+            <i class="bi bi-graph-up-arrow sub-icon text-primary"></i>
+            <span>Patient Analysis</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- 5.1 DOCTOR MANAGEMENT -->
+      <div class="nav-group">
+        <div class="menu-header" (click)="toggleDoctorMenu()" [class.expanded]="isDoctorMenuOpen" *ngIf="!isSidebarCollapsed">
+          <div class="header-left">
+            <i class="bi bi-person-badge-fill header-icon text-cyan"></i>
+            <span>Doctor Management</span>
+          </div>
+          <i class="bi bi-chevron-down chevron-icon" [class.rotate]="isDoctorMenuOpen"></i>
+        </div>
+
+        <!-- Collapsed icon fallback -->
+        <a *ngIf="isSidebarCollapsed" (click)="openDoctorFromCollapsed()" class="menu-item root-item" style="cursor: pointer;" title="Doctor Management">
+          <i class="bi bi-person-badge-fill menu-icon" style="color: #06b6d4;"></i>
+        </a>
+
+        <div class="sub-menu" *ngIf="isDoctorMenuOpen && !isSidebarCollapsed">
+          <!-- Doctor List -->
+          <a routerLink="/doctors" class="sub-menu-item">
+            <i class="bi bi-person-lines-fill sub-icon text-cyan"></i>
+            <span>Doctor List</span>
+          </a>
+
+          <!-- Add Doctor -->
+          <a routerLink="/add-doctor" class="sub-menu-item">
+            <i class="bi bi-person-plus-fill sub-icon text-success"></i>
+            <span>Add Doctor</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- 5. USER MANAGEMENT -->
+      <div class="nav-group">
+        <div class="menu-header" (click)="toggleUserMenu()" [class.expanded]="isUserMenuOpen" *ngIf="!isSidebarCollapsed">
+          <div class="header-left">
+            <i class="bi bi-person-gear header-icon"></i>
+            <span>User Management</span>
+          </div>
+          <i class="bi bi-chevron-down chevron-icon" [class.rotate]="isUserMenuOpen"></i>
+        </div>
+
+        <!-- Collapsed icon fallback -->
+        <a *ngIf="isSidebarCollapsed" (click)="openUserFromCollapsed()" class="menu-item root-item" style="cursor: pointer;" title="User Management">
+          <i class="bi bi-person-gear menu-icon"></i>
+        </a>
+
+        <div class="sub-menu" *ngIf="isUserMenuOpen && !isSidebarCollapsed">
+          <!-- User List -->
+          <a routerLink="/users" class="sub-menu-item">
+            <i class="bi bi-people sub-icon"></i>
+            <span>User List</span>
+            <span class="count-badge">{{ totalUsersCount }}</span>
+          </a>
+
+          <!-- Access Permissions -->
+          <a routerLink="/access" class="sub-menu-item">
+            <i class="bi bi-key-fill sub-icon text-info"></i>
+            <span>Access</span>
+            <span class="count-badge" style="background: #0284c7;">DB</span>
+          </a>
+
+          <!-- Role Assignment -->
+          <a routerLink="/roles" class="sub-menu-item">
+            <i class="bi bi-shield-check sub-icon text-emerald"></i>
+            <span>Role</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- 6. SETTINGS & STORE MENU -->
+      <div class="nav-group">
+        <div class="menu-header" (click)="toggleSettingsMenu()" [class.expanded]="isSettingsMenuOpen" *ngIf="!isSidebarCollapsed">
+          <div class="header-left">
+            <i class="bi bi-gear-fill header-icon text-secondary"></i>
+            <span>Settings</span>
+          </div>
+          <i class="bi bi-chevron-down chevron-icon" [class.rotate]="isSettingsMenuOpen"></i>
+        </div>
+
+        <a *ngIf="isSidebarCollapsed" (click)="openSettingsFromCollapsed()" class="menu-item root-item" style="cursor: pointer;" title="Settings: Store Config, Category, Tax">
+          <i class="bi bi-gear-fill menu-icon"></i>
+        </a>
+
+        <div class="sub-menu" *ngIf="isSettingsMenuOpen && !isSidebarCollapsed">
+          <a routerLink="/settings" class="sub-menu-item">
+            <i class="bi bi-shop-window sub-icon text-emerald"></i>
+            <span>Store Configuration</span>
+          </a>
+          <a routerLink="/category" class="sub-menu-item">
+            <i class="bi bi-tags-fill sub-icon text-primary"></i>
+            <span>Category</span>
+            <span class="count-badge" style="background: #2563eb;">DB</span>
+          </a>
+          <a routerLink="/tax" class="sub-menu-item">
+            <i class="bi bi-percent sub-icon text-warning"></i>
+            <span>Tax</span>
+            <span class="count-badge" style="background: #059669;">DB</span>
+          </a>
+          <a routerLink="/warehouse" class="sub-menu-item">
+            <i class="bi bi-building-gear sub-icon text-info"></i>
+            <span>Warehouse</span>
+            <span class="count-badge" style="background: #0284c7;">DB</span>
+          </a>
+          <a routerLink="/brand" class="sub-menu-item">
+            <i class="bi bi-award-fill sub-icon text-purple"></i>
+            <span>Brand</span>
+            <span class="count-badge" style="background: #9333ea;">DB</span>
+          </a>
+          <a routerLink="/branch" class="sub-menu-item">
+            <i class="bi bi-diagram-3-fill sub-icon text-teal"></i>
+            <span>Branch</span>
+            <span class="count-badge" style="background: #0d9488;">DB</span>
+          </a>
+        </div>
+      </div>
+
+    </nav>
+
+    <!-- Sidebar Footer (User Info & Logout) -->
+    <div class="sidebar-footer">
+      <div class="user-brief" *ngIf="!isSidebarCollapsed">
+        <div class="user-avatar-sm">
+          {{ (loggedInUser || 'A').charAt(0).toUpperCase() }}
+        </div>
+        <div class="user-details-sm">
+          <span class="u-name">{{ loggedInUser }}</span>
+          <span class="u-role">{{ userRole }}</span>
+        </div>
+      </div>
+
+      <button type="button" class="sidebar-logout-btn" (click)="logout()" title="Sign Out">
+        <i class="bi bi-box-arrow-right"></i>
+        <span *ngIf="!isSidebarCollapsed">Logout</span>
+      </button>
+    </div>
+
+  </aside>
+
+  <!-- ================= RIGHT MAIN CONTENT AREA ================= -->
+  <main class="app-main-content">
+
+    <!-- Top Navigation Card (IDENTICAL TO DASHBOARD) -->
+    <header class="top-nav-card">
+      <div class="top-nav-left">
+        <button type="button" class="btn-sidebar-toggle" (click)="toggleSidebar()" title="Toggle Navigation Menu">
+          <i class="bi bi-list"></i>
+        </button>
+        <div class="page-title-wrap">
+          <h2>Tablets & Medicine Inventory</h2>
+          <div class="breadcrumb-sub">
+            <span>Home</span> / <strong>MySQL Pharmacy Catalog (<code>medicines</code>)</strong>
+          </div>
+        </div>
+      </div>
+
+      <!-- Actions & Sync Status -->
+      <div class="top-nav-right">
+        <div class="live-clock-pill">
+          <i class="bi bi-clock-fill text-primary"></i>
+          <span>{{ currentDateTime }}</span>
+        </div>
+
+        <button 
+          type="button" 
+          class="btn-sync-db" 
+          (click)="loadMedicines()" 
+          title="Sync live data from MySQL"
+          [disabled]="loading">
+          <i class="bi bi-arrow-clockwise" [class.spin]="loading"></i>
+          <span>Sync DB</span>
+        </button>
+
+        <button 
+          type="button" 
+          class="btn-pos-shortcut" 
+          style="background: linear-gradient(135deg, #10b981, #059669); color: #ffffff; border: none;"
+          (click)="openAddModal()" 
+          title="Add New Medicine to Database">
+          <i class="bi bi-plus-circle-fill me-1"></i>
+          <span>+ Add Medicine</span>
+        </button>
+
+        <a routerLink="/pos" class="btn-pos-shortcut" title="Open POS Billing">
+          <i class="bi bi-receipt-cutoff me-1"></i>
+          <span>POS Counter</span>
+        </a>
+
+        <div class="top-user-pill">
+          <div class="avatar-circle">
+            {{ (loggedInUser || 'A').charAt(0).toUpperCase() }}
+          </div>
+          <div class="user-info-text">
+            <strong>{{ loggedInUser }}</strong>
+            <span class="badge-role">{{ userRole }}</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Toast Notification Banner -->
+    <div *ngIf="toastMessage" class="toast-floating">
+      <i class="bi bi-check-circle-fill me-2"></i>
+      <span>{{ toastMessage }}</span>
+    </div>
+
+    <!-- ================= ADD / EDIT MEDICINE FORM CARD ================= -->
+    <section class="form-card-panel">
+      <div class="form-panel-header">
+        <div>
+          <h3>
+            <i class="bi" [ngClass]="isEditMode ? 'bi-pencil-square text-primary' : 'bi-plus-circle-fill text-emerald'"></i>
+            {{ isEditMode ? 'Edit Medicine Record' : 'Add New Medicine / Tablet' }}
+          </h3>
+          <p>
+            {{ isEditMode ? 'Update existing drug details in the database.' : 'Add your pharmacy stock directly to the MySQL database. Medicines added here will immediately display in POS Billing.' }}
+          </p>
+        </div>
+        <button *ngIf="isEditMode" type="button" class="btn-cancel-edit" (click)="resetForm()">
+          <i class="bi bi-x-circle me-1"></i> Cancel Edit
+        </button>
+      </div>
+
+      <form (ngSubmit)="saveMedicine()" class="med-form-card-body">
+
+        <!-- Row 1: Medicine Basic Info (Name, Generic Composition, Category) -->
+        <div class="form-row-3">
+          <!-- Medicine Name -->
+          <div class="form-field">
+            <div class="field-label-row">
+              <label class="mb-0">Brand Name / Medicine Name <span class="text-danger">*</span></label>
+              <button 
+                type="button" 
+                class="btn-ai-autofill" 
+                (click)="aiAutoFill()" 
+                [disabled]="aiLoading || !formMedicine.name" 
+                title="Use AI to auto-fill generic formula, manufacturer & category and log to MySQL">
+                <i class="bi" [ngClass]="aiLoading ? 'bi-arrow-repeat spin' : 'bi-stars'"></i>
+                <span>{{ aiLoading ? 'AI Thinking...' : '✨ AI Auto-Fill' }}</span>
+              </button>
+            </div>
+            <div class="input-icon-wrap">
+              <i class="bi bi-capsule"></i>
+              <input 
+                type="text" 
+                class="pos-input" 
+                placeholder="e.g. Dolo 650 Tablet" 
+                [(ngModel)]="formMedicine.name" 
+                name="name" 
+                required />
+            </div>
+          </div>
+
+          <!-- Generic / Salt Name -->
+          <div class="form-field">
+            <label>Generic Composition / Formula</label>
+            <div class="input-icon-wrap">
+              <i class="bi bi-file-medical"></i>
+              <input 
+                type="text" 
+                class="pos-input" 
+                placeholder="e.g. Paracetamol 650mg" 
+                [(ngModel)]="formMedicine.genericName" 
+                name="genericName" />
+            </div>
+          </div>
+
+          <!-- Category -->
+          <div class="form-field">
+            <label>Category</label>
+            <div class="input-icon-wrap">
+              <i class="bi bi-tags-fill"></i>
+              <select class="pos-select" [(ngModel)]="formMedicine.category" name="category">
+                <option *ngFor="let cat of categories | slice:1" [value]="cat">{{ cat }}</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Row 2: Batch, Expiry & Manufacturer -->
+        <div class="form-row-3">
+          <!-- Batch Number -->
+          <div class="form-field">
+            <label>Batch Number</label>
+            <div class="input-icon-wrap">
+              <i class="bi bi-qr-code"></i>
+              <input 
+                type="text" 
+                class="pos-input" 
+                placeholder="e.g. DL2026B1" 
+                [(ngModel)]="formMedicine.batchNo" 
+                name="batchNo" />
+            </div>
+          </div>
+
+          <!-- Expiry Date -->
+          <div class="form-field">
+            <label>Expiry Date (YYYY-MM)</label>
+            <div class="input-icon-wrap">
+              <i class="bi bi-calendar-event"></i>
+              <input 
+                type="text" 
+                class="pos-input" 
+                placeholder="e.g. 2028-05" 
+                [(ngModel)]="formMedicine.expiryDate" 
+                name="expiryDate" />
+            </div>
+          </div>
+
+          <!-- Manufacturer -->
+          <div class="form-field">
+            <label>Manufacturer / Pharmaceutical Company</label>
+            <div class="input-icon-wrap">
+              <i class="bi bi-building"></i>
+              <input 
+                type="text" 
+                class="pos-input" 
+                placeholder="e.g. Micro Labs Ltd" 
+                [(ngModel)]="formMedicine.manufacturer" 
+                name="manufacturer" />
+            </div>
+          </div>
+        </div>
+
+        <!-- Row 3: Pricing, Tax & Stock Quantity -->
+        <div class="form-row-4">
+          <!-- Selling Price -->
+          <div class="form-field">
+            <label>Selling Price (₹) <span class="text-danger">*</span></label>
+            <div class="input-icon-wrap">
+              <i class="bi bi-currency-rupee"></i>
+              <input 
+                type="number" 
+                class="pos-input" 
+                placeholder="0.00" 
+                [(ngModel)]="formMedicine.unitPrice" 
+                name="unitPrice" 
+                min="0.1" 
+                step="0.01" 
+                required />
+            </div>
+          </div>
+
+          <!-- MRP -->
+          <div class="form-field">
+            <label>MRP (₹)</label>
+            <div class="input-icon-wrap">
+              <i class="bi bi-tag"></i>
+              <input 
+                type="number" 
+                class="pos-input" 
+                placeholder="0.00" 
+                [(ngModel)]="formMedicine.mrp" 
+                name="mrp" 
+                min="0.1" 
+                step="0.01" />
+            </div>
+          </div>
+
+          <!-- GST Rate -->
+          <div class="form-field">
+            <label>GST Rate (%)</label>
+            <div class="input-icon-wrap">
+              <i class="bi bi-percent"></i>
+              <select class="pos-select" [(ngModel)]="formMedicine.gstRate" name="gstRate">
+                <option [ngValue]="0">None (0% - No GST / Exempted)</option>
+                <option *ngFor="let t of taxes" [ngValue]="t.gstRate">
+                  {{ t.gstRate }}% - {{ t.taxName }} ({{ t.taxType === 'INCLUSIVE' ? 'Inclusive MRP' : 'Exclusive +GST' }})
+                </option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Stock Qty -->
+          <div class="form-field">
+            <label>Initial Stock Quantity</label>
+            <div class="input-icon-wrap">
+              <i class="bi bi-box-seam"></i>
+              <input 
+                type="number" 
+                class="pos-input" 
+                placeholder="100" 
+                [(ngModel)]="formMedicine.stockQty" 
+                name="stockQty" 
+                min="0" />
+            </div>
+          </div>
+        </div>
+
+        <!-- Row 4: Dedicated Action Footer Bar -->
+        <div class="form-action-footer">
+          <div class="footer-note">
+            <i class="bi bi-info-circle text-emerald me-1"></i>
+            <span>Fields marked with <strong class="text-danger">*</strong> are mandatory.</span>
+          </div>
+          <div class="footer-buttons">
+            <button type="button" class="btn-reset-form" (click)="resetForm()">
+              <i class="bi bi-arrow-counterclockwise me-1"></i>
+              <span>Reset</span>
+            </button>
+            <button type="submit" class="btn-submit-med" [disabled]="!formMedicine.name || formMedicine.unitPrice <= 0">
+              <i class="bi" [ngClass]="isEditMode ? 'bi-check2-circle' : 'bi-plus-circle-fill'"></i>
+              <span>{{ isEditMode ? 'Update Medicine' : 'Save Medicine to Database' }}</span>
+            </button>
+          </div>
+        </div>
+
+      </form>
+    </section>
+
+    <!-- ================= LIVE DATABASE MEDICINES TABLE ================= -->
+    <section class="table-card-panel">
+      <div class="table-panel-header">
+        <div class="t-header-left">
+          <h3>
+            <i class="bi bi-database-check text-emerald me-2"></i>
+            Live Medicines in Database ({{ filteredMedicines.length }})
+          </h3>
+          <p>Stored in MySQL <code>medicines</code> table for {{ activeStoreName }}</p>
+        </div>
+
+        <!-- Search Bar -->
+        <div class="table-search-wrap">
+          <i class="bi bi-search"></i>
+          <input 
+            type="text" 
+            placeholder="Search medicine name, formula, batch..." 
+            [(ngModel)]="searchQuery" 
+            (input)="onSearchChange()" />
+        </div>
+      </div>
+
+      <!-- Category Filter Pills -->
+      <div class="category-pills-row">
+        <button 
+          type="button" 
+          *ngFor="let cat of categories" 
+          class="pill-btn" 
+          [class.active]="selectedCategory === cat" 
+          (click)="filterByCategory(cat)">
+          {{ cat }}
+        </button>
+      </div>
+
+      <!-- Empty State -->
+      <div *ngIf="filteredMedicines.length === 0 && !loading" class="empty-state-box">
+        <div class="empty-icon"><i class="bi bi-capsule"></i></div>
+        <h4>No Medicines Found</h4>
+        <p>You haven't added any medicines yet or no items match your search.</p>
+        <p class="empty-sub">Fill out the form above to add your first drug to the MySQL database.</p>
+      </div>
+
+      <!-- Data Table -->
+      <div *ngIf="filteredMedicines.length > 0" class="table-responsive">
+        <table class="inventory-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Medicine Name</th>
+              <th>Category</th>
+              <th>Batch No</th>
+              <th>Expiry</th>
+              <th class="text-end">Selling Price</th>
+              <th class="text-end">MRP</th>
+              <th class="text-center">GST %</th>
+              <th class="text-center">Stock</th>
+              <th>Manufacturer</th>
+              <th class="text-center">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let med of filteredMedicines; let i = index">
+              <td class="text-muted">{{ i + 1 }}</td>
+              <td>
+                <strong class="med-table-name">{{ med.name }}</strong>
+                <div class="med-table-gen" *ngIf="med.genericName">{{ med.genericName }}</div>
+              </td>
+              <td><span class="badge-cat">{{ med.category || 'General' }}</span></td>
+              <td><code>{{ med.batchNo || 'N/A' }}</code></td>
+              <td>
+                <span class="badge-exp">{{ med.expiryDate || 'N/A' }}</span>
+              </td>
+              <td class="text-end font-bold text-emerald">₹{{ (med.unitPrice || 0).toFixed(2) }}</td>
+              <td class="text-end text-muted">₹{{ (med.mrp || 0).toFixed(2) }}</td>
+              <td class="text-center">{{ med.gstRate || 0 }}%</td>
+              <td class="text-center">
+                  <span class="stock-pill" *ngIf="(med.stockQty || 0) > 0" [class.low-stock]="(med.stockQty || 0) < 10">
+                    {{ (med.stockQty || 0) }}
+                  </span>
+                  <span class="stock-pill" *ngIf="(med.stockQty || 0) === 0" style="background: #fee2e2; color: #dc2626; border-color: #fca5a5;">
+                    Out Of Stock
+                  </span>
+                </td>
+              <td class="text-muted small">{{ med.manufacturer || '—' }}</td>
+              <td class="text-center">
+                <div class="action-btns">
+                  <button *ngIf="canUpdateMed" type="button" class="btn-action edit" (click)="editMedicine(med)" title="Edit">
+                    <i class="bi bi-pencil-fill"></i>
+                  </button>
+                  <button *ngIf="canDeleteMed" type="button" class="btn-action delete" (click)="deleteMedicine(med)" title="Delete">
+                    <i class="bi bi-trash-fill"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ================= EDIT MEDICINE MODAL ================= -->
+  <div class="modal-backdrop-custom" *ngIf="showMedModal" (click)="closeMedModal()">
+    <div class="modal-dialog-custom modal-dialog-lg" (click)="$event.stopPropagation()">
+      
+      <div class="modal-header-custom">
+        <div class="modal-title-left">
+          <div class="modal-icon-badge">
+            <i class="bi bi-capsule"></i>
+          </div>
+          <div>
+            <h3>{{ isEditMode ? 'Edit Medicine Record' : 'Add New Medicine' }}</h3>
+            <p>Update drug details, prices, stock quantity, and GST in MySQL database.</p>
+          </div>
+        </div>
+        <button type="button" class="btn-close-modal" (click)="closeMedModal()">
+          <i class="bi bi-x-lg"></i>
+        </button>
+      </div>
+
+      <form (ngSubmit)="saveMedicine()">
+        <div class="modal-body-custom">
+          
+          <div class="form-row-modal-2">
+            <div class="form-group-modal">
+              <div class="field-label-row">
+                <label>Medicine / Brand Name <span class="text-danger">*</span></label>
+                <button 
+                  type="button" 
+                  class="btn-ai-autofill-sm" 
+                  (click)="aiAutoFill()" 
+                  [disabled]="aiLoading || !formMedicine.name">
+                  <i class="bi" [ngClass]="aiLoading ? 'bi-arrow-repeat spin' : 'bi-stars'"></i>
+                  <span>{{ aiLoading ? 'AI...' : 'AI Auto-Fill' }}</span>
+                </button>
+              </div>
+              <input 
+                type="text" 
+                class="modal-input" 
+                [(ngModel)]="formMedicine.name" 
+                name="modal_name" 
+                required />
+            </div>
+
+            <div class="form-group-modal">
+              <label>Generic Composition / Formula</label>
+              <input 
+                type="text" 
+                class="modal-input" 
+                [(ngModel)]="formMedicine.genericName" 
+                name="modal_gen" />
+            </div>
+          </div>
+
+          <div class="form-row-modal-3">
+            <div class="form-group-modal">
+              <label>Category</label>
+              <select class="modal-select" [(ngModel)]="formMedicine.category" name="modal_cat">
+                <option *ngFor="let cat of categories | slice:1" [value]="cat">{{ cat }}</option>
+              </select>
+            </div>
+
+            <div class="form-group-modal">
+              <label>Batch Number</label>
+              <input 
+                type="text" 
+                class="modal-input font-mono" 
+                [(ngModel)]="formMedicine.batchNo" 
+                name="modal_batch" />
+            </div>
+
+            <div class="form-group-modal">
+              <label>Expiry Date (YYYY-MM)</label>
+              <input 
+                type="text" 
+                class="modal-input font-mono" 
+                [(ngModel)]="formMedicine.expiryDate" 
+                name="modal_exp" />
+            </div>
+          </div>
+
+          <div class="form-row-modal-4">
+            <div class="form-group-modal">
+              <label>Selling Price (₹) <span class="text-danger">*</span></label>
+              <input 
+                type="number" 
+                class="modal-input font-mono font-bold text-emerald" 
+                [(ngModel)]="formMedicine.unitPrice" 
+                name="modal_price" 
+                min="0.1" 
+                step="0.01" 
+                required />
+            </div>
+
+            <div class="form-group-modal">
+              <label>MRP (₹)</label>
+              <input 
+                type="number" 
+                class="modal-input font-mono" 
+                [(ngModel)]="formMedicine.mrp" 
+                name="modal_mrp" 
+                min="0.1" 
+                step="0.01" />
+            </div>
+
+            <div class="form-group-modal">
+              <label>GST Rate (%)</label>
+              <select class="modal-select" [(ngModel)]="formMedicine.gstRate" name="modal_gst">
+                <option [ngValue]="0">None (0% - No GST)</option>
+                <option *ngFor="let t of taxes" [ngValue]="t.gstRate">
+                  {{ t.gstRate }}% - {{ t.taxName }}
+                </option>
+              </select>
+            </div>
+
+            <div class="form-group-modal">
+              <label>Stock Qty</label>
+              <input 
+                type="number" 
+                class="modal-input font-mono" 
+                [(ngModel)]="formMedicine.stockQty" 
+                name="modal_qty" 
+                min="0" />
+            </div>
+          </div>
+
+          <div class="form-group-modal">
+            <label>Manufacturer / Pharmaceutical Company</label>
+            <input 
+              type="text" 
+              class="modal-input" 
+              [(ngModel)]="formMedicine.manufacturer" 
+              name="modal_mfg" 
+              placeholder="e.g. Micro Labs Ltd, Cipla, Alkem" />
+          </div>
+
+        </div>
+
+        <div class="modal-footer-custom">
+          <button type="button" class="btn-cancel-modal" (click)="closeMedModal()">
+            Cancel
+          </button>
+          <button 
+            type="submit" 
+            class="btn-save-modal" 
+            [disabled]="isSavingMed || !formMedicine.name || formMedicine.unitPrice <= 0">
+            <i class="bi" [ngClass]="isSavingMed ? 'bi-arrow-repeat spin' : 'bi-cloud-arrow-up-fill'"></i>
+            <span>{{ isSavingMed ? 'Saving to Database...' : (isEditMode ? 'Update Medicine' : 'Save Medicine') }}</span>
+          </button>
+        </div>
+      </form>
+
+    </div>
+  </div>
+</div>

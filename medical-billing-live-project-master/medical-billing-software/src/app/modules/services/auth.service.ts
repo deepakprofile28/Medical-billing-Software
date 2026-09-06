@@ -701,6 +701,7 @@ export class AuthService {
     }
     if (response.role) {
       localStorage.setItem('role', response.role);
+      localStorage.setItem('userRole', response.role);
     }
     if (response.companyId !== null && response.companyId !== undefined) {
       localStorage.setItem('companyId', response.companyId.toString());
@@ -733,6 +734,17 @@ export class AuthService {
 
   getCompanyName(): string | null {
     return localStorage.getItem('companyName');
+  }
+
+  getCurrentUser(): { fullName: string; username: string; email: string; role: string } {
+    const userName = localStorage.getItem('userName') || 'Apollo';
+    const role = localStorage.getItem('role') || localStorage.getItem('userRole') || 'ADMIN';
+    return {
+      fullName: userName,
+      username: userName,
+      email: localStorage.getItem('userEmail') || '',
+      role: role
+    };
   }
 
   logout(): void {

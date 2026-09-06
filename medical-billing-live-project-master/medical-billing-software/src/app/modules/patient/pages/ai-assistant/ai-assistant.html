@@ -1,0 +1,544 @@
+<div class="dashboard-layout-wrapper" [class.sidebar-collapsed]="isSidebarCollapsed">
+
+  <!-- ================= LEFT SIDEBAR MENU (IDENTICAL TO DASHBOARD) ================= -->
+  <aside class="app-sidebar">
+    
+    <!-- Sidebar Brand Header -->
+    <div class="sidebar-brand">
+      <div class="brand-icon-box">
+        <i class="bi bi-hospital-fill"></i>
+      </div>
+      <div class="brand-details" *ngIf="!isSidebarCollapsed">
+        <h2 class="brand-title">PharmaCare</h2>
+        <span class="brand-subtitle">Clinical & Billing Hub</span>
+      </div>
+    </div>
+
+    <!-- Active Store Badge -->
+    <div class="sidebar-store-pill" *ngIf="!isSidebarCollapsed">
+      <i class="bi bi-shop-window text-emerald"></i>
+      <div class="store-text">
+        <span class="store-label">Active Store</span>
+        <strong class="store-name">{{ activeStoreName }} (#{{ activeStoreId }})</strong>
+      </div>
+    </div>
+
+    <!-- Sidebar Navigation Items -->
+    <nav class="sidebar-nav">
+      
+      <!-- 1. DASHBOARD -->
+      <div class="nav-group">
+        <a routerLink="/dashboard" class="menu-item root-item">
+          <i class="bi bi-grid-1x2-fill menu-icon"></i>
+          <span class="menu-text" *ngIf="!isSidebarCollapsed">Dashboard</span>
+          <span class="badge-live-pulse" *ngIf="!isSidebarCollapsed">Live</span>
+        </a>
+      </div>
+
+      <!-- 2. POS BILLING COUNTER -->
+      <div class="nav-group">
+        <a routerLink="/pos" class="menu-item root-item">
+          <i class="bi bi-receipt-cutoff menu-icon text-warning"></i>
+          <span class="menu-text" *ngIf="!isSidebarCollapsed">POS Billing Counter</span>
+          <span class="badge-pos-pulse" *ngIf="!isSidebarCollapsed">POS</span>
+        </a>
+      </div>
+
+      <!-- 2.5 SALES MENU -->
+      <div class="nav-group">
+        <div class="menu-header" (click)="isSalesMenuOpen = !isSalesMenuOpen" [class.expanded]="isSalesMenuOpen" *ngIf="!isSidebarCollapsed">
+          <div class="header-left">
+            <i class="bi bi-cart-check-fill header-icon text-success"></i>
+            <span>Sales Management</span>
+          </div>
+          <i class="bi bi-chevron-down chevron-icon" [class.rotate]="isSalesMenuOpen"></i>
+        </div>
+
+        <a *ngIf="isSidebarCollapsed" (click)="isSidebarCollapsed = false; isSalesMenuOpen = true" class="menu-item root-item" style="cursor: pointer;" title="Sales Management">
+          <i class="bi bi-cart-check-fill menu-icon text-success"></i>
+        </a>
+
+        <div class="sub-menu" *ngIf="isSalesMenuOpen && !isSidebarCollapsed">
+          <a routerLink="/sales-transactions" class="sub-menu-item">
+            <i class="bi bi-credit-card-2-front-fill sub-icon text-primary"></i>
+            <span>Transaction</span>
+          </a>
+          <a routerLink="/sales-orders" class="sub-menu-item">
+            <i class="bi bi-box-seam-fill sub-icon text-info"></i>
+            <span>Order</span>
+          </a>
+          <a routerLink="/sales-suspended" class="sub-menu-item">
+            <i class="bi bi-pause-circle-fill sub-icon text-warning"></i>
+            <span>Order Suspended</span>
+          </a>
+          <a routerLink="/sales-completed" class="sub-menu-item">
+            <i class="bi bi-check-circle-fill sub-icon text-success"></i>
+            <span>Completed</span>
+          </a>
+          <a routerLink="/sales-exchange" class="sub-menu-item">
+            <i class="bi bi-arrow-repeat sub-icon text-purple"></i>
+            <span>Exchange</span>
+          </a>
+          <a routerLink="/sales-returns" class="sub-menu-item">
+            <i class="bi bi-arrow-counterclockwise sub-icon text-danger"></i>
+            <span>Return and Refund</span>
+          </a>
+        </div>
+      </div>
+
+      
+      <!-- PURCHASE MENU -->
+      <div class="nav-group">
+        <div class="menu-header" (click)="isPurchaseMenuOpen = !isPurchaseMenuOpen" [class.expanded]="isPurchaseMenuOpen" *ngIf="!isSidebarCollapsed">
+          <div class="header-left">
+            <i class="bi bi-bag-check-fill header-icon" style="color: #f59e0b;"></i>
+            <span>Purchase Management</span>
+          </div>
+          <i class="bi bi-chevron-down chevron-icon" [class.rotate]="isPurchaseMenuOpen"></i>
+        </div>
+
+        <a *ngIf="isSidebarCollapsed" (click)="isSidebarCollapsed = false; isPurchaseMenuOpen = true" class="menu-item root-item" style="cursor: pointer;" title="Purchase Management">
+          <i class="bi bi-bag-check-fill menu-icon" style="color: #f59e0b;"></i>
+        </a>
+
+        <div class="sub-menu" *ngIf="isPurchaseMenuOpen && !isSidebarCollapsed">
+          <a routerLink="/purchase" class="sub-menu-item">
+            <i class="bi bi-cart-plus-fill sub-icon text-info"></i>
+            <span>Purchase</span>
+          </a>
+          <a routerLink="/purchase-returns" class="sub-menu-item">
+            <i class="bi bi-arrow-return-left sub-icon text-danger"></i>
+            <span>Purchase Return</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- 3. TABLETS & MEDICINES -->
+      <div class="nav-group">
+        <a routerLink="/tablets" class="menu-item root-item">
+          <i class="bi bi-capsule-pill menu-icon text-emerald"></i>
+          <span class="menu-text" *ngIf="!isSidebarCollapsed">Tablets & Medicines</span>
+        </a>
+      </div>
+
+      <!-- 4. AI CLINICAL ASSISTANT (ACTIVE) -->
+      <div class="nav-group">
+        <a routerLink="/ai-assistant" routerLinkActive="active" class="menu-item root-item ai-menu-highlight" title="AI Medical Assistant">
+          <i class="bi bi-robot menu-icon text-purple"></i>
+          <span class="menu-text" *ngIf="!isSidebarCollapsed">AI Clinical Assistant</span>
+          <span class="badge-ai-pulse" *ngIf="!isSidebarCollapsed">AI DB</span>
+        </a>
+      </div>
+
+      <!-- 5. PATIENT MANAGEMENT -->
+      <div class="nav-group">
+        <div class="menu-header" (click)="togglePatientMenu()" [class.expanded]="isPatientMenuOpen" *ngIf="!isSidebarCollapsed">
+          <div class="header-left">
+            <i class="bi bi-person-vcard-fill header-icon"></i>
+            <span>Patient Management</span>
+          </div>
+          <i class="bi bi-chevron-down chevron-icon" [class.rotate]="isPatientMenuOpen"></i>
+        </div>
+
+        <a *ngIf="isSidebarCollapsed" (click)="openPatientFromCollapsed()" class="menu-item root-item" style="cursor: pointer;" title="Patient Management">
+          <i class="bi bi-person-vcard-fill menu-icon"></i>
+        </a>
+
+        <div class="sub-menu" *ngIf="isPatientMenuOpen && !isSidebarCollapsed">
+          <a routerLink="/patients" class="sub-menu-item">
+            <i class="bi bi-people-fill sub-icon"></i>
+            <span>Patient List</span>
+            <span class="count-badge">{{ totalPatientsCount }}</span>
+          </a>
+          <a routerLink="/patient-registration" class="sub-menu-item">
+            <i class="bi bi-person-plus-fill sub-icon text-success"></i>
+            <span>Add Patient</span>
+          </a>
+          <a routerLink="/patients" class="sub-menu-item">
+            <i class="bi bi-file-earmark-text-fill sub-icon text-warning"></i>
+            <span>Patient Draft</span>
+          </a>
+          <a routerLink="/dashboard" class="sub-menu-item">
+            <i class="bi bi-graph-up-arrow sub-icon text-primary"></i>
+            <span>Patient Analysis</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- 5.1 DOCTOR MANAGEMENT -->
+      <div class="nav-group">
+        <div class="menu-header" (click)="toggleDoctorMenu()" [class.expanded]="isDoctorMenuOpen" *ngIf="!isSidebarCollapsed">
+          <div class="header-left">
+            <i class="bi bi-person-badge-fill header-icon text-cyan"></i>
+            <span>Doctor Management</span>
+          </div>
+          <i class="bi bi-chevron-down chevron-icon" [class.rotate]="isDoctorMenuOpen"></i>
+        </div>
+
+        <!-- Collapsed icon fallback -->
+        <a *ngIf="isSidebarCollapsed" (click)="openDoctorFromCollapsed()" class="menu-item root-item" style="cursor: pointer;" title="Doctor Management">
+          <i class="bi bi-person-badge-fill menu-icon" style="color: #06b6d4;"></i>
+        </a>
+
+        <div class="sub-menu" *ngIf="isDoctorMenuOpen && !isSidebarCollapsed">
+          <!-- Doctor List -->
+          <a routerLink="/doctors" class="sub-menu-item">
+            <i class="bi bi-person-lines-fill sub-icon text-cyan"></i>
+            <span>Doctor List</span>
+          </a>
+
+          <!-- Add Doctor -->
+          <a routerLink="/add-doctor" class="sub-menu-item">
+            <i class="bi bi-person-plus-fill sub-icon text-success"></i>
+            <span>Add Doctor</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- 6. USER MANAGEMENT -->
+      <div class="nav-group">
+        <div class="menu-header" (click)="toggleUserMenu()" [class.expanded]="isUserMenuOpen" *ngIf="!isSidebarCollapsed">
+          <div class="header-left">
+            <i class="bi bi-person-gear header-icon"></i>
+            <span>User Management</span>
+          </div>
+          <i class="bi bi-chevron-down chevron-icon" [class.rotate]="isUserMenuOpen"></i>
+        </div>
+
+        <a *ngIf="isSidebarCollapsed" (click)="openUserFromCollapsed()" class="menu-item root-item" style="cursor: pointer;" title="User Management">
+          <i class="bi bi-person-gear menu-icon"></i>
+        </a>
+
+        <div class="sub-menu" *ngIf="isUserMenuOpen && !isSidebarCollapsed">
+          <a routerLink="/users" class="sub-menu-item">
+            <i class="bi bi-people sub-icon"></i>
+            <span>User List</span>
+            <span class="count-badge">{{ totalUsersCount }}</span>
+          </a>
+          <a routerLink="/access" class="sub-menu-item">
+            <i class="bi bi-key-fill sub-icon text-info"></i>
+            <span>Access</span>
+            <span class="count-badge" style="background: #0284c7;">DB</span>
+          </a>
+          <a routerLink="/roles" class="sub-menu-item">
+            <i class="bi bi-shield-check sub-icon text-emerald"></i>
+            <span>Role</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- 7. SETTINGS & STORE MENU -->
+      <div class="nav-group">
+        <div class="menu-header" (click)="toggleSettingsMenu()" [class.expanded]="isSettingsMenuOpen" *ngIf="!isSidebarCollapsed">
+          <div class="header-left">
+            <i class="bi bi-gear-fill header-icon text-secondary"></i>
+            <span>Settings</span>
+          </div>
+          <i class="bi bi-chevron-down chevron-icon" [class.rotate]="isSettingsMenuOpen"></i>
+        </div>
+
+        <a *ngIf="isSidebarCollapsed" (click)="openSettingsFromCollapsed()" class="menu-item root-item" style="cursor: pointer;" title="Settings: Store Config, Category, Tax">
+          <i class="bi bi-gear-fill menu-icon"></i>
+        </a>
+
+        <div class="sub-menu" *ngIf="isSettingsMenuOpen && !isSidebarCollapsed">
+          <a routerLink="/settings" class="sub-menu-item">
+            <i class="bi bi-shop-window sub-icon text-emerald"></i>
+            <span>Store Configuration</span>
+          </a>
+          <a routerLink="/category" class="sub-menu-item">
+            <i class="bi bi-tags-fill sub-icon text-primary"></i>
+            <span>Category</span>
+            <span class="count-badge" style="background: #2563eb;">DB</span>
+          </a>
+          <a routerLink="/tax" class="sub-menu-item">
+            <i class="bi bi-percent sub-icon text-warning"></i>
+            <span>Tax</span>
+            <span class="count-badge" style="background: #059669;">DB</span>
+          </a>
+          <a routerLink="/warehouse" class="sub-menu-item">
+            <i class="bi bi-building-gear sub-icon text-info"></i>
+            <span>Warehouse</span>
+            <span class="count-badge" style="background: #0284c7;">DB</span>
+          </a>
+          <a routerLink="/brand" class="sub-menu-item">
+            <i class="bi bi-award-fill sub-icon text-purple"></i>
+            <span>Brand</span>
+            <span class="count-badge" style="background: #9333ea;">DB</span>
+          </a>
+          <a routerLink="/branch" class="sub-menu-item">
+            <i class="bi bi-diagram-3-fill sub-icon text-teal"></i>
+            <span>Branch</span>
+            <span class="count-badge" style="background: #0d9488;">DB</span>
+          </a>
+        </div>
+      </div>
+
+    </nav>
+
+    <!-- Sidebar Footer -->
+    <div class="sidebar-footer">
+      <div class="user-brief" *ngIf="!isSidebarCollapsed">
+        <div class="user-avatar-sm">
+          {{ (loggedInUser || 'A').charAt(0).toUpperCase() }}
+        </div>
+        <div class="user-details-sm">
+          <span class="u-name">{{ loggedInUser }}</span>
+          <span class="u-role">{{ userRole }}</span>
+        </div>
+      </div>
+
+      <button type="button" class="sidebar-logout-btn" (click)="logout()" title="Sign Out">
+        <i class="bi bi-box-arrow-right"></i>
+        <span *ngIf="!isSidebarCollapsed">Logout</span>
+      </button>
+    </div>
+
+  </aside>
+
+  <!-- ================= RIGHT MAIN CONTENT AREA ================= -->
+  <main class="app-main-content">
+
+    <!-- Top Navigation Card (IDENTICAL TO DASHBOARD) -->
+    <header class="top-nav-card">
+      <div class="top-nav-left">
+        <button type="button" class="btn-sidebar-toggle" (click)="toggleSidebar()" title="Toggle Navigation Menu">
+          <i class="bi bi-list"></i>
+        </button>
+        <div class="page-title-wrap">
+          <h2>AI Clinical Assistant & Rx Analyzer</h2>
+          <div class="breadcrumb-sub">
+            <span>Home</span> / <strong>MySQL Clinical Intelligence (<code>ai_consultations</code>)</strong>
+          </div>
+        </div>
+      </div>
+
+      <!-- Actions & Sync Status -->
+      <div class="top-nav-right">
+        <div class="live-clock-pill">
+          <i class="bi bi-clock-fill text-primary"></i>
+          <span>{{ currentDateTime }}</span>
+        </div>
+
+        <button 
+          type="button" 
+          class="btn-sync-db" 
+          (click)="loadHistory()" 
+          title="Sync AI logs from MySQL table"
+          [disabled]="loadingHistory">
+          <i class="bi bi-arrow-clockwise" [class.spin]="loadingHistory"></i>
+          <span>Sync DB</span>
+        </button>
+
+        <a routerLink="/tablets" class="btn-pos-shortcut" title="Open Tablets Inventory">
+          <i class="bi bi-capsule-pill me-1"></i>
+          <span>Tablets</span>
+        </a>
+
+        <div class="top-user-pill">
+          <div class="avatar-circle">
+            {{ (loggedInUser || 'A').charAt(0).toUpperCase() }}
+          </div>
+          <div class="user-info-text">
+            <strong>{{ loggedInUser }}</strong>
+            <span class="badge-role">{{ userRole }}</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Toast Notification Banner -->
+    <div *ngIf="toastMessage" class="toast-floating">
+      <i class="bi bi-check-circle-fill me-2"></i>
+      <span>{{ toastMessage }}</span>
+    </div>
+
+    <!-- ================= AI QUERY SEARCH CARD ================= -->
+    <section class="ai-query-panel">
+      <div class="ai-header-content">
+        <div class="ai-badge-header">
+          <i class="bi bi-stars"></i>
+          <span>CLINICAL AI COPILOT & PHARMACY INTELLIGENCE</span>
+        </div>
+        <h3>Search Medicine, Symptoms, or Dosage Guidelines</h3>
+        <p>Ask anything about drug dosage, generic compositions, contraindications, or substitutes. Every query is analyzed and automatically saved into MySQL table <code>ai_consultations</code>.</p>
+      </div>
+
+      <div class="ai-search-box-wrap">
+        <div class="ai-input-container">
+          <i class="bi bi-search search-icon"></i>
+          <input 
+            type="text" 
+            class="ai-search-input" 
+            [(ngModel)]="searchPrompt" 
+            (keyup.enter)="runAnalysis()" 
+            placeholder="e.g. Dolo 650 dosage, Azithral side effects, Gastric ulcer medicine, Augmentin substitutes..." />
+          <button *ngIf="searchPrompt" type="button" class="btn-clear-input" (click)="clearSearch()">
+            <i class="bi bi-x-circle"></i>
+          </button>
+        </div>
+        <button 
+          type="button" 
+          class="btn-ask-ai" 
+          (click)="runAnalysis()" 
+          [disabled]="analyzing || !searchPrompt.trim()">
+          <i class="bi" [ngClass]="analyzing ? 'bi-arrow-repeat spin' : 'bi-cpu-fill'"></i>
+          <span>{{ analyzing ? 'AI Analyzing...' : 'Ask Clinical AI' }}</span>
+        </button>
+      </div>
+
+      <!-- Quick Prompt Suggestions -->
+      <div class="quick-prompts-bar">
+        <span class="quick-label"><i class="bi bi-lightning-charge-fill me-1 text-warning"></i>Quick Queries:</span>
+        <button 
+          type="button" 
+          *ngFor="let qp of quickPrompts" 
+          class="prompt-chip" 
+          (click)="runAnalysis(qp)">
+          {{ qp }}
+        </button>
+      </div>
+    </section>
+
+    <!-- ================= AI ANALYSIS RESULT DISPLAY ================= -->
+    <section *ngIf="currentResult" class="ai-result-panel">
+      <div class="result-header">
+        <div class="r-title-wrap">
+          <div class="ai-icon-large">
+            <i class="bi bi-capsule-pill"></i>
+          </div>
+          <div>
+            <div class="badge-query-pill">
+              <i class="bi bi-chat-quote-fill me-1"></i> Query: "{{ currentResult.queryPrompt }}"
+            </div>
+            <h3 class="result-med-name">{{ currentResult.medicineName }}</h3>
+            <span class="result-cat-tag">{{ currentResult.category }}</span>
+          </div>
+        </div>
+
+        <div class="r-meta-wrap">
+          <span class="badge-db-saved">
+            <i class="bi bi-database-check me-1 text-success"></i> Saved in MySQL (ID #{{ currentResult.id }})
+          </span>
+          <span class="timestamp-text">{{ currentResult.createdAt | date:'medium' }}</span>
+        </div>
+      </div>
+
+      <!-- Clinical Information Grid -->
+      <div class="clinical-info-grid">
+        
+        <!-- Card 1: Generic Composition -->
+        <div class="info-card border-blue">
+          <div class="info-card-header text-blue">
+            <i class="bi bi-file-medical-fill"></i>
+            <h4>Generic Salt & Active Composition</h4>
+          </div>
+          <p class="info-card-body">{{ currentResult.genericComposition }}</p>
+        </div>
+
+        <!-- Card 2: Recommended Dosage -->
+        <div class="info-card border-emerald">
+          <div class="info-card-header text-emerald">
+            <i class="bi bi-stopwatch-fill"></i>
+            <h4>Recommended Dosage & Regimen</h4>
+          </div>
+          <p class="info-card-body">{{ currentResult.dosageInstructions }}</p>
+        </div>
+
+        <!-- Card 3: Precautions & Adverse Effects -->
+        <div class="info-card border-amber">
+          <div class="info-card-header text-amber">
+            <i class="bi bi-shield-exclamation"></i>
+            <h4>Side Effects, Cautions & Warnings</h4>
+          </div>
+          <p class="info-card-body">{{ currentResult.sideEffects }}</p>
+        </div>
+
+        <!-- Card 4: Cost-Effective Substitutes -->
+        <div class="info-card border-purple">
+          <div class="info-card-header text-purple">
+            <i class="bi bi-arrow-left-right"></i>
+            <h4>Equivalent Generic Substitutes</h4>
+          </div>
+          <pre class="info-card-substitutes">{{ currentResult.genericSubstitutes }}</pre>
+        </div>
+
+      </div>
+
+      <!-- AI Clinical Summary Assessment -->
+      <div class="ai-assessment-box" *ngIf="currentResult.aiResponse">
+        <div class="assessment-header">
+          <i class="bi bi-robot text-purple me-2"></i>
+          <strong>Clinical Pharmacist Assessment Note</strong>
+        </div>
+        <p class="assessment-content">{{ currentResult.aiResponse }}</p>
+      </div>
+    </section>
+
+    <!-- ================= MYSQL DATABASE HISTORY TABLE ================= -->
+    <section class="ai-history-panel">
+      <div class="history-panel-header">
+        <div>
+          <h3>
+            <i class="bi bi-database-fill text-purple me-2"></i>
+            AI Clinical Consultation Logs in MySQL (<code>ai_consultations</code>)
+          </h3>
+          <p>Separate database table storing {{ historyList.length }} consultation records for {{ activeStoreName }}</p>
+        </div>
+
+        <button type="button" class="btn-refresh-history" (click)="loadHistory()">
+          <i class="bi bi-arrow-clockwise me-1"></i> Refresh Logs
+        </button>
+      </div>
+
+      <!-- Empty state -->
+      <div *ngIf="historyList.length === 0 && !loadingHistory" class="empty-history-box">
+        <i class="bi bi-journal-medical empty-icon"></i>
+        <h4>No AI Consultations Stored Yet</h4>
+        <p>Use the search bar above to query medicine indications or dosages. Every search is automatically saved into the MySQL database.</p>
+      </div>
+
+      <!-- History Table -->
+      <div *ngIf="historyList.length > 0" class="table-responsive">
+        <table class="ai-history-table">
+          <thead>
+            <tr>
+              <th>DB ID</th>
+              <th>Query Prompt</th>
+              <th>Analyzed Medicine</th>
+              <th>Category</th>
+              <th>Generic Formula</th>
+              <th>Logged At</th>
+              <th class="text-center">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr 
+              *ngFor="let item of historyList" 
+              (click)="selectHistoryItem(item)" 
+              [class.row-selected]="currentResult?.id === item.id">
+              <td><span class="badge-db-id">#{{ item.id }}</span></td>
+              <td><strong class="query-prompt-text">{{ item.queryPrompt }}</strong></td>
+              <td><span class="med-tag">{{ item.medicineName }}</span></td>
+              <td><span class="cat-tag">{{ item.category }}</span></td>
+              <td class="text-muted small">{{ item.genericComposition }}</td>
+              <td class="small text-muted">{{ item.createdAt | date:'short' }}</td>
+              <td class="text-center">
+                <button 
+                  *ngIf="canDeleteAi"
+                  type="button" 
+                  class="btn-delete-log" 
+                  (click)="deleteHistoryItem(item, $event)" 
+                  title="Delete consultation record from MySQL">
+                  <i class="bi bi-trash-fill"></i>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+  </main>
+</div>
+

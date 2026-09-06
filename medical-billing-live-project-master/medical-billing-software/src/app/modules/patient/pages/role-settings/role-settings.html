@@ -1,0 +1,706 @@
+<div class="dashboard-layout-wrapper" [class.sidebar-collapsed]="isSidebarCollapsed">
+
+  <!-- ================= LEFT SIDEBAR MENU (IDENTICAL TO DASHBOARD) ================= -->
+  <aside class="app-sidebar">
+    
+    <!-- Sidebar Brand Header -->
+    <div class="sidebar-brand">
+      <div class="brand-icon-box">
+        <i class="bi bi-hospital-fill"></i>
+      </div>
+      <div class="brand-details" *ngIf="!isSidebarCollapsed">
+        <h2 class="brand-title">PharmaCare</h2>
+        <span class="brand-subtitle">Clinical & Billing Hub</span>
+      </div>
+    </div>
+
+    <!-- Active Store Badge -->
+    <div class="sidebar-store-pill" *ngIf="!isSidebarCollapsed">
+      <i class="bi bi-shop-window text-emerald"></i>
+      <div class="store-text">
+        <span class="store-label">Active Store</span>
+        <strong class="store-name">{{ activeStoreName }} (#{{ activeStoreId }})</strong>
+      </div>
+    </div>
+
+    <!-- Sidebar Navigation Items -->
+    <nav class="sidebar-nav">
+      
+      <!-- 1. DASHBOARD -->
+      <!-- 1. DASHBOARD -->
+      <div class="nav-group" *ngIf="canAccess('DASHBOARD')">
+        <a routerLink="/dashboard" class="menu-item root-item" title="Dashboard">
+          <i class="bi bi-grid-1x2-fill menu-icon"></i>
+          <span class="menu-text" *ngIf="!isSidebarCollapsed">Dashboard</span>
+          <span class="badge-live-pulse" *ngIf="!isSidebarCollapsed">Live</span>
+        </a>
+      </div>
+
+      <!-- 2. POS BILLING COUNTER -->
+      <div class="nav-group" *ngIf="canAccess('POS_BILLING')">
+        <a routerLink="/pos" class="menu-item root-item" title="POS Billing Counter">
+          <i class="bi bi-receipt-cutoff menu-icon text-warning"></i>
+          <span class="menu-text" *ngIf="!isSidebarCollapsed">POS Billing Counter</span>
+          <span class="badge-pos-pulse" *ngIf="!isSidebarCollapsed">POS</span>
+        </a>
+      </div>
+
+      <!-- 2.5 SALES MENU -->
+      <div class="nav-group">
+        <div class="menu-header" (click)="isSalesMenuOpen = !isSalesMenuOpen" [class.expanded]="isSalesMenuOpen" *ngIf="!isSidebarCollapsed">
+          <div class="header-left">
+            <i class="bi bi-cart-check-fill header-icon text-success"></i>
+            <span>Sales Management</span>
+          </div>
+          <i class="bi bi-chevron-down chevron-icon" [class.rotate]="isSalesMenuOpen"></i>
+        </div>
+
+        <a *ngIf="isSidebarCollapsed" (click)="isSidebarCollapsed = false; isSalesMenuOpen = true" class="menu-item root-item" style="cursor: pointer;" title="Sales Management">
+          <i class="bi bi-cart-check-fill menu-icon text-success"></i>
+        </a>
+
+        <div class="sub-menu" *ngIf="isSalesMenuOpen && !isSidebarCollapsed">
+          <a routerLink="/sales-transactions" class="sub-menu-item">
+            <i class="bi bi-credit-card-2-front-fill sub-icon text-primary"></i>
+            <span>Transaction</span>
+          </a>
+          <a routerLink="/sales-orders" class="sub-menu-item">
+            <i class="bi bi-box-seam-fill sub-icon text-info"></i>
+            <span>Order</span>
+          </a>
+          <a routerLink="/sales-suspended" class="sub-menu-item">
+            <i class="bi bi-pause-circle-fill sub-icon text-warning"></i>
+            <span>Order Suspended</span>
+          </a>
+          <a routerLink="/sales-completed" class="sub-menu-item">
+            <i class="bi bi-check-circle-fill sub-icon text-success"></i>
+            <span>Completed</span>
+          </a>
+          <a routerLink="/sales-exchange" class="sub-menu-item">
+            <i class="bi bi-arrow-repeat sub-icon text-purple"></i>
+            <span>Exchange</span>
+          </a>
+          <a routerLink="/sales-returns" class="sub-menu-item">
+            <i class="bi bi-arrow-counterclockwise sub-icon text-danger"></i>
+            <span>Return and Refund</span>
+          </a>
+        </div>
+      </div>
+
+      
+      <!-- PURCHASE MENU -->
+      <div class="nav-group">
+        <div class="menu-header" (click)="isPurchaseMenuOpen = !isPurchaseMenuOpen" [class.expanded]="isPurchaseMenuOpen" *ngIf="!isSidebarCollapsed">
+          <div class="header-left">
+            <i class="bi bi-bag-check-fill header-icon" style="color: #f59e0b;"></i>
+            <span>Purchase Management</span>
+          </div>
+          <i class="bi bi-chevron-down chevron-icon" [class.rotate]="isPurchaseMenuOpen"></i>
+        </div>
+
+        <a *ngIf="isSidebarCollapsed" (click)="isSidebarCollapsed = false; isPurchaseMenuOpen = true" class="menu-item root-item" style="cursor: pointer;" title="Purchase Management">
+          <i class="bi bi-bag-check-fill menu-icon" style="color: #f59e0b;"></i>
+        </a>
+
+        <div class="sub-menu" *ngIf="isPurchaseMenuOpen && !isSidebarCollapsed">
+          <a routerLink="/purchase" class="sub-menu-item">
+            <i class="bi bi-cart-plus-fill sub-icon text-info"></i>
+            <span>Purchase</span>
+          </a>
+          <a routerLink="/purchase-returns" class="sub-menu-item">
+            <i class="bi bi-arrow-return-left sub-icon text-danger"></i>
+            <span>Purchase Return</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- 3. TABLETS & MEDICINES -->
+      <div class="nav-group" *ngIf="canAccess('TABLETS')">
+        <a routerLink="/tablets" class="menu-item root-item" title="Tablets & Medicines">
+          <i class="bi bi-capsule-pill menu-icon text-emerald"></i>
+          <span class="menu-text" *ngIf="!isSidebarCollapsed">Tablets & Medicines</span>
+        </a>
+      </div>
+
+      <!-- 4. AI CLINICAL ASSISTANT -->
+      <div class="nav-group" *ngIf="canAccess('AI_ASSISTANT')">
+        <a routerLink="/ai-assistant" class="menu-item root-item" title="AI Medical Assistant">
+          <i class="bi bi-robot menu-icon" style="color: #a855f7;"></i>
+          <span class="menu-text" *ngIf="!isSidebarCollapsed">AI Clinical Assistant</span>
+          <span class="badge-pos-pulse" style="background: #7c3aed;" *ngIf="!isSidebarCollapsed">AI DB</span>
+        </a>
+      </div>
+
+      <!-- 5. PATIENT MANAGEMENT -->
+      <div class="nav-group" *ngIf="canAccess('PATIENT_LIST') || canAccess('PATIENT_REGISTRATION') || canAccess('PATIENT_DETAILS')">
+        <div class="menu-header" (click)="togglePatientMenu()" [class.expanded]="isPatientMenuOpen" *ngIf="!isSidebarCollapsed">
+          <div class="header-left">
+            <i class="bi bi-person-vcard-fill header-icon"></i>
+            <span>Patient Management</span>
+          </div>
+          <i class="bi bi-chevron-down chevron-icon" [class.rotate]="isPatientMenuOpen"></i>
+        </div>
+
+        <a *ngIf="isSidebarCollapsed" (click)="openPatientFromCollapsed()" class="menu-item root-item" style="cursor: pointer;" title="Patient Management">
+          <i class="bi bi-person-vcard-fill menu-icon"></i>
+        </a>
+
+        <div class="sub-menu" *ngIf="isPatientMenuOpen && !isSidebarCollapsed">
+          <a routerLink="/patients" class="sub-menu-item" *ngIf="canAccess('PATIENT_LIST')">
+            <i class="bi bi-people-fill sub-icon"></i>
+            <span>Patient List</span>
+            <span class="count-badge">{{ totalPatientsCount }}</span>
+          </a>
+          <a routerLink="/patient-registration" class="sub-menu-item" *ngIf="canAccess('PATIENT_REGISTRATION')">
+            <i class="bi bi-person-plus-fill sub-icon text-success"></i>
+            <span>Add Patient</span>
+          </a>
+          <a routerLink="/patient-drafts" class="sub-menu-item" *ngIf="canAccess('PATIENT_LIST')">
+            <i class="bi bi-file-earmark-text-fill sub-icon text-warning"></i>
+            <span>Patient Draft</span>
+            <span class="count-badge badge-warning" *ngIf="draftsCount > 0">{{ draftsCount }}</span>
+          </a>
+          <a routerLink="/dashboard" class="sub-menu-item" *ngIf="canAccess('DASHBOARD')">
+            <i class="bi bi-graph-up-arrow sub-icon text-primary"></i>
+            <span>Patient Analysis</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- 5.1 DOCTOR MANAGEMENT -->
+      <div class="nav-group" *ngIf="canAccess('DOCTORS')">
+        <div class="menu-header" (click)="toggleDoctorMenu()" [class.expanded]="isDoctorMenuOpen" *ngIf="!isSidebarCollapsed">
+          <div class="header-left">
+            <i class="bi bi-person-badge-fill header-icon text-cyan"></i>
+            <span>Doctor Management</span>
+          </div>
+          <i class="bi bi-chevron-down chevron-icon" [class.rotate]="isDoctorMenuOpen"></i>
+        </div>
+
+        <!-- Collapsed icon fallback -->
+        <a *ngIf="isSidebarCollapsed" (click)="openDoctorFromCollapsed()" class="menu-item root-item" style="cursor: pointer;" title="Doctor Management">
+          <i class="bi bi-person-badge-fill menu-icon" style="color: #06b6d4;"></i>
+        </a>
+
+        <div class="sub-menu" *ngIf="isDoctorMenuOpen && !isSidebarCollapsed">
+          <!-- Doctor List -->
+          <a routerLink="/doctors" class="sub-menu-item">
+            <i class="bi bi-person-lines-fill sub-icon text-cyan"></i>
+            <span>Doctor List</span>
+          </a>
+
+          <!-- Add Doctor -->
+          <a routerLink="/add-doctor" class="sub-menu-item">
+            <i class="bi bi-person-plus-fill sub-icon text-success"></i>
+            <span>Add Doctor</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- 6. USER MANAGEMENT (ACTIVE ON ROLES) -->
+      <div class="nav-group" *ngIf="canAccess('USER_MANAGEMENT') || canAccess('ACCESS') || canAccess('ROLES')">
+        <div class="menu-header" (click)="toggleUserMenu()" [class.expanded]="isUserMenuOpen" *ngIf="!isSidebarCollapsed">
+          <div class="header-left">
+            <i class="bi bi-person-gear header-icon"></i>
+            <span>User Management</span>
+          </div>
+          <i class="bi bi-chevron-down chevron-icon" [class.rotate]="isUserMenuOpen"></i>
+        </div>
+
+        <a *ngIf="isSidebarCollapsed" (click)="openUserFromCollapsed()" class="menu-item root-item active" style="cursor: pointer;" title="User Management">
+          <i class="bi bi-person-gear menu-icon"></i>
+        </a>
+
+        <div class="sub-menu" *ngIf="isUserMenuOpen && !isSidebarCollapsed">
+          <a routerLink="/users" class="sub-menu-item" *ngIf="canAccess('USER_MANAGEMENT')">
+            <i class="bi bi-people sub-icon"></i>
+            <span>User List</span>
+            <span class="count-badge">{{ totalUsersCount }}</span>
+          </a>
+          <a routerLink="/access" class="sub-menu-item" *ngIf="canAccess('ACCESS')">
+            <i class="bi bi-key-fill sub-icon text-info"></i>
+            <span>Access</span>
+            <span class="count-badge" style="background: #0284c7;">DB</span>
+          </a>
+          <!-- ROLE (CURRENT PAGE ACTIVE) -->
+          <a routerLink="/roles" class="sub-menu-item active" *ngIf="canAccess('ROLES')">
+            <i class="bi bi-shield-check sub-icon text-emerald"></i>
+            <span>Role</span>
+            <span class="count-badge" style="background: #059669;">DB</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- 7. SETTINGS & STORE MENU -->
+      <div class="nav-group" *ngIf="canAccess('STORE_SETTINGS') || canAccess('CATEGORIES') || canAccess('TAX_SETTINGS')">
+        <div class="menu-header" (click)="toggleSettingsMenu()" [class.expanded]="isSettingsMenuOpen" *ngIf="!isSidebarCollapsed">
+          <div class="header-left">
+            <i class="bi bi-gear-fill header-icon text-secondary"></i>
+            <span>Settings</span>
+          </div>
+          <i class="bi bi-chevron-down chevron-icon" [class.rotate]="isSettingsMenuOpen"></i>
+        </div>
+
+        <a *ngIf="isSidebarCollapsed" (click)="openSettingsFromCollapsed()" class="menu-item root-item" style="cursor: pointer;" title="Settings: Store Config, Category, Tax">
+          <i class="bi bi-gear-fill menu-icon"></i>
+        </a>
+
+        <div class="sub-menu" *ngIf="isSettingsMenuOpen && !isSidebarCollapsed">
+          <a routerLink="/settings" class="sub-menu-item" *ngIf="canAccess('STORE_SETTINGS')">
+            <i class="bi bi-shop-window sub-icon text-emerald"></i>
+            <span>Store Configuration</span>
+          </a>
+          <a routerLink="/category" class="sub-menu-item" *ngIf="canAccess('CATEGORIES')">
+            <i class="bi bi-tags-fill sub-icon text-primary"></i>
+            <span>Category</span>
+            <span class="count-badge" style="background: #2563eb;">DB</span>
+          </a>
+          <a routerLink="/tax" class="sub-menu-item" *ngIf="canAccess('TAX_SETTINGS')">
+            <i class="bi bi-percent sub-icon text-warning"></i>
+            <span>Tax</span>
+            <span class="count-badge" style="background: #059669;">DB</span>
+          </a>
+          <a routerLink="/warehouse" class="sub-menu-item">
+            <i class="bi bi-building-gear sub-icon text-info"></i>
+            <span>Warehouse</span>
+            <span class="count-badge" style="background: #0284c7;">DB</span>
+          </a>
+          <a routerLink="/brand" class="sub-menu-item">
+            <i class="bi bi-award-fill sub-icon text-purple"></i>
+            <span>Brand</span>
+            <span class="count-badge" style="background: #9333ea;">DB</span>
+          </a>
+          <a routerLink="/branch" class="sub-menu-item">
+            <i class="bi bi-diagram-3-fill sub-icon text-teal"></i>
+            <span>Branch</span>
+            <span class="count-badge" style="background: #0d9488;">DB</span>
+          </a>
+        </div>
+      </div>
+
+    </nav>
+
+    <!-- Sidebar Footer (User Info & Logout) -->
+    <div class="sidebar-footer">
+      <div class="user-brief" *ngIf="!isSidebarCollapsed">
+        <div class="user-avatar-sm">
+          {{ (loggedInUser || 'A').charAt(0).toUpperCase() }}
+        </div>
+        <div class="user-details-sm">
+          <span class="u-name">{{ loggedInUser }}</span>
+          <span class="u-role">{{ userRole }}</span>
+        </div>
+      </div>
+
+      <button type="button" class="sidebar-logout-btn" (click)="logout()" title="Sign Out">
+        <i class="bi bi-box-arrow-right"></i>
+        <span *ngIf="!isSidebarCollapsed">Logout</span>
+      </button>
+    </div>
+
+  </aside>
+
+  <!-- ================= MAIN CONTENT AREA ================= -->
+  <main class="main-content">
+    
+    <!-- Top Action Header -->
+    <header class="page-header">
+      <div class="header-left-bar">
+        <button type="button" class="sidebar-toggle-btn" (click)="toggleSidebar()" title="Toggle Sidebar">
+          <i class="bi bi-list"></i>
+        </button>
+
+        <button type="button" class="btn-back" (click)="goBack()" title="Back to Previous Page">
+          <i class="bi bi-arrow-left"></i>
+          <span>Back</span>
+        </button>
+
+        <div class="page-title-box">
+          <div class="icon-circle">
+            <i class="bi bi-shield-lock-fill"></i>
+          </div>
+          <div>
+            <h1 class="page-title">Role Management</h1>
+            <span class="page-subtitle">Configure hospital staff roles, designations, and system access permissions</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="header-right-bar">
+        <div class="live-clock">
+          <i class="bi bi-clock-history text-emerald"></i>
+          <span>{{ currentDateTime }}</span>
+        </div>
+        <button
+          type="button"
+          class="btn-add-role"
+          (click)="openAddModal()"
+          [disabled]="!canWriteRole"
+          [class.action-disabled]="!canWriteRole"
+          [title]="!canWriteRole ? 'Write permission required to add role' : 'Add Role'">
+          <i class="bi bi-plus-circle-fill"></i>
+          <span>+ Add Role</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Toast Notification Banner -->
+    <div class="toast-banner" *ngIf="toastMessage" [ngClass]="'toast-' + toastType">
+      <i class="bi" [ngClass]="{
+        'bi-check-circle-fill': toastType === 'success',
+        'bi-exclamation-triangle-fill': toastType === 'danger',
+        'bi-info-circle-fill': toastType === 'info'
+      }"></i>
+      <span>{{ toastMessage }}</span>
+    </div>
+
+    <!-- Stats & Filter Bar -->
+    <section class="filter-card">
+      <div class="search-box">
+        <i class="bi bi-search search-icon"></i>
+        <input 
+          type="text" 
+          class="search-input" 
+          placeholder="Search roles by name, designation, or access keyword..."
+          [(ngModel)]="searchQuery"
+          (input)="onSearchChange()">
+      </div>
+
+      <div class="status-filters">
+        <button 
+          type="button" 
+          class="status-btn" 
+          [class.active]="filterStatus === 'ALL'"
+          (click)="setFilterStatus('ALL')">
+          All Roles ({{ roles.length }})
+        </button>
+        <button 
+          type="button" 
+          class="status-btn active-filter" 
+          [class.active]="filterStatus === 'ACTIVE'"
+          (click)="setFilterStatus('ACTIVE')">
+          Active Only
+        </button>
+        <button 
+          type="button" 
+          class="status-btn inactive-filter" 
+          [class.active]="filterStatus === 'INACTIVE'"
+          (click)="setFilterStatus('INACTIVE')">
+          Inactive
+        </button>
+      </div>
+    </section>
+
+    <!-- Role Data Grid -->
+    <div class="grid-container">
+      <div class="table-responsive">
+        <table class="roles-table">
+          <thead>
+            <tr>
+              <th style="width: 240px;">Role Name</th>
+              <th style="width: 220px;">Designation</th>
+              <th style="width: 280px;">Access Permissions</th>
+              <th>Description</th>
+              <th style="width: 110px; text-align: center;">Status</th>
+              <th style="width: 130px; text-align: center;">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Loading skeleton -->
+            <tr *ngIf="loading">
+              <td colspan="6" class="text-center py-5">
+                <div class="spinner-border text-emerald" role="status">
+                  <span class="visually-hidden">Loading roles...</span>
+                </div>
+                <p class="mt-2 text-muted">Fetching roles from database...</p>
+              </td>
+            </tr>
+
+            <!-- Empty State -->
+            <tr *ngIf="!loading && filteredRoles.length === 0">
+              <td colspan="6" class="empty-state-cell">
+                <i class="bi bi-shield-x empty-icon"></i>
+                <h4 class="empty-title">No Roles Found</h4>
+                <p class="empty-desc">
+                  {{ searchQuery ? 'No roles match your search query.' : 'No roles available in the database yet.' }}
+                </p>
+                <button type="button" class="btn-empty-add" (click)="openAddModal()">
+                  <i class="bi bi-plus-lg"></i> Create First Role
+                </button>
+              </td>
+            </tr>
+
+            <!-- Data Rows -->
+            <tr *ngFor="let role of filteredRoles" class="role-row">
+              <!-- Role Name -->
+              <td>
+                <div class="role-name-cell">
+                  <div class="role-icon-box">
+                    <i class="bi bi-person-badge-fill"></i>
+                  </div>
+                  <div>
+                    <strong class="role-title">{{ role.roleName }}</strong>
+                    <span class="role-id-tag">#ROLE-{{ role.id }}</span>
+                  </div>
+                </div>
+              </td>
+
+              <!-- Designation -->
+              <td>
+                <div class="designation-badge">
+                  <i class="bi bi-briefcase-fill text-muted"></i>
+                  <span>{{ role.designation || 'General Staff' }}</span>
+                </div>
+              </td>
+
+              <!-- Access Permissions -->
+              <td>
+                <div class="access-cell">
+                  <span class="access-pill" *ngIf="role.accessLevel">
+                    <i class="bi bi-key-fill text-warning"></i>
+                    {{ role.accessLevel }}
+                  </span>
+                  <span class="text-muted" *ngIf="!role.accessLevel">—</span>
+                </div>
+              </td>
+
+              <!-- Description -->
+              <td>
+                <div class="desc-cell" [title]="role.description || ''">
+                  {{ role.description || 'No description provided' }}
+                </div>
+              </td>
+
+              <!-- Status -->
+              <td style="text-align: center;">
+                <button 
+                  type="button" 
+                  class="badge-status-btn"
+                  [ngClass]="role.status === 'ACTIVE' ? 'badge-active' : 'badge-inactive'"
+                  (click)="toggleStatus(role)"
+                  title="Click to toggle status">
+                  <i class="bi" [ngClass]="role.status === 'ACTIVE' ? 'bi-check-circle-fill' : 'bi-x-circle-fill'"></i>
+                  {{ role.status }}
+                </button>
+              </td>
+
+              <!-- Action (Edit and Delete icons) -->
+              <td style="text-align: center;">
+                <div class="action-btn-group">
+                  <!-- Edit Icon Button -->
+                  <button 
+                    *ngIf="canUpdateRole"
+                    type="button" 
+                    class="btn-action btn-edit" 
+                    (click)="openEditModal(role)"
+                    title="Edit Role">
+                    <i class="bi bi-pencil-square"></i>
+                  </button>
+
+                  <!-- Delete Icon Button -->
+                  <button 
+                    *ngIf="canDeleteRole"
+                    type="button" 
+                    class="btn-action btn-delete" 
+                    (click)="confirmDelete(role)"
+                    title="Delete Role">
+                    <i class="bi bi-trash3-fill"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Table Footer Summary -->
+      <div class="table-footer-bar" *ngIf="!loading && filteredRoles.length > 0">
+        <span class="summary-text">
+          Showing <strong>{{ filteredRoles.length }}</strong> of <strong>{{ roles.length }}</strong> total roles in database
+        </span>
+        <span class="db-sync-indicator">
+          <i class="bi bi-database-check text-emerald"></i>
+          <span>MySQL Database Synced</span>
+        </span>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ================= ADD / EDIT ROLE MODAL ================= -->
+  <div class="modal-backdrop" *ngIf="showModal" (click)="closeModal()">
+    <div class="modal-card" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <div class="modal-title-box">
+          <div class="modal-icon-box">
+            <i class="bi" [ngClass]="isEditing ? 'bi-pencil-fill' : 'bi-shield-plus'"></i>
+          </div>
+          <div>
+            <h3 class="modal-title">{{ isEditing ? 'Edit Role' : 'Add New Role' }}</h3>
+            <span class="modal-subtitle">{{ isEditing ? 'Update role details and permissions' : 'Create a new staff role in database' }}</span>
+          </div>
+        </div>
+        <button type="button" class="btn-close-modal" (click)="closeModal()">
+          <i class="bi bi-x-lg"></i>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <form (ngSubmit)="saveRole()">
+          
+          <!-- Role Name & Designation (Row) -->
+          <div class="form-row">
+            <div class="form-group flex-1">
+              <label class="form-label">
+                Role Name <span class="required">*</span>
+              </label>
+              <div class="input-with-icon">
+                <i class="bi bi-shield-check input-icon"></i>
+                <input 
+                  type="text" 
+                  class="form-control" 
+                  placeholder="e.g. Senior Pharmacist, Cashier" 
+                  [(ngModel)]="roleForm.roleName" 
+                  name="roleName" 
+                  required>
+              </div>
+            </div>
+
+            <div class="form-group flex-1">
+              <label class="form-label">Designation</label>
+              <div class="input-with-icon">
+                <i class="bi bi-briefcase input-icon"></i>
+                <input 
+                  type="text" 
+                  class="form-control" 
+                  placeholder="e.g. Pharmacy In-Charge, Billing Lead" 
+                  [(ngModel)]="roleForm.designation" 
+                  name="designation">
+              </div>
+            </div>
+          </div>
+
+          <!-- Access Permissions (Linked to MySQL access_permissions) -->
+          <div class="form-group">
+            <div class="d-flex align-items-center justify-content-between mb-1">
+              <label class="form-label mb-0">Access Set / Permissions <span class="text-danger">*</span></label>
+              <a routerLink="/access" (click)="closeModal()" class="text-emerald text-decoration-none small fw-semibold" style="font-size: 11.5px;">
+                <i class="bi bi-shield-lock-fill me-1"></i>Configure Access Sets
+              </a>
+            </div>
+            <div class="input-with-icon">
+              <i class="bi bi-key-fill input-icon text-warning"></i>
+              <select 
+                class="form-control form-select" 
+                [(ngModel)]="roleForm.accessLevel" 
+                name="accessLevel"
+                required>
+                <option value="" disabled>-- Select an Access Set from Database --</option>
+                <option *ngFor="let acc of accessSets" [value]="acc.name">
+                  {{ acc.name }} — {{ acc.description || 'Configured Access Set' }}
+                </option>
+                <option *ngIf="accessSets.length === 0" [value]="roleForm.accessLevel || 'Full System Access'">
+                  {{ roleForm.accessLevel || 'Full System Access (Default)' }}
+                </option>
+              </select>
+            </div>
+            
+            <!-- Quick preset chips from Database Access Sets -->
+            <div class="preset-chips-container mt-2" *ngIf="accessSets.length > 0">
+              <span class="preset-label">Available Sets:</span>
+              <button 
+                type="button" 
+                class="preset-chip" 
+                *ngFor="let acc of accessSets"
+                [class.selected]="roleForm.accessLevel === acc.name"
+                (click)="roleForm.accessLevel = acc.name">
+                <i class="bi" [ngClass]="roleForm.accessLevel === acc.name ? 'bi-check-circle-fill text-success' : 'bi-shield-lock'"></i>
+                {{ acc.name }}
+              </button>
+            </div>
+
+            <div class="preset-chips-container mt-2" *ngIf="accessSets.length === 0">
+              <span class="preset-label">Quick Presets:</span>
+              <button 
+                type="button" 
+                class="preset-chip" 
+                *ngFor="let p of accessPresets"
+                [class.selected]="isAccessSelected(p)"
+                (click)="roleForm.accessLevel = p">
+                <i class="bi" [ngClass]="isAccessSelected(p) ? 'bi-check2' : 'bi-plus'"></i>
+                {{ p }}
+              </button>
+            </div>
+          </div>
+
+          <!-- Description -->
+          <div class="form-group">
+            <label class="form-label">Description</label>
+            <textarea 
+              class="form-control textarea-control" 
+              rows="3" 
+              placeholder="Provide a detailed description of this role's duties and operational scope..."
+              [(ngModel)]="roleForm.description" 
+              name="description"></textarea>
+          </div>
+
+          <!-- Status Selection -->
+          <div class="form-group">
+            <label class="form-label">Status</label>
+            <div class="status-radio-group">
+              <label class="radio-label" [class.selected]="roleForm.status === 'ACTIVE'">
+                <input type="radio" [(ngModel)]="roleForm.status" name="status" value="ACTIVE">
+                <i class="bi bi-check-circle-fill text-emerald"></i>
+                <span>Active</span>
+              </label>
+              <label class="radio-label" [class.selected]="roleForm.status === 'INACTIVE'">
+                <input type="radio" [(ngModel)]="roleForm.status" name="status" value="INACTIVE">
+                <i class="bi bi-x-circle-fill text-secondary"></i>
+                <span>Inactive</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Modal Actions -->
+          <div class="modal-footer">
+            <button type="button" class="btn-cancel" (click)="closeModal()" [disabled]="saving">
+              Cancel
+            </button>
+            <button type="submit" class="btn-save" [disabled]="saving || (isEditing ? !canUpdateRole : !canWriteRole)">
+              <i class="bi bi-check-lg" *ngIf="!saving"></i>
+              <span class="spinner-border spinner-border-sm me-2" *ngIf="saving"></span>
+              <span>{{ saving ? 'Saving...' : (isEditing ? 'Update Role' : 'Save Role') }}</span>
+            </button>
+          </div>
+
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= DELETE CONFIRMATION MODAL ================= -->
+  <div class="modal-backdrop" *ngIf="showDeleteModal" (click)="closeDeleteModal()">
+    <div class="modal-card modal-sm" (click)="$event.stopPropagation()">
+      <div class="delete-icon-wrapper">
+        <i class="bi bi-exclamation-triangle-fill text-danger"></i>
+      </div>
+      <h3 class="delete-title">Delete Role?</h3>
+      <p class="delete-message">
+        Are you sure you want to delete role <strong>"{{ deletingRole?.roleName }}"</strong>?
+        This action cannot be undone.
+      </p>
+
+      <div class="modal-footer justify-center">
+        <button type="button" class="btn-cancel" (click)="closeDeleteModal()" [disabled]="deleting">
+          Cancel
+        </button>
+        <button type="button" class="btn-confirm-delete" (click)="executeDelete()" [disabled]="deleting">
+          <span class="spinner-border spinner-border-sm me-2" *ngIf="deleting"></span>
+          <i class="bi bi-trash3-fill" *ngIf="!deleting"></i>
+          <span>{{ deleting ? 'Deleting...' : 'Delete Role' }}</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+</div>

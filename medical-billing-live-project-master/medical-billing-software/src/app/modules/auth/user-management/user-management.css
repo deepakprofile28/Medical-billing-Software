@@ -35,8 +35,6 @@
 
 .user-management-page {
   font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  min-height: 100vh;
-  padding: 24px 32px;
   color: var(--text-main);
   box-sizing: border-box;
 }

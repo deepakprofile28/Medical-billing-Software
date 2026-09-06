@@ -5,6 +5,7 @@ import { Router, RouterModule } from '@angular/router';
 import { catchError, of } from 'rxjs';
 import { PatientService, Patient } from '../../../../services/patient.service';
 import { AuthService, SignupRequest } from '../../../../services/auth.service';
+import { DoctorService } from '../../../../services/doctor.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -18,6 +19,7 @@ import { AuthService, SignupRequest } from '../../../../services/auth.service';
   styleUrl: './dashboard.css'
 })
 export class Dashboard implements OnInit, OnDestroy {
+  isPurchaseMenuOpen = false;
 
   // =====================================================
   // LOADING & STATE
@@ -28,17 +30,20 @@ export class Dashboard implements OnInit, OnDestroy {
   private clockSubscription?: ReturnType<typeof setInterval>;
 
   // =====================================================
-  // SIDEBAR NAVIGATION STATE
+  // SIDEBAR NAVIGATION STATE (Closed / Collapsed by default)
   // =====================================================
   isSidebarCollapsed = false;
-  isPatientMenuOpen = true;
-  isUserMenuOpen = true;
+  isPatientMenuOpen = false;
+  isDoctorMenuOpen = false;
+  isUserMenuOpen = false;
+  isSettingsMenuOpen = false;
+  isSalesMenuOpen = false;
 
   // =====================================================
   // STORE CONTEXT & LOGGED-IN USER
   // =====================================================
   activeStoreName = 'Apollo';
-  activeStoreId = '6';
+  activeStoreId = '1';
   loggedInUser = 'Administrator';
   userRole = 'ADMIN';
 
@@ -85,6 +90,7 @@ export class Dashboard implements OnInit, OnDestroy {
   constructor(
     private patientService: PatientService,
     private authService: AuthService,
+    private doctorService: DoctorService,
     private router: Router,
     private cdr: ChangeDetectorRef
   ) {}
@@ -94,6 +100,19 @@ export class Dashboard implements OnInit, OnDestroy {
     this.updateClock();
     this.clockSubscription = setInterval(() => this.updateClock(), 1000);
     this.loadDashboardData();
+    this.loadDoctorMetrics();
+  }
+
+  loadDoctorMetrics(): void {
+    this.doctorService.getAllDoctors(this.activeStoreId).subscribe({
+      next: (docs) => {
+        if (docs && docs.length > 0) {
+          this.doctorCount = docs.length;
+          this.cdr.detectChanges();
+        }
+      },
+      error: () => {}
+    });
   }
 
   ngOnDestroy(): void {
@@ -340,14 +359,50 @@ export class Dashboard implements OnInit, OnDestroy {
   // =====================================================
   toggleSidebar(): void {
     this.isSidebarCollapsed = !this.isSidebarCollapsed;
+    if (!this.isSidebarCollapsed) {
+      this.isSettingsMenuOpen = true;
+      this.isPatientMenuOpen = true;
+    }
+  }
+
+  openSettingsFromCollapsed(): void {
+    this.isSidebarCollapsed = false;
+    this.isSettingsMenuOpen = true;
+    this.cdr.detectChanges();
+  }
+
+  openPatientFromCollapsed(): void {
+    this.isSidebarCollapsed = false;
+    this.isPatientMenuOpen = true;
+    this.cdr.detectChanges();
+  }
+
+  openDoctorFromCollapsed(): void {
+    this.isSidebarCollapsed = false;
+    this.isDoctorMenuOpen = true;
+    this.cdr.detectChanges();
+  }
+
+  openUserFromCollapsed(): void {
+    this.isSidebarCollapsed = false;
+    this.isUserMenuOpen = true;
+    this.cdr.detectChanges();
   }
 
   togglePatientMenu(): void {
     this.isPatientMenuOpen = !this.isPatientMenuOpen;
   }
 
+  toggleDoctorMenu(): void {
+    this.isDoctorMenuOpen = !this.isDoctorMenuOpen;
+  }
+
   toggleUserMenu(): void {
     this.isUserMenuOpen = !this.isUserMenuOpen;
+  }
+
+  toggleSettingsMenu(): void {
+    this.isSettingsMenuOpen = !this.isSettingsMenuOpen;
   }
 
   scrollToAnalysis(): void {

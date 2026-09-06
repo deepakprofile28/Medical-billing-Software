@@ -39,6 +39,8 @@
 
 .dashboard-layout-wrapper {
   display: flex;
+  min-height: 100vh;
+  width: 100%;
   height: 100vh;
   max-height: 100vh;
   width: 100vw;
@@ -71,6 +73,8 @@
   transition: width 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow: 4px 0 25px rgba(0, 0, 0, 0.12);
   z-index: 100;
+  position: sticky;
+  top: 0;
   height: 100vh;
   overflow-y: auto;
   overflow-x: hidden;
@@ -226,6 +230,18 @@
   padding: 2px 6px;
   border-radius: 20px;
   font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.badge-pos-pulse {
+  margin-left: auto;
+  font-size: 0.65rem;
+  background: #f59e0b;
+  color: #ffffff;
+  padding: 2px 7px;
+  border-radius: 20px;
+  font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
@@ -395,6 +411,7 @@
    ========================================================================== */
 .app-main-content {
   flex: 1;
+  padding: 24px 32px;
   height: 100vh;
   max-height: 100vh;
   overflow-y: auto;
@@ -791,7 +808,7 @@
 /* ==========================================================================
    ANALYTICS & TABLES GRIDS
    ========================================================================== */
-.analytics-grid, .tables-grid {
+.analytics-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 24px;
@@ -799,9 +816,17 @@
 }
 
 @media (max-width: 991px) {
-  .analytics-grid, .tables-grid {
+  .analytics-grid {
     grid-template-columns: 1fr;
   }
+}
+
+.tables-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  margin-bottom: 24px;
+  width: 100%;
 }
 
 .panel-card {
@@ -1022,44 +1047,100 @@
   font-weight: 600;
 }
 
-/* Table Design */
+/* ==========================================================================
+   TABLE RESPONSIVE & CUSTOM TABLE ALIGNMENTS
+   ========================================================================== */
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-light);
+}
+
 .custom-table {
   width: 100%;
-  border-collapse: collapse;
-  font-size: 0.82rem;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 0.84rem;
+  background: var(--surface);
 }
 
 .custom-table th {
   text-align: left;
-  padding: 12px 14px;
+  padding: 13px 18px;
   background: #f8fafc;
-  color: var(--text-muted);
+  color: #475569;
   font-weight: 700;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 2px solid var(--border);
   text-transform: uppercase;
   font-size: 0.72rem;
   letter-spacing: 0.5px;
-}
-
-.custom-table td {
-  padding: 12px 14px;
-  border-bottom: 1px solid var(--border-light);
+  white-space: nowrap;
   vertical-align: middle;
 }
 
-.custom-table tr:hover {
-  background: #fafafa;
+.custom-table td {
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--border-light);
+  vertical-align: middle;
+  white-space: nowrap;
+  color: var(--text-main);
+}
+
+.custom-table tbody tr:hover {
+  background: #f8fafc;
+}
+
+.custom-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* Explicit Column Alignments */
+.text-center {
+  text-align: center !important;
+}
+
+.text-end {
+  text-align: right !important;
+}
+
+/* Column Width Guides */
+.col-id { width: 80px; }
+.col-patient { min-width: 220px; }
+.col-contact { min-width: 180px; }
+.col-blood { width: 110px; }
+.col-city { min-width: 130px; }
+.col-status { width: 140px; }
+.col-action { width: 110px; }
+.col-user { min-width: 220px; }
+.col-email { min-width: 250px; }
+.col-role { width: 160px; }
+
+/* Cell Content Components */
+.badge-id {
+  display: inline-block;
+  padding: 3px 10px;
+  background: #f1f5f9;
+  color: #334155;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-weight: 700;
+  font-size: 0.78rem;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
 }
 
 .patient-cell {
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
+  white-space: nowrap;
 }
 
 .patient-avatar {
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
   background: linear-gradient(135deg, #2563eb, #1d4ed8);
   color: #ffffff;
@@ -1067,76 +1148,117 @@
   align-items: center;
   justify-content: center;
   font-weight: 700;
-  font-size: 0.82rem;
+  font-size: 0.85rem;
   flex-shrink: 0;
+  box-shadow: 0 2px 6px rgba(37, 99, 235, 0.25);
+}
+
+.avatar-staff {
+  background: linear-gradient(135deg, #059669, #0d9488) !important;
+  box-shadow: 0 2px 6px rgba(5, 150, 105, 0.25) !important;
+}
+
+.patient-info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
 }
 
 .patient-name {
   font-weight: 700;
+  font-size: 0.88rem;
   color: var(--text-main);
+  white-space: nowrap;
+  line-height: 1.3;
 }
 
 .patient-sub {
-  font-size: 0.72rem;
+  font-size: 0.73rem;
   color: var(--text-muted);
+  white-space: nowrap;
+  line-height: 1.2;
+  margin-top: 2px;
 }
 
 .contact-text {
   font-weight: 600;
   color: var(--text-main);
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  gap: 4px;
+  gap: 6px;
+  white-space: nowrap;
+  font-size: 0.84rem;
+}
+
+.city-text {
+  font-size: 0.84rem;
+  color: #334155;
+  white-space: nowrap;
+  font-weight: 500;
 }
 
 .blood-badge {
-  display: inline-block;
-  padding: 2px 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3px 10px;
   background: #fef2f2;
   color: #dc2626;
-  font-weight: 700;
-  font-size: 0.75rem;
-  border-radius: 4px;
+  font-weight: 800;
+  font-size: 0.76rem;
+  border-radius: 6px;
+  border: 1px solid #fecaca;
+  white-space: nowrap;
 }
 
 .status-pill {
-  display: inline-block;
-  padding: 3px 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 14px;
   border-radius: 20px;
-  font-size: 0.72rem;
-  font-weight: 600;
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
 }
 
 .status-active {
   background: #ecfdf5;
   color: #059669;
+  border: 1px solid #a7f3d0;
 }
 
-.badge-admin { background: #fee2e2; color: #dc2626; }
-.badge-pharmacist { background: #d1fae5; color: #059669; }
-.badge-billing { background: #e0e7ff; color: #4338ca; }
-.badge-doctor { background: #dbeafe; color: #2563eb; }
-.badge-receptionist { background: #fef3c7; color: #d97706; }
-.badge-default { background: #f1f5f9; color: #64748b; }
+.badge-admin { background: #fee2e2; color: #dc2626; border: 1px solid #fecaca; }
+.badge-pharmacist { background: #d1fae5; color: #059669; border: 1px solid #a7f3d0; }
+.badge-billing { background: #e0e7ff; color: #4338ca; border: 1px solid #c7d2fe; }
+.badge-doctor { background: #dbeafe; color: #2563eb; border: 1px solid #bfdbfe; }
+.badge-receptionist { background: #fef3c7; color: #d97706; border: 1px solid #fde68a; }
+.badge-default { background: #f1f5f9; color: #64748b; border: 1px solid var(--border); }
 
 .btn-table-action {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  padding: 5px 10px;
+  justify-content: center;
+  gap: 6px;
+  padding: 6px 14px;
   background: #eff6ff;
   color: #2563eb;
   border: 1px solid #bfdbfe;
   border-radius: 6px;
-  font-size: 0.76rem;
-  font-weight: 600;
+  font-size: 0.78rem;
+  font-weight: 700;
   cursor: pointer;
+  white-space: nowrap;
   transition: var(--transition);
 }
 
 .btn-table-action:hover {
   background: #2563eb;
   color: #ffffff;
+  border-color: #2563eb;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 6px rgba(37, 99, 235, 0.25);
 }
 
 .empty-table-state {

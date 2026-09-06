@@ -18,6 +18,7 @@ import {
   SignupRequest,
   CompanyRegistrationRequest
 } from '../../services/auth.service';
+import { RoleService, Role } from '../../services/role.service';
 
 
 @Component({
@@ -44,33 +45,13 @@ export class Signup implements OnInit {
   activeStoreName = '';
   activeStoreId = '';
 
-  readonly roles = [
-    {
-      value: 'PHARMACIST',
-      label: 'Pharmacist / Pharmacy Staff'
-    },
-    {
-      value: 'BILLING_OFFICER',
-      label: 'Medical Billing Specialist'
-    },
-    {
-      value: 'DOCTOR',
-      label: 'Doctor / Physician'
-    },
-    {
-      value: 'RECEPTIONIST',
-      label: 'Front Desk / Receptionist'
-    },
-    {
-      value: 'ADMIN',
-      label: 'Store Administrator / Co-Admin'
-    }
-  ];
+  roles: { value: string; label: string }[] = [];
 
   constructor(
     private fb: FormBuilder,
     private router: Router,
     private authService: AuthService,
+    private roleService: RoleService,
     private cdr: ChangeDetectorRef
   ) {}
 
@@ -81,7 +62,7 @@ export class Signup implements OnInit {
 
   ngOnInit(): void {
     this.activeStoreName = localStorage.getItem('companyName') || 'Apollo';
-    this.activeStoreId = localStorage.getItem('companyId') || '6';
+    this.activeStoreId = localStorage.getItem('companyId') || '1';
 
     this.signupForm = this.fb.group(
       {
@@ -110,7 +91,7 @@ export class Signup implements OnInit {
         ],
 
         role: [
-          'PHARMACIST',
+          '',
           [
             Validators.required
           ]
@@ -142,6 +123,39 @@ export class Signup implements OnInit {
         validators: this.passwordMatchValidator
       }
     );
+
+    this.loadDbRoles();
+  }
+
+  loadDbRoles(): void {
+    this.roleService.getAllRoles(this.activeStoreId, false).subscribe({
+      next: (dbRoles: Role[]) => {
+        if (dbRoles && dbRoles.length > 0) {
+          this.roles = dbRoles
+            .filter(r => !r.status || r.status.toUpperCase() === 'ACTIVE')
+            .map(r => {
+              const name = (r.roleName || '').trim();
+              const desig = (r.designation || '').trim();
+              const label = desig && desig.toLowerCase() !== name.toLowerCase()
+                ? `${name} (${desig})`
+                : name;
+              return {
+                value: name,
+                label: label
+              };
+            });
+          if (this.roles.length > 0 && !this.signupForm.get('role')?.value) {
+            this.signupForm.patchValue({ role: this.roles[0].value });
+          }
+        } else {
+          this.roles = [];
+        }
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        console.error('Error loading roles from MySQL in signup:', err);
+      }
+    });
   }
 
   // =====================================================

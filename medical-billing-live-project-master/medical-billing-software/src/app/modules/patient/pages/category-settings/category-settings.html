@@ -1,0 +1,615 @@
+<div class="dashboard-layout-wrapper" [class.sidebar-collapsed]="isSidebarCollapsed">
+
+  <!-- ================= LEFT SIDEBAR NAVIGATION ================= -->
+  <aside class="app-sidebar">
+    <!-- Brand Header -->
+    <div class="sidebar-brand">
+      <div class="brand-logo-icon">
+        <i class="bi bi-hospital-fill"></i>
+      </div>
+      <div class="brand-info" *ngIf="!isSidebarCollapsed">
+        <h1 class="brand-name">{{ activeStoreName }}</h1>
+        <span class="brand-tag">Pharmacy Cloud</span>
+      </div>
+    </div>
+
+    <!-- Navigation Links -->
+    <nav class="sidebar-nav">
+      
+      <!-- 1. Dashboard -->
+      <a routerLink="/dashboard" class="menu-item root-item" title="Dashboard">
+        <i class="bi bi-grid-1x2-fill menu-icon"></i>
+        <span class="menu-label" *ngIf="!isSidebarCollapsed">Dashboard</span>
+      </a>
+
+      <!-- 2. POS Billing Counter -->
+      <a routerLink="/pos" class="menu-item root-item" title="POS Billing Counter">
+        <i class="bi bi-receipt-cutoff menu-icon"></i>
+        <span class="menu-label" *ngIf="!isSidebarCollapsed">POS Billing</span>
+      </a>
+
+      <!-- SALES MENU -->
+      <div class="nav-group">
+        <div class="menu-header" (click)="isSalesMenuOpen = !isSalesMenuOpen" [class.expanded]="isSalesMenuOpen" *ngIf="!isSidebarCollapsed">
+          <div class="header-left">
+            <i class="bi bi-cart-check-fill header-icon text-success"></i>
+            <span>Sales Management</span>
+          </div>
+          <i class="bi bi-chevron-down chevron-icon" [class.rotate]="isSalesMenuOpen"></i>
+        </div>
+
+        <a *ngIf="isSidebarCollapsed" (click)="isSidebarCollapsed = false; isSalesMenuOpen = true" class="menu-item root-item" style="cursor: pointer;" title="Sales Management">
+          <i class="bi bi-cart-check-fill menu-icon text-success"></i>
+        </a>
+
+        <div class="sub-menu" *ngIf="isSalesMenuOpen && !isSidebarCollapsed">
+          <a routerLink="/sales-transactions" class="sub-menu-item">
+            <i class="bi bi-credit-card-2-front-fill sub-icon text-primary"></i>
+            <span>Transaction</span>
+          </a>
+          <a routerLink="/sales-orders" class="sub-menu-item">
+            <i class="bi bi-box-seam-fill sub-icon text-info"></i>
+            <span>Order</span>
+          </a>
+          <a routerLink="/sales-suspended" class="sub-menu-item">
+            <i class="bi bi-pause-circle-fill sub-icon text-warning"></i>
+            <span>Order Suspended</span>
+          </a>
+          <a routerLink="/sales-completed" class="sub-menu-item">
+            <i class="bi bi-check-circle-fill sub-icon text-success"></i>
+            <span>Completed</span>
+          </a>
+          <a routerLink="/sales-exchange" class="sub-menu-item">
+            <i class="bi bi-arrow-repeat sub-icon text-purple"></i>
+            <span>Exchange</span>
+          </a>
+          <a routerLink="/sales-returns" class="sub-menu-item">
+            <i class="bi bi-arrow-counterclockwise sub-icon text-danger"></i>
+            <span>Return and Refund</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- 3. Tablets / Medicines Inventory -->
+      
+      <!-- PURCHASE MENU -->
+      <div class="nav-group">
+        <div class="menu-header" (click)="isPurchaseMenuOpen = !isPurchaseMenuOpen" [class.expanded]="isPurchaseMenuOpen" *ngIf="!isSidebarCollapsed">
+          <div class="header-left">
+            <i class="bi bi-bag-check-fill header-icon" style="color: #f59e0b;"></i>
+            <span>Purchase Management</span>
+          </div>
+          <i class="bi bi-chevron-down chevron-icon" [class.rotate]="isPurchaseMenuOpen"></i>
+        </div>
+
+        <a *ngIf="isSidebarCollapsed" (click)="isSidebarCollapsed = false; isPurchaseMenuOpen = true" class="menu-item root-item" style="cursor: pointer;" title="Purchase Management">
+          <i class="bi bi-bag-check-fill menu-icon" style="color: #f59e0b;"></i>
+        </a>
+
+        <div class="sub-menu" *ngIf="isPurchaseMenuOpen && !isSidebarCollapsed">
+          <a routerLink="/purchase" class="sub-menu-item">
+            <i class="bi bi-cart-plus-fill sub-icon text-info"></i>
+            <span>Purchase</span>
+          </a>
+          <a routerLink="/purchase-returns" class="sub-menu-item">
+            <i class="bi bi-arrow-return-left sub-icon text-danger"></i>
+            <span>Purchase Return</span>
+          </a>
+        </div>
+      </div>
+
+      <a routerLink="/tablets" class="menu-item root-item" title="Tablets & Medicines Inventory">
+        <i class="bi bi-capsule menu-icon text-emerald"></i>
+        <span class="menu-label" *ngIf="!isSidebarCollapsed">Medicines Stock</span>
+      </a>
+
+      <!-- 4. Patient Hub -->
+      <div class="menu-group" [class.open]="isPatientMenuOpen">
+        <div class="menu-header" (click)="togglePatientMenu()" *ngIf="!isSidebarCollapsed">
+          <div class="header-left">
+            <i class="bi bi-people-fill header-icon"></i>
+            <span class="menu-label">Patient Hub</span>
+          </div>
+          <i class="bi bi-chevron-down chevron-icon" [class.rotate]="isPatientMenuOpen"></i>
+        </div>
+
+        <a *ngIf="isSidebarCollapsed" (click)="openPatientFromCollapsed()" class="menu-item root-item" style="cursor: pointer;" title="Patient Hub: Registration, List, Drafts">
+          <i class="bi bi-people-fill menu-icon"></i>
+        </a>
+
+        <div class="sub-menu" *ngIf="isPatientMenuOpen && !isSidebarCollapsed">
+          <a routerLink="/patient-registration" class="sub-menu-item">
+            <i class="bi bi-person-plus-fill sub-icon"></i>
+            <span>Registration</span>
+          </a>
+          <a routerLink="/patient-preview" class="sub-menu-item">
+            <i class="bi bi-card-checklist sub-icon"></i>
+            <span>Preview & List</span>
+            <span class="count-badge">{{ totalPatientsCount }}</span>
+          </a>
+          <a routerLink="/patient-drafts" class="sub-menu-item">
+            <i class="bi bi-file-earmark-text sub-icon"></i>
+            <span>Draft Records</span>
+            <span class="count-badge badge-warning">{{ draftsCount }}</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- 5. AI Assistant -->
+      <a routerLink="/ai-assistant" class="menu-item root-item" title="AI Assistant">
+        <i class="bi bi-robot menu-icon text-emerald"></i>
+        <span class="menu-label" *ngIf="!isSidebarCollapsed">AI Assistant</span>
+      </a>
+
+      <!-- 6. User Directory -->
+      <div class="menu-group" [class.open]="isUserMenuOpen">
+        <div class="menu-header" (click)="toggleUserMenu()" *ngIf="!isSidebarCollapsed">
+          <div class="header-left">
+            <i class="bi bi-person-gear header-icon"></i>
+            <span class="menu-label">Staff & Users</span>
+          </div>
+          <i class="bi bi-chevron-down chevron-icon" [class.rotate]="isUserMenuOpen"></i>
+        </div>
+
+        <a *ngIf="isSidebarCollapsed" (click)="openUserFromCollapsed()" class="menu-item root-item" style="cursor: pointer;" title="Staff Directory">
+          <i class="bi bi-person-gear menu-icon"></i>
+        </a>
+
+        <div class="sub-menu" *ngIf="isUserMenuOpen && !isSidebarCollapsed">
+          <a routerLink="/users" class="sub-menu-item">
+            <i class="bi bi-people sub-icon"></i>
+            <span>User List</span>
+            <span class="count-badge">{{ totalUsersCount }}</span>
+          </a>
+          <a routerLink="/access" class="sub-menu-item">
+            <i class="bi bi-key-fill sub-icon text-info"></i>
+            <span>Access</span>
+            <span class="count-badge" style="background: #0284c7;">DB</span>
+          </a>
+          <a routerLink="/roles" class="sub-menu-item">
+            <i class="bi bi-shield-check sub-icon text-emerald"></i>
+            <span>Role</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- 7. Settings (Store Configuration, Category, Tax) -->
+      <div class="menu-group open">
+        <div class="menu-header" (click)="toggleSettingsMenu()" *ngIf="!isSidebarCollapsed">
+          <div class="header-left">
+            <i class="bi bi-gear-fill header-icon"></i>
+            <span class="menu-label">Settings</span>
+          </div>
+          <i class="bi bi-chevron-down chevron-icon" [class.rotate]="isSettingsMenuOpen"></i>
+        </div>
+
+        <a *ngIf="isSidebarCollapsed" (click)="openSettingsFromCollapsed()" class="menu-item root-item active" style="cursor: pointer;" title="Settings: Store Config, Category, Tax">
+          <i class="bi bi-gear-fill menu-icon"></i>
+        </a>
+
+        <div class="sub-menu" *ngIf="isSettingsMenuOpen && !isSidebarCollapsed">
+          <a routerLink="/settings" class="sub-menu-item">
+            <i class="bi bi-shop-window sub-icon text-emerald"></i>
+            <span>Store Configuration</span>
+          </a>
+          <a routerLink="/category" class="sub-menu-item active">
+            <i class="bi bi-tags-fill sub-icon text-primary"></i>
+            <span>Category</span>
+            <span class="count-badge" style="background: #2563eb;">DB</span>
+          </a>
+          <a routerLink="/tax" class="sub-menu-item">
+            <i class="bi bi-percent sub-icon text-warning"></i>
+            <span>Tax</span>
+            <span class="count-badge" style="background: #059669;">DB</span>
+          </a>
+          <a routerLink="/warehouse" class="sub-menu-item">
+            <i class="bi bi-building-gear sub-icon text-info"></i>
+            <span>Warehouse</span>
+            <span class="count-badge" style="background: #0284c7;">DB</span>
+          </a>
+          <a routerLink="/brand" class="sub-menu-item">
+            <i class="bi bi-award-fill sub-icon text-purple"></i>
+            <span>Brand</span>
+            <span class="count-badge" style="background: #9333ea;">DB</span>
+          </a>
+          <a routerLink="/branch" class="sub-menu-item">
+            <i class="bi bi-diagram-3-fill sub-icon text-teal"></i>
+            <span>Branch</span>
+            <span class="count-badge" style="background: #0d9488;">DB</span>
+          </a>
+        </div>
+      </div>
+
+    </nav>
+
+    <!-- Sidebar Footer (User Info & Logout) -->
+    <div class="sidebar-footer">
+      <div class="user-profile-badge" *ngIf="!isSidebarCollapsed">
+        <div class="u-avatar">
+          {{ (loggedInUser || 'A').charAt(0).toUpperCase() }}
+        </div>
+        <div class="u-meta">
+          <span class="u-name">{{ loggedInUser }}</span>
+          <span class="u-role">{{ userRole }}</span>
+        </div>
+      </div>
+      <button type="button" class="sidebar-logout-btn" (click)="logout()" title="Logout">
+        <i class="bi bi-box-arrow-right"></i>
+        <span *ngIf="!isSidebarCollapsed">Sign Out</span>
+      </button>
+    </div>
+  </aside>
+
+  <!-- ================= MAIN CONTENT AREA ================= -->
+  <main class="app-main-content">
+
+    <!-- Top Navigation Card -->
+    <header class="top-nav-card">
+      <div class="top-nav-left">
+        <button type="button" class="btn-sidebar-toggle" (click)="toggleSidebar()" title="Toggle Navigation Menu">
+          <i class="bi bi-list"></i>
+        </button>
+        <div class="page-title-wrap">
+          <h2>Medicine Categories Master</h2>
+          <div class="breadcrumb-sub">
+            <span>Home</span> / <span>Settings</span> / <strong>Categories (MySQL Live Table: <code>categories</code>)</strong>
+          </div>
+        </div>
+      </div>
+
+      <!-- Actions & Sync Status -->
+      <div class="top-nav-right">
+        <div class="live-clock-pill">
+          <i class="bi bi-clock-fill text-primary"></i>
+          <span>{{ currentDateTime }}</span>
+        </div>
+
+        <button 
+          type="button" 
+          class="btn-add-cat-top" 
+          (click)="openAddModal()"
+          title="Add New Medicine Category">
+          <i class="bi bi-plus-circle-fill me-1"></i>
+          <span>Add Category</span>
+        </button>
+
+        <div class="top-user-pill">
+          <div class="avatar-circle">
+            {{ (loggedInUser || 'A').charAt(0).toUpperCase() }}
+          </div>
+          <div class="user-info-text">
+            <strong>{{ loggedInUser }}</strong>
+            <span class="badge-role">{{ userRole }}</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Toast Notification Banner -->
+    <div *ngIf="toastMessage" class="toast-floating">
+      <i class="bi bi-check-circle-fill me-2"></i>
+      <span>{{ toastMessage }}</span>
+    </div>
+
+    <!-- Summary Metrics Cards Row -->
+    <div class="cat-stats-row">
+      <div class="stat-card">
+        <div class="stat-icon-wrap bg-primary-light text-primary">
+          <i class="bi bi-tags-fill"></i>
+        </div>
+        <div class="stat-content">
+          <span class="stat-label">Total Categories</span>
+          <strong class="stat-value">{{ categories.length }}</strong>
+          <span class="stat-sub">Persisted in MySQL</span>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon-wrap bg-emerald-light text-emerald">
+          <i class="bi bi-check-circle-fill"></i>
+        </div>
+        <div class="stat-content">
+          <span class="stat-label">Active Categories</span>
+          <strong class="stat-value">{{ (categories | slice:0).length }}</strong>
+          <span class="stat-sub">Available in POS & Inventory</span>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon-wrap bg-warning-light text-warning">
+          <i class="bi bi-sort-numeric-down"></i>
+        </div>
+        <div class="stat-content">
+          <span class="stat-label">Display Order</span>
+          <strong class="stat-value">Custom Position</strong>
+          <span class="stat-sub">Sequential Sort in POS</span>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon-wrap bg-blue-light text-blue">
+          <i class="bi bi-cpu-fill"></i>
+        </div>
+        <div class="stat-content">
+          <span class="stat-label">Automatic Seeding</span>
+          <strong class="stat-value">7 Initial Types</strong>
+          <span class="stat-sub">Tablets, Syrups, Injections...</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================= SINGLE GRID PAGE FOR CATEGORIES ================= -->
+    <div class="cat-grid-card">
+      
+      <!-- Table Filter & Action Toolbar -->
+      <div class="grid-toolbar">
+        <div class="search-box-wrap">
+          <i class="bi bi-search search-icon"></i>
+          <input 
+            type="text" 
+            class="search-input" 
+            [(ngModel)]="searchQuery" 
+            (input)="onSearchChange()"
+            placeholder="Search category name, code (e.g. TAB, SYR), description..." />
+        </div>
+
+        <div class="toolbar-actions">
+          <!-- Status Filter Pills -->
+          <div class="filter-pill-group">
+            <button 
+              type="button" 
+              class="pill-btn" 
+              [class.active]="filterStatus === 'ALL'" 
+              (click)="setFilterStatus('ALL')">
+              All ({{ categories.length }})
+            </button>
+            <button 
+              type="button" 
+              class="pill-btn" 
+              [class.active]="filterStatus === 'ACTIVE'" 
+              (click)="setFilterStatus('ACTIVE')">
+              Active
+            </button>
+            <button 
+              type="button" 
+              class="pill-btn" 
+              [class.active]="filterStatus === 'INACTIVE'" 
+              (click)="setFilterStatus('INACTIVE')">
+              Inactive
+            </button>
+          </div>
+
+          <!-- Refresh Button -->
+          <button type="button" class="btn-refresh" (click)="loadCategories()" title="Refresh from MySQL Database">
+            <i class="bi bi-arrow-clockwise" [class.spin]="loading"></i>
+          </button>
+
+          <!-- Primary Add Category Button -->
+          <button type="button" class="btn-add-cat-grid" (click)="openAddModal()">
+            <i class="bi bi-plus-lg me-1"></i>
+            <span>+ Add Category</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Categories Data Table -->
+      <div class="table-responsive-wrap">
+        <table class="cat-modern-table">
+          <thead>
+            <tr>
+              <th class="th-pos text-center">Position</th>
+              <th class="th-code">Category Code</th>
+              <th class="th-name">Category Name</th>
+              <th class="th-desc">Description</th>
+              <th class="th-status text-center">Status [Active / inActive]</th>
+              <th class="th-action text-center">Action [Edit and Delete]</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Loading Row -->
+            <tr *ngIf="loading">
+              <td colspan="6" class="text-center py-5">
+                <div class="spinner-border text-primary" role="status"></div>
+                <div class="mt-2 text-muted small">Loading categories directly from MySQL...</div>
+              </td>
+            </tr>
+
+            <!-- Empty Row -->
+            <tr *ngIf="!loading && filteredCategories.length === 0">
+              <td colspan="6" class="text-center py-5">
+                <i class="bi bi-tags text-muted" style="font-size: 2.5rem; opacity: 0.5;"></i>
+                <div class="mt-2 font-bold">No categories found</div>
+                <div class="text-muted small">Click "+ Add Category" to create your first medicine category.</div>
+              </td>
+            </tr>
+
+            <!-- Category Rows -->
+            <tr *ngFor="let cat of filteredCategories; let idx = index" [class.inactive-row]="cat.status === 'INACTIVE'">
+              
+              <!-- 1. Position -->
+              <td class="text-center">
+                <span class="position-badge">#{{ cat.position || (idx + 1) }}</span>
+              </td>
+
+              <!-- 2. Category Code -->
+              <td>
+                <span class="cat-code-pill font-mono">{{ cat.code || 'CAT' }}</span>
+              </td>
+
+              <!-- 3. Category Name -->
+              <td>
+                <div class="cat-name-cell">
+                  <i class="bi bi-folder2-open text-primary me-2"></i>
+                  <strong>{{ cat.name }}</strong>
+                </div>
+              </td>
+
+              <!-- 4. Description -->
+              <td>
+                <span class="cat-desc-text text-muted">{{ cat.description || '—' }}</span>
+              </td>
+
+              <!-- 5. Status [Active / inActive] -->
+              <td class="text-center">
+                <button 
+                  type="button" 
+                  class="status-toggle-btn"
+                  [class.status-active]="cat.status === 'ACTIVE'"
+                  [class.status-inactive]="cat.status === 'INACTIVE'"
+                  (click)="toggleCategoryStatus(cat)"
+                  title="Click to toggle Active / Inactive">
+                  <span class="status-dot"></span>
+                  <span>{{ cat.status === 'ACTIVE' ? 'Active' : 'Inactive' }}</span>
+                </button>
+              </td>
+
+              <!-- 6. Action [Edit and Delete] -->
+              <td class="text-center">
+                <div class="action-btn-group">
+                  <button 
+                    *ngIf="canUpdateCategory"
+                    type="button" 
+                    class="btn-action-edit" 
+                    (click)="openEditModal(cat)" 
+                    title="Edit Category">
+                    <i class="bi bi-pencil-fill"></i>
+                    <span>Edit</span>
+                  </button>
+
+                  <button 
+                    *ngIf="canDeleteCategory"
+                    type="button" 
+                    class="btn-action-delete" 
+                    (click)="deleteCategory(cat)" 
+                    title="Delete Category">
+                    <i class="bi bi-trash3-fill"></i>
+                    <span>Delete</span>
+                  </button>
+                </div>
+              </td>
+
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Grid Footer Info -->
+      <div class="grid-table-footer" *ngIf="!loading && filteredCategories.length > 0">
+        <span class="text-muted">
+          Showing <strong>{{ filteredCategories.length }}</strong> of <strong>{{ categories.length }}</strong> categories persisted in MySQL
+        </span>
+        <span class="badge-db-sync">
+          <i class="bi bi-database-check me-1"></i> MySQL Table: <code>categories</code>
+        </span>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- ================= ADD / EDIT CATEGORY MODAL ================= -->
+  <div class="modal-backdrop-custom" *ngIf="showModal" (click)="closeModal()">
+    <div class="modal-dialog-custom" (click)="$event.stopPropagation()">
+      
+      <div class="modal-header-custom">
+        <div class="modal-title-left">
+          <div class="modal-icon-badge">
+            <i class="bi bi-tags-fill"></i>
+          </div>
+          <div>
+            <h3>{{ isEditing ? 'Edit Category' : 'Add New Category' }}</h3>
+            <p>Configure category name, code, sort position, and active status in MySQL database.</p>
+          </div>
+        </div>
+        <button type="button" class="btn-close-modal" (click)="closeModal()">
+          <i class="bi bi-x-lg"></i>
+        </button>
+      </div>
+
+      <form (ngSubmit)="saveCategory()">
+        <div class="modal-body-custom">
+          
+          <!-- Category Name -->
+          <div class="form-group-modal">
+            <label>Category Name <span class="text-danger">*</span></label>
+            <input 
+              type="text" 
+              class="modal-input" 
+              [(ngModel)]="categoryForm.name" 
+              name="cat_name"
+              (input)="onNameChange()"
+              placeholder="e.g. Tablets, Syrups, Injections, Ointments" 
+              required />
+          </div>
+
+          <!-- Code & Position in 2 columns -->
+          <div class="form-grid-modal-2">
+            <div class="form-group-modal">
+              <label>Category Code <span class="text-danger">*</span></label>
+              <input 
+                type="text" 
+                class="modal-input font-mono" 
+                [(ngModel)]="categoryForm.code" 
+                name="cat_code"
+                placeholder="e.g. TAB, SYR, INJ" 
+                maxlength="10" />
+            </div>
+
+            <div class="form-group-modal">
+              <label>Display Position (Sort Order)</label>
+              <input 
+                type="number" 
+                class="modal-input font-mono" 
+                [(ngModel)]="categoryForm.position" 
+                name="cat_pos"
+                min="1" />
+            </div>
+          </div>
+
+          <!-- Description -->
+          <div class="form-group-modal">
+            <label>Description</label>
+            <textarea 
+              class="modal-textarea" 
+              [(ngModel)]="categoryForm.description" 
+              name="cat_desc"
+              rows="3"
+              placeholder="Describe medicines, dosage forms or items belonging to this category"></textarea>
+          </div>
+
+          <!-- Status Selector -->
+          <div class="form-group-modal">
+            <label>Status</label>
+            <div class="radio-pill-group">
+              <label class="radio-pill" [class.active]="categoryForm.status === 'ACTIVE'">
+                <input type="radio" [(ngModel)]="categoryForm.status" name="cat_status" value="ACTIVE" />
+                <i class="bi bi-check2-circle me-1"></i> Active (Visible in POS & Stock)
+              </label>
+              <label class="radio-pill" [class.active]="categoryForm.status === 'INACTIVE'">
+                <input type="radio" [(ngModel)]="categoryForm.status" name="cat_status" value="INACTIVE" />
+                <i class="bi bi-pause-circle me-1"></i> Inactive (Hidden)
+              </label>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="modal-footer-custom">
+          <button type="button" class="btn-cancel-modal" (click)="closeModal()">
+            Cancel
+          </button>
+          <button 
+            type="submit" 
+            class="btn-save-modal" 
+            [disabled]="saving || !categoryForm.name">
+            <i class="bi" [ngClass]="saving ? 'bi-arrow-repeat spin' : 'bi-cloud-arrow-up-fill'"></i>
+            <span>{{ saving ? 'Saving to DB...' : (isEditing ? 'Update Category' : 'Save Category') }}</span>
+          </button>
+        </div>
+      </form>
+
+    </div>
+  </div>
+
+</div>
+
