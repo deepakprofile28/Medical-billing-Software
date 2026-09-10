@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
+import { Component, HostListener, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
@@ -19,6 +19,7 @@ import { AccessService } from '../../../services/access.service';
 })
 export class WarehouseSettings implements OnInit, OnDestroy {
   isPurchaseMenuOpen = false;
+  isSupplierMenuOpen = false;
 
   canUpdateWarehouse = true;
   canDeleteWarehouse = true;
@@ -107,6 +108,16 @@ export class WarehouseSettings implements OnInit, OnDestroy {
   }
 
   toggleSidebar(): void { this.isSidebarCollapsed = !this.isSidebarCollapsed; }
+  
+  toggleSupplierMenu(): void {
+    this.isSupplierMenuOpen = !this.isSupplierMenuOpen;
+  }
+
+  openSupplierFromCollapsed(): void {
+    this.isSidebarCollapsed = false;
+    this.isSupplierMenuOpen = true;
+  }
+
   togglePatientMenu(): void { this.isPatientMenuOpen = !this.isPatientMenuOpen; }
   toggleDoctorMenu(): void { this.isDoctorMenuOpen = !this.isDoctorMenuOpen; }
   toggleUserMenu(): void { this.isUserMenuOpen = !this.isUserMenuOpen; }
@@ -260,5 +271,27 @@ export class WarehouseSettings implements OnInit, OnDestroy {
     this.toastMessage = msg;
     setTimeout(() => { this.toastMessage = ''; }, 3500);
   }
-}
 
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent) {
+    const sidebar = document.querySelector('.sidebar');
+    const toggleBtn = document.querySelector('.btn-sidebar-toggle') || document.querySelector('.toggle-btn');
+    const target = event.target as Node;
+    
+    if (sidebar && !sidebar.contains(target) && (!toggleBtn || !toggleBtn.contains(target))) {
+      this.closeAllMenus();
+    }
+  }
+
+  closeAllMenus() {
+    const self = this as any;
+    if (typeof self.isPatientMenuOpen !== 'undefined') self.isPatientMenuOpen = false;
+    if (typeof self.isDoctorMenuOpen !== 'undefined') self.isDoctorMenuOpen = false;
+    if (typeof self.isUserMenuOpen !== 'undefined') self.isUserMenuOpen = false;
+    if (typeof self.isSettingsMenuOpen !== 'undefined') self.isSettingsMenuOpen = false;
+    if (typeof self.isSalesMenuOpen !== 'undefined') self.isSalesMenuOpen = false;
+    if (typeof self.isPurchaseMenuOpen !== 'undefined') self.isPurchaseMenuOpen = false;
+    if (typeof self.isSupplierMenuOpen !== "undefined") self.isSupplierMenuOpen = false;
+  }
+
+}

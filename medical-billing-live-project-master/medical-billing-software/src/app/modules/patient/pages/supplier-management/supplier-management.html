@@ -1,0 +1,714 @@
+<div class="dashboard-layout-wrapper" [class.sidebar-collapsed]="isSidebarCollapsed">
+  
+  <!-- ======================================================== -->
+  <!-- 1. LEFT SIDEBAR NAVIGATION                               -->
+  <!-- ======================================================== -->
+  <aside class="app-sidebar">
+    <!-- Brand / Logo Area -->
+    <div class="sidebar-header">
+      <div class="logo-wrapper" *ngIf="!isSidebarCollapsed">
+        <div class="logo-icon-bg">
+          <i class="bi bi-hospital-fill"></i>
+        </div>
+        <div class="logo-text">
+          <span class="brand-title">PharmaCare</span>
+          <span class="brand-subtitle">Smart Billing Cloud</span>
+        </div>
+      </div>
+      
+      <div class="logo-icon-bg collapsed-logo" *ngIf="isSidebarCollapsed">
+        <i class="bi bi-hospital-fill"></i>
+      </div>
+
+      <button class="btn-toggle-sidebar" (click)="toggleSidebar()" title="Toggle Sidebar">
+        <i class="bi" [ngClass]="isSidebarCollapsed ? 'bi-chevron-right' : 'bi-chevron-left'"></i>
+      </button>
+    </div>
+
+    <!-- Scrollable Navigation Items -->
+    <nav class="sidebar-nav custom-scrollbar">
+      
+      <!-- 1. POS BILLING (PRIMARY HERO BUTTON) -->
+      <div class="nav-group mb-2">
+        <a routerLink="/pos" class="menu-item hero-pos-item" title="Quick POS Billing">
+          <i class="bi bi-cart-check-fill menu-icon"></i>
+          <span class="menu-text" *ngIf="!isSidebarCollapsed">POS Counter</span>
+          <span class="badge-pos-pulse" *ngIf="!isSidebarCollapsed">F1</span>
+        </a>
+      </div>
+
+      <!-- DASHBOARD LINK -->
+      <div class="nav-group">
+        <a routerLink="/dashboard" class="menu-item root-item">
+          <i class="bi bi-speedometer2 menu-icon text-primary"></i>
+          <span class="menu-text" *ngIf="!isSidebarCollapsed">Dashboard</span>
+        </a>
+      </div>
+
+      <!-- 2. SALES MANAGEMENT -->
+      <div class="nav-group">
+        <div class="menu-header" (click)="toggleSalesMenu()" [class.expanded]="isSalesMenuOpen" *ngIf="!isSidebarCollapsed">
+          <div class="header-left">
+            <i class="bi bi-receipt header-icon text-indigo"></i>
+            <span>Sales Management</span>
+          </div>
+          <i class="bi bi-chevron-down chevron-icon" [class.rotate]="isSalesMenuOpen"></i>
+        </div>
+
+        <a *ngIf="isSidebarCollapsed" (click)="openSalesFromCollapsed()" class="menu-item root-item" style="cursor: pointer;" title="Sales Management">
+          <i class="bi bi-receipt menu-icon text-indigo"></i>
+        </a>
+
+        <div class="sub-menu" *ngIf="isSalesMenuOpen && !isSidebarCollapsed">
+          <a routerLink="/sales-transactions" class="sub-menu-item">
+            <i class="bi bi-cash-coin sub-icon text-primary"></i>
+            <span>Sales Transaction</span>
+          </a>
+          <a routerLink="/sales-orders" class="sub-menu-item">
+            <i class="bi bi-journal-text sub-icon text-info"></i>
+            <span>Sales Order</span>
+          </a>
+          <a routerLink="/sales-suspended" class="sub-menu-item">
+            <i class="bi bi-pause-circle-fill sub-icon text-warning"></i>
+            <span>Order Suspended</span>
+          </a>
+          <a routerLink="/sales-completed" class="sub-menu-item">
+            <i class="bi bi-check-circle-fill sub-icon text-success"></i>
+            <span>Completed</span>
+          </a>
+          <a routerLink="/sales-exchange" class="sub-menu-item">
+            <i class="bi bi-arrow-repeat sub-icon text-purple"></i>
+            <span>Exchange</span>
+          </a>
+          <a routerLink="/sales-returns" class="sub-menu-item">
+            <i class="bi bi-arrow-counterclockwise sub-icon text-danger"></i>
+            <span>Return and Refund</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- 3. PRODUCTS -->
+      <div class="nav-group">
+        <a routerLink="/tablets" class="menu-item root-item">
+          <i class="bi bi-capsule-pill menu-icon text-emerald"></i>
+          <span class="menu-text" *ngIf="!isSidebarCollapsed">Products</span>
+        </a>
+      </div>
+
+      <!-- 4. PURCHASE MANAGEMENT -->
+      <div class="nav-group">
+        <div class="menu-header" (click)="togglePurchaseMenu()" [class.expanded]="isPurchaseMenuOpen" *ngIf="!isSidebarCollapsed">
+          <div class="header-left">
+            <i class="bi bi-bag-check-fill header-icon" style="color: #f59e0b;"></i>
+            <span>Purchase Management</span>
+          </div>
+          <i class="bi bi-chevron-down chevron-icon" [class.rotate]="isPurchaseMenuOpen"></i>
+        </div>
+
+        <a *ngIf="isSidebarCollapsed" (click)="isSidebarCollapsed = false; isPurchaseMenuOpen = true" class="menu-item root-item" style="cursor: pointer;" title="Purchase Management">
+          <i class="bi bi-bag-check-fill menu-icon" style="color: #f59e0b;"></i>
+        </a>
+
+        <div class="sub-menu" *ngIf="isPurchaseMenuOpen && !isSidebarCollapsed">
+          <a routerLink="/purchase" class="sub-menu-item">
+            <i class="bi bi-cart-plus-fill sub-icon text-info"></i>
+            <span>Purchase</span>
+          </a>
+          <a routerLink="/purchase-returns" class="sub-menu-item">
+            <i class="bi bi-arrow-return-left sub-icon text-danger"></i>
+            <span>Purchase Return</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- 5. SUPPLIER MANAGEMENT (DEDICATED TOP-LEVEL MODULE) -->
+      <div class="nav-group">
+        <div class="menu-header" (click)="toggleSupplierMenu()" [class.expanded]="isSupplierMenuOpen" *ngIf="!isSidebarCollapsed">
+          <div class="header-left">
+            <i class="bi bi-truck header-icon" style="color: #0284c7;"></i>
+            <span>Supplier Management</span>
+          </div>
+          <i class="bi bi-chevron-down chevron-icon" [class.rotate]="isSupplierMenuOpen"></i>
+        </div>
+
+        <a *ngIf="isSidebarCollapsed" (click)="openSupplierFromCollapsed()" class="menu-item root-item" style="cursor: pointer;" title="Supplier Management">
+          <i class="bi bi-truck menu-icon" style="color: #0284c7;"></i>
+        </a>
+
+        <div class="sub-menu" *ngIf="isSupplierMenuOpen && !isSidebarCollapsed">
+          <a routerLink="/supplier-list" routerLinkActive="active" class="sub-menu-item active">
+            <i class="bi bi-card-list sub-icon text-primary"></i>
+            <span>Supplier List</span>
+          </a>
+          <a routerLink="/supplier-registration" class="sub-menu-item">
+            <i class="bi bi-person-plus-fill sub-icon text-success"></i>
+            <span>Add Supplier</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- 5. AI CLINICAL ASSISTANT -->
+      <div class="nav-group">
+        <a routerLink="/ai-assistant" class="menu-item root-item" title="AI Medical Assistant">
+          <i class="bi bi-robot menu-icon" style="color: #a855f7;"></i>
+          <span class="menu-text" *ngIf="!isSidebarCollapsed">AI Clinical Assistant</span>
+          <span class="badge-pos-pulse" style="background: #7c3aed;" *ngIf="!isSidebarCollapsed">AI DB</span>
+        </a>
+      </div>
+
+      <!-- 6. PATIENT MANAGEMENT -->
+      <div class="nav-group">
+        <div class="menu-header" (click)="togglePatientMenu()" [class.expanded]="isPatientMenuOpen" *ngIf="!isSidebarCollapsed">
+          <div class="header-left">
+            <i class="bi bi-person-vcard-fill header-icon"></i>
+            <span>Patient Management</span>
+          </div>
+          <i class="bi bi-chevron-down chevron-icon" [class.rotate]="isPatientMenuOpen"></i>
+        </div>
+
+        <a *ngIf="isSidebarCollapsed" (click)="openPatientFromCollapsed()" class="menu-item root-item" style="cursor: pointer;" title="Patient Management">
+          <i class="bi bi-person-vcard-fill menu-icon"></i>
+        </a>
+
+        <div class="sub-menu" *ngIf="isPatientMenuOpen && !isSidebarCollapsed">
+          <a routerLink="/patients" class="sub-menu-item">
+            <i class="bi bi-people-fill sub-icon"></i>
+            <span>Patient List</span>
+          </a>
+          <a routerLink="/patient-registration" class="sub-menu-item">
+            <i class="bi bi-person-plus-fill sub-icon text-success"></i>
+            <span>Add Patient</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- 7. DOCTOR MANAGEMENT -->
+      <div class="nav-group">
+        <div class="menu-header" (click)="toggleDoctorMenu()" [class.expanded]="isDoctorMenuOpen" *ngIf="!isSidebarCollapsed">
+          <div class="header-left">
+            <i class="bi bi-heart-pulse-fill header-icon text-danger"></i>
+            <span>Doctor Management</span>
+          </div>
+          <i class="bi bi-chevron-down chevron-icon" [class.rotate]="isDoctorMenuOpen"></i>
+        </div>
+
+        <a *ngIf="isSidebarCollapsed" (click)="openDoctorFromCollapsed()" class="menu-item root-item" style="cursor: pointer;" title="Doctor Management">
+          <i class="bi bi-heart-pulse-fill menu-icon text-danger"></i>
+        </a>
+
+        <div class="sub-menu" *ngIf="isDoctorMenuOpen && !isSidebarCollapsed">
+          <a routerLink="/doctors" class="sub-menu-item">
+            <i class="bi bi-person-lines-fill sub-icon"></i>
+            <span>Doctor Directory</span>
+          </a>
+          <a routerLink="/doctor-registration" class="sub-menu-item">
+            <i class="bi bi-person-plus sub-icon text-success"></i>
+            <span>Add Doctor</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- 8. SETTINGS & CONFIG -->
+      <div class="nav-group">
+        <div class="menu-header" (click)="toggleSettingsMenu()" [class.expanded]="isSettingsMenuOpen" *ngIf="!isSidebarCollapsed">
+          <div class="header-left">
+            <i class="bi bi-gear-fill header-icon text-secondary"></i>
+            <span>Administration</span>
+          </div>
+          <i class="bi bi-chevron-down chevron-icon" [class.rotate]="isSettingsMenuOpen"></i>
+        </div>
+
+        <a *ngIf="isSidebarCollapsed" (click)="openSettingsFromCollapsed()" class="menu-item root-item" style="cursor: pointer;" title="Administration">
+          <i class="bi bi-gear-fill menu-icon text-secondary"></i>
+        </a>
+
+        <div class="sub-menu" *ngIf="isSettingsMenuOpen && !isSidebarCollapsed">
+          <a routerLink="/users" class="sub-menu-item">
+            <i class="bi bi-people sub-icon"></i>
+            <span>User Management</span>
+          </a>
+          <a routerLink="/roles" class="sub-menu-item">
+            <i class="bi bi-shield-check sub-icon"></i>
+            <span>Role Settings</span>
+          </a>
+          <a routerLink="/access" class="sub-menu-item">
+            <i class="bi bi-lock-fill sub-icon"></i>
+            <span>Access Settings</span>
+          </a>
+          <a routerLink="/settings" class="sub-menu-item">
+            <i class="bi bi-shop sub-icon"></i>
+            <span>Store Settings</span>
+          </a>
+          <a routerLink="/tax" class="sub-menu-item">
+            <i class="bi bi-percent sub-icon"></i>
+            <span>Tax Settings</span>
+          </a>
+          <a routerLink="/warehouse" class="sub-menu-item">
+            <i class="bi bi-building-gear sub-icon"></i>
+            <span>Warehouse</span>
+          </a>
+          <a routerLink="/brand" class="sub-menu-item">
+            <i class="bi bi-tag-fill sub-icon"></i>
+            <span>Brand Settings</span>
+          </a>
+          <a routerLink="/category-settings" class="sub-menu-item">
+            <i class="bi bi-grid-fill sub-icon"></i>
+            <span>Category Settings</span>
+          </a>
+          <a routerLink="/rack" class="sub-menu-item">
+            <i class="bi bi-box-seam sub-icon"></i>
+            <span>Rack Config</span>
+          </a>
+        </div>
+      </div>
+
+    </nav>
+
+    <!-- Sidebar Footer / User Profile -->
+    <div class="sidebar-footer" *ngIf="!isSidebarCollapsed">
+      <div class="user-info-card">
+        <div class="user-avatar">
+          <i class="bi bi-person-fill"></i>
+        </div>
+        <div class="user-details">
+          <span class="user-name">{{ loggedInUser }}</span>
+          <span class="user-role">{{ userRole }}</span>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ======================================================== -->
+  <!-- 2. MAIN CONTENT AREA                                     -->
+  <!-- ======================================================== -->
+  <main class="app-main-content">
+    
+    <!-- Top Bar Navigation Card -->
+    <header class="top-nav-card">
+      <div class="nav-left">
+        <button class="btn-sidebar-toggle-mobile" (click)="toggleSidebar()">
+          <i class="bi bi-list"></i>
+        </button>
+        <div class="active-store-indicator">
+          <span class="pulse-dot"></span>
+          <span class="store-label">Active Store:</span>
+          <strong class="store-name">{{ activeStoreName }} (#{{ activeStoreId }})</strong>
+        </div>
+      </div>
+
+      <div class="nav-right">
+        <!-- Digital Clock -->
+        <div class="live-clock-badge">
+          <i class="bi bi-clock-history"></i>
+          <span>{{ currentDateTime }}</span>
+        </div>
+
+        <a routerLink="/pos" class="btn-pos-shortcut" title="Open POS Billing Counter">
+          <i class="bi bi-cart-check-fill"></i>
+          <span>POS Billing (F1)</span>
+        </a>
+
+        <a routerLink="/purchase" class="btn-pos-shortcut" title="View Inward Purchases" style="background: rgba(245, 158, 11, 0.12); color: #b45309; border: 1px solid rgba(245, 158, 11, 0.3);">
+          <i class="bi bi-bag-check-fill"></i>
+          <span>Purchase</span>
+        </a>
+
+        <!-- Logout Button -->
+        <button class="btn-logout" (click)="logout()" title="Logout of Session">
+          <i class="bi bi-box-arrow-right"></i>
+        </button>
+      </div>
+    </header>
+
+    <!-- Page Content Container -->
+    <div class="dashboard-content-container">
+
+      <!-- Breadcrumbs -->
+      <div class="page-breadcrumb-nav">
+        <span class="breadcrumb-item"><i class="bi bi-house-door"></i> Home</span>
+        <i class="bi bi-chevron-right breadcrumb-separator"></i>
+        <span class="breadcrumb-item">Purchase Management</span>
+        <i class="bi bi-chevron-right breadcrumb-separator"></i>
+        <span class="breadcrumb-item active">Supplier Management</span>
+      </div>
+
+      <!-- STAT CARDS ROW -->
+      <div class="supplier-stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon-wrapper blue">
+            <i class="bi bi-truck"></i>
+          </div>
+          <div class="stat-content">
+            <span class="stat-label">Total Suppliers</span>
+            <h3 class="stat-value">{{ suppliers.length }}</h3>
+            <span class="stat-desc">Registered pharma vendors</span>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon-wrapper green">
+            <i class="bi bi-patch-check-fill"></i>
+          </div>
+          <div class="stat-content">
+            <span class="stat-label">Active Suppliers</span>
+            <h3 class="stat-value">{{ activeCount }}</h3>
+            <span class="stat-desc">Currently procuring stock</span>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon-wrapper orange">
+            <i class="bi bi-slash-circle"></i>
+          </div>
+          <div class="stat-content">
+            <span class="stat-label">Inactive / On Hold</span>
+            <h3 class="stat-value">{{ inactiveCount }}</h3>
+            <span class="stat-desc">Temporarily disabled</span>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon-wrapper purple">
+            <i class="bi bi-cash-stack"></i>
+          </div>
+          <div class="stat-content">
+            <span class="stat-label">Payment Terms</span>
+            <h3 class="stat-value">Net 30d Avg</h3>
+            <span class="stat-desc">Standard procurement cycle</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- MAIN TABLE CARD PANEL -->
+      <div class="table-card-panel">
+        
+        <!-- Table Header & Action Toolbar -->
+        <div class="table-panel-header">
+          <div class="header-titles">
+            <h2>Supplier & Vendor Directory</h2>
+            <p>Manage pharmaceutical vendors, contact personnel, and procurement terms for <strong>{{ activeStoreName }} (#{{ activeStoreId }})</strong></p>
+          </div>
+          
+          <div class="header-actions">
+            <!-- Search Bar -->
+            <div class="search-input-group">
+              <i class="bi bi-search search-icon"></i>
+              <input 
+                type="text" 
+                class="search-field" 
+                placeholder="Search vendor, code, GSTIN, phone, city..." 
+                [(ngModel)]="searchQuery" 
+              />
+              <button class="clear-search-btn" *ngIf="searchQuery" (click)="searchQuery = ''">
+                <i class="bi bi-x-circle-fill"></i>
+              </button>
+            </div>
+
+            <!-- Status Filter -->
+            <div class="filter-dropdown-group">
+              <select class="filter-select" [(ngModel)]="statusFilter">
+                <option value="ALL">All Statuses</option>
+                <option value="ACTIVE">Active Only</option>
+                <option value="INACTIVE">Inactive Only</option>
+              </select>
+            </div>
+
+            <!-- Add Supplier Primary Button -->
+            <a routerLink="/supplier-registration" class="btn-primary-action" style="text-decoration: none;">
+              <i class="bi bi-person-plus-fill"></i>
+              <span>Add New Supplier</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- Table View -->
+        <div class="table-responsive-wrapper custom-scrollbar">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th style="width: 10%">Code</th>
+                <th style="width: 25%">Supplier Name & GSTIN</th>
+                <th style="width: 18%">Contact Person</th>
+                <th style="width: 15%">Phone / Email</th>
+                <th style="width: 12%">Location</th>
+                <th style="width: 10%">Payment Terms</th>
+                <th style="width: 10%">Status</th>
+                <th style="width: 10%; text-align: center;">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let s of filteredSuppliers">
+                <!-- Supplier Code -->
+                <td>
+                  <span class="badge-code">{{ s.code || ('SUP-00' + s.id) }}</span>
+                </td>
+
+                <!-- Name & GSTIN -->
+                <td>
+                  <div class="supplier-name-cell">
+                    <div class="font-bold text-dark">{{ s.name }}</div>
+                    <div class="text-xs text-muted" *ngIf="s.gstin">
+                      <i class="bi bi-receipt-cutoff"></i> GSTIN: {{ s.gstin }}
+                    </div>
+                  </div>
+                </td>
+
+                <!-- Contact Person -->
+                <td>
+                  <div class="contact-cell">
+                    <span class="contact-name">{{ s.contactPerson || 'N/A' }}</span>
+                  </div>
+                </td>
+
+                <!-- Phone & Email -->
+                <td>
+                  <div class="contact-info-cell">
+                    <div class="phone-line">
+                      <i class="bi bi-telephone-fill text-success text-xs"></i>
+                      <span>{{ s.phone }}</span>
+                    </div>
+                    <div class="email-line text-xs text-muted" *ngIf="s.email">
+                      <i class="bi bi-envelope"></i> {{ s.email }}
+                    </div>
+                  </div>
+                </td>
+
+                <!-- Location -->
+                <td>
+                  <div class="location-cell">
+                    <span class="city-name">{{ s.city || 'Tamil Nadu' }}</span>
+                    <span class="state-sub text-xs text-muted" *ngIf="s.state">, {{ s.state }}</span>
+                  </div>
+                </td>
+
+                <!-- Payment Terms -->
+                <td>
+                  <span class="badge-terms">{{ s.paymentTerms || 'Net 30 Days' }}</span>
+                </td>
+
+                <!-- Status -->
+                <td>
+                  <button 
+                    class="status-pill" 
+                    [ngClass]="s.status === 'ACTIVE' ? 'status-active' : 'status-inactive'"
+                    (click)="toggleStatus(s)"
+                    title="Click to toggle status"
+                  >
+                    <i class="bi" [ngClass]="s.status === 'ACTIVE' ? 'bi-check-circle-fill' : 'bi-x-circle-fill'"></i>
+                    <span>{{ s.status }}</span>
+                  </button>
+                </td>
+
+                <!-- Actions -->
+                <td style="text-align: center;">
+                  <div class="table-actions">
+                    <button class="btn-action-icon edit-btn" (click)="openEditModal(s)" title="Edit Supplier Details">
+                      <i class="bi bi-pencil-square"></i>
+                    </button>
+                    <button class="btn-action-icon delete-btn" (click)="deleteSupplier(s)" title="Delete Supplier">
+                      <i class="bi bi-trash3"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+
+              <!-- Empty State -->
+              <tr *ngIf="filteredSuppliers.length === 0">
+                <td colspan="8" class="empty-state-cell">
+                  <div class="empty-state">
+                    <i class="bi bi-truck empty-icon"></i>
+                    <h4>No Suppliers Found</h4>
+                    <p>There are no suppliers matching "{{ searchQuery }}". Add a new supplier to start purchasing stock.</p>
+                    <button class="btn-primary-action btn-sm mt-2" (click)="openAddModal()">
+                      <i class="bi bi-plus-circle"></i> Add First Supplier
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Table Footer / Count -->
+        <div class="table-panel-footer">
+          <div class="record-counter">
+            Showing <strong>{{ filteredSuppliers.length }}</strong> of <strong>{{ suppliers.length }}</strong> registered vendors
+          </div>
+          <div class="footer-note">
+            Multi-Tenant Isolated Database for Store #{{ activeStoreId }}
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<!-- ======================================================== -->
+<!-- 3. ADD / EDIT SUPPLIER MODAL                             -->
+<!-- ======================================================== -->
+<div class="modal-backdrop-overlay" *ngIf="showModal" (click)="closeModal()">
+  <div class="modal-dialog-container modal-md-custom" (click)="$event.stopPropagation()">
+    
+    <div class="modal-header-custom">
+      <div class="modal-title-box">
+        <div class="modal-header-icon" [style.background]="isEditing ? '#0284c7' : '#10b981'">
+          <i class="bi" [ngClass]="isEditing ? 'bi-pencil-square' : 'bi-truck'"></i>
+        </div>
+        <div>
+          <h3>{{ isEditing ? 'Edit Supplier' : 'Register New Supplier' }}</h3>
+          <p class="modal-subtitle">Configure procurement vendor details and tax credentials</p>
+        </div>
+      </div>
+      <button class="modal-btn-close" (click)="closeModal()">
+        <i class="bi bi-x-lg"></i>
+      </button>
+    </div>
+
+    <div class="modal-body-custom">
+      
+      <div class="form-row-2col">
+        <div class="form-group">
+          <label>Supplier / Vendor Name <span class="required-star">*</span></label>
+          <input 
+            type="text" 
+            class="modal-input" 
+            [(ngModel)]="form.name" 
+            placeholder="e.g. Apollo Healthcare Logistics" 
+            required 
+          />
+        </div>
+        
+        <div class="form-group">
+          <label>Supplier Code</label>
+          <input 
+            type="text" 
+            class="modal-input" 
+            [(ngModel)]="form.code" 
+            placeholder="e.g. SUP-005" 
+          />
+        </div>
+      </div>
+
+      <div class="form-row-2col">
+        <div class="form-group">
+          <label>Contact Person <span class="required-star">*</span></label>
+          <input 
+            type="text" 
+            class="modal-input" 
+            [(ngModel)]="form.contactPerson" 
+            placeholder="e.g. Ramesh Kumar" 
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label>Phone Number <span class="required-star">*</span></label>
+          <input 
+            type="text" 
+            class="modal-input" 
+            [(ngModel)]="form.phone" 
+            placeholder="e.g. 9841012345" 
+            required 
+          />
+        </div>
+      </div>
+
+      <div class="form-row-2col">
+        <div class="form-group">
+          <label>Email Address</label>
+          <input 
+            type="email" 
+            class="modal-input" 
+            [(ngModel)]="form.email" 
+            placeholder="e.g. orders@supplier.com" 
+          />
+        </div>
+
+        <div class="form-group">
+          <label>GSTIN / Tax Identification</label>
+          <input 
+            type="text" 
+            class="modal-input" 
+            [(ngModel)]="form.gstin" 
+            placeholder="e.g. 33AAAAA1234A1Z5" 
+          />
+        </div>
+      </div>
+
+      <div class="form-row-2col">
+        <div class="form-group">
+          <label>Payment Terms</label>
+          <select class="modal-select" [(ngModel)]="form.paymentTerms">
+            <option *ngFor="let term of paymentTermOptions" [value]="term">{{ term }}</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Status</label>
+          <select class="modal-select" [(ngModel)]="form.status">
+            <option value="ACTIVE">Active</option>
+            <option value="INACTIVE">Inactive</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Street Address</label>
+        <input 
+          type="text" 
+          class="modal-input" 
+          [(ngModel)]="form.address" 
+          placeholder="e.g. 45 Anna Salai, Industrial Estate" 
+        />
+      </div>
+
+      <div class="form-row-3col">
+        <div class="form-group">
+          <label>City</label>
+          <input 
+            type="text" 
+            class="modal-input" 
+            [(ngModel)]="form.city" 
+            placeholder="e.g. Chennai" 
+          />
+        </div>
+
+        <div class="form-group">
+          <label>State</label>
+          <input 
+            type="text" 
+            class="modal-input" 
+            [(ngModel)]="form.state" 
+            placeholder="e.g. Tamil Nadu" 
+          />
+        </div>
+
+        <div class="form-group">
+          <label>Pincode</label>
+          <input 
+            type="text" 
+            class="modal-input" 
+            [(ngModel)]="form.pincode" 
+            placeholder="e.g. 600032" 
+          />
+        </div>
+      </div>
+
+    </div>
+
+    <div class="modal-footer-custom">
+      <button class="btn-modal-cancel" (click)="closeModal()">
+        <i class="bi bi-x"></i> Cancel
+      </button>
+      <button class="btn-modal-save" (click)="saveSupplier()" [disabled]="saving">
+        <i class="bi bi-check2-circle" *ngIf="!saving"></i>
+        <span class="spinner-border spinner-border-sm me-1" *ngIf="saving"></span>
+        <span>{{ isEditing ? 'Update Supplier' : 'Save Supplier' }}</span>
+      </button>
+    </div>
+
+  </div>
+</div>
+

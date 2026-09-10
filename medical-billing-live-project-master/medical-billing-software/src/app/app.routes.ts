@@ -31,13 +31,32 @@ import { SalesExchangePage } from './modules/patient/pages/sales-exchange/sales-
 import { SalesReturnsPage } from './modules/patient/pages/sales-returns/sales-returns';
 import { authGuard } from './@core/guards/auth-guard';
 
+import { RackSettings } from './modules/patient/pages/rack-settings/rack-settings';
+
 
 import { PurchaseList } from './modules/patient/pages/purchase/purchase-list/purchase-list';
 import { PurchaseReturnsList } from './modules/patient/pages/purchase-returns/purchase-returns-list/purchase-returns-list';
+import { SupplierManagement } from './modules/patient/pages/supplier-management/supplier-management';
+import { SupplierRegistration } from './modules/patient/pages/supplier-registration/supplier-registration';
 
 export const routes: Routes = [
+  {
+    path: 'rack',
+    component: RackSettings,
+    canActivate: [authGuard]
+  },
+  {
+    path: 'racks',
+    redirectTo: 'rack',
+    pathMatch: 'full'
+  },
+  {
+    path: 'rack-settings',
+    redirectTo: 'rack',
+    pathMatch: 'full'
+  },
 
-  // Purchase Routes
+  // Purchase & Returns Routes
   {
     path: 'purchase',
     component: PurchaseList,
@@ -47,6 +66,38 @@ export const routes: Routes = [
     path: 'purchase-returns',
     component: PurchaseReturnsList,
     canActivate: [authGuard]
+  },
+
+  // Supplier Management Routes
+  {
+    path: 'supplier-list',
+    component: SupplierManagement,
+    canActivate: [authGuard]
+  },
+  {
+    path: 'suppliers',
+    redirectTo: 'supplier-list',
+    pathMatch: 'full'
+  },
+  {
+    path: 'supplier-management',
+    redirectTo: 'supplier-list',
+    pathMatch: 'full'
+  },
+  {
+    path: 'supplier',
+    redirectTo: 'supplier-list',
+    pathMatch: 'full'
+  },
+  {
+    path: 'supplier-registration',
+    component: SupplierRegistration,
+    canActivate: [authGuard]
+  },
+  {
+    path: 'add-supplier',
+    redirectTo: 'supplier-registration',
+    pathMatch: 'full'
   },
 
   // Public Multi-Tenant Business Onboarding & Auth Routes

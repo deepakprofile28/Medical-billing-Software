@@ -37,182 +37,87 @@ export const COMPLETED_MODULE_SECTIONS: ModuleSection[] = [
     title: 'POINT OF SALE & BILLING',
     icon: 'bi-receipt-cutoff',
     rows: [
-      {
-        code: 'POS_BILLING',
-        name: 'POS Billing Counter',
-        route: '/pos',
-        icon: 'bi-cart-check-fill',
-        read: true,
-        write: true,
-        update: true,
-        delete: true
-      }
+      { code: 'POS_BILLING', name: 'POS Billing Counter', route: '/pos', icon: 'bi-cart-check-fill', read: true, write: true, update: true, delete: true }
+    ]
+  },
+  {
+    title: 'SALES MANAGEMENT',
+    icon: 'bi-graph-up-arrow',
+    rows: [
+      { code: 'SALES_TRANSACTION', name: 'Sales Transaction', route: '/sales-transactions', icon: 'bi-cash-coin', read: true, write: true, update: true, delete: true },
+      { code: 'SALES_ORDER', name: 'Sales Order', route: '/sales-orders', icon: 'bi-journal-text', read: true, write: true, update: true, delete: true },
+      { code: 'SALES_SUSPENDED', name: 'Sales Suspended', route: '/sales-suspended', icon: 'bi-pause-circle', read: true, write: true, update: true, delete: true },
+      { code: 'SALES_COMPLETED', name: 'Sales Completed', route: '/sales-completed', icon: 'bi-check2-circle', read: true, write: true, update: true, delete: true },
+      { code: 'SALES_EXCHANGE', name: 'Sales Exchange', route: '/sales-exchange', icon: 'bi-arrow-left-right', read: true, write: true, update: true, delete: true },
+      { code: 'SALES_RETURN', name: 'Sales Return', route: '/sales-returns', icon: 'bi-arrow-return-left', read: true, write: true, update: true, delete: true }
+    ]
+  },
+  {
+    title: 'PURCHASE MANAGEMENT',
+    icon: 'bi-cart-plus-fill',
+    rows: [
+      { code: 'PURCHASE', name: 'Purchase List', route: '/purchase', icon: 'bi-bag-plus-fill', read: true, write: true, update: true, delete: true },
+      { code: 'PURCHASE_RETURN', name: 'Purchase Return', route: '/purchase-returns', icon: 'bi-bag-dash-fill', read: true, write: true, update: true, delete: true }
+    ]
+  },
+  {
+    title: 'SUPPLIER MANAGEMENT',
+    icon: 'bi-truck',
+    rows: [
+      { code: 'SUPPLIER_LIST', name: 'Supplier List', route: '/supplier-list', icon: 'bi-card-list', read: true, write: true, update: true, delete: true },
+      { code: 'SUPPLIER_REGISTRATION', name: 'Add Supplier', route: '/supplier-registration', icon: 'bi-person-plus-fill', read: true, write: true, update: true, delete: true }
     ]
   },
   {
     title: 'MEDICINES & INVENTORY',
     icon: 'bi-capsule-pill',
     rows: [
-      {
-        code: 'TABLETS',
-        name: 'Tablets & Medicine Inventory',
-        route: '/tablets',
-        icon: 'bi-capsule',
-        read: true,
-        write: true,
-        update: true,
-        delete: true
-      },
-      {
-        code: 'CATEGORIES',
-        name: 'Medicine Categories',
-        route: '/category-settings',
-        icon: 'bi-tags-fill',
-        read: true,
-        write: true,
-        update: true,
-        delete: true
-      }
+      { code: 'TABLETS', name: 'Products Inventory', route: '/tablets', icon: 'bi-capsule', read: true, write: true, update: true, delete: true },
+      { code: 'CATEGORIES', name: 'Medicine Categories', route: '/category-settings', icon: 'bi-tags-fill', read: true, write: true, update: true, delete: true }
     ]
   },
   {
     title: 'PATIENT MANAGEMENT',
     icon: 'bi-person-vcard-fill',
     rows: [
-      {
-        code: 'PATIENT_REGISTRATION',
-        name: 'Patient Registration',
-        route: '/patient-registration',
-        icon: 'bi-person-plus-fill',
-        read: true,
-        write: true,
-        update: true,
-        delete: true
-      },
-      {
-        code: 'PATIENT_LIST',
-        name: 'Patient Directory & List',
-        route: '/patient-list',
-        icon: 'bi-people-fill',
-        read: true,
-        write: true,
-        update: true,
-        delete: true
-      },
-      {
-        code: 'PATIENT_DETAILS',
-        name: 'Patient Clinical Details',
-        route: '/patient-details',
-        icon: 'bi-file-medical-fill',
-        read: true,
-        write: true,
-        update: true,
-        delete: true
-      }
+      { code: 'PATIENT_REGISTRATION', name: 'Patient Registration', route: '/patient-registration', icon: 'bi-person-plus-fill', read: true, write: true, update: true, delete: true },
+      { code: 'PATIENT_LIST', name: 'Patient Directory', route: '/patient-list', icon: 'bi-people-fill', read: true, write: true, update: true, delete: true },
+      { code: 'PATIENT_DETAILS', name: 'Patient Clinical Details', route: '/patient-details', icon: 'bi-file-medical-fill', read: true, write: true, update: true, delete: true }
     ]
   },
   {
     title: 'DOCTOR MANAGEMENT',
     icon: 'bi-person-badge-fill',
     rows: [
-      {
-        code: 'DOCTORS',
-        name: 'Doctor Management & Directory',
-        route: '/doctors',
-        icon: 'bi-person-badge',
-        read: true,
-        write: true,
-        update: true,
-        delete: true
-      }
+      { code: 'DOCTORS', name: 'Doctor Management', route: '/doctors', icon: 'bi-person-badge', read: true, write: true, update: true, delete: true }
     ]
   },
   {
     title: 'CLINICAL & AI INTELLIGENCE',
     icon: 'bi-robot',
     rows: [
-      {
-        code: 'AI_ASSISTANT',
-        name: 'AI Medical Assistant',
-        route: '/ai-assistant',
-        icon: 'bi-cpu-fill',
-        read: true,
-        write: true,
-        update: true,
-        delete: true
-      }
+      { code: 'AI_ASSISTANT', name: 'AI Medical Assistant', route: '/ai-assistant', icon: 'bi-cpu-fill', read: true, write: true, update: true, delete: true }
     ]
   },
   {
     title: 'STAFF & SECURITY',
     icon: 'bi-shield-lock-fill',
     rows: [
-      {
-        code: 'USER_MANAGEMENT',
-        name: 'User Management & Staff',
-        route: '/users',
-        icon: 'bi-person-gear',
-        read: true,
-        write: true,
-        update: true,
-        delete: true
-      },
-      {
-        code: 'ROLES',
-        name: 'Role Management',
-        route: '/roles',
-        icon: 'bi-shield-check',
-        read: true,
-        write: true,
-        update: true,
-        delete: true
-      },
-      {
-        code: 'ACCESS',
-        name: 'Access Control & Permissions',
-        route: '/access',
-        icon: 'bi-key-fill',
-        read: true,
-        write: true,
-        update: true,
-        delete: true
-      }
+      { code: 'USER_MANAGEMENT', name: 'User Management', route: '/users', icon: 'bi-person-gear', read: true, write: true, update: true, delete: true },
+      { code: 'ROLES', name: 'Role Management', route: '/roles', icon: 'bi-shield-check', read: true, write: true, update: true, delete: true },
+      { code: 'ACCESS', name: 'Access Control', route: '/access', icon: 'bi-key-fill', read: true, write: true, update: true, delete: true }
     ]
   },
   {
     title: 'ADMINISTRATION & SETTINGS',
     icon: 'bi-gear-fill',
     rows: [
-      {
-        code: 'DASHBOARD',
-        name: 'Dashboard & Analytics',
-        route: '/dashboard',
-        icon: 'bi-grid-1x2-fill',
-        read: true,
-        write: true,
-        update: true,
-        delete: true
-      },
-      {
-        code: 'STORE_SETTINGS',
-        name: 'Store & Hospital Settings',
-        route: '/settings',
-        icon: 'bi-shop-window',
-        read: true,
-        write: true,
-        update: true,
-        delete: true
-      },
-      {
-        code: 'TAX_SETTINGS',
-        name: 'Tax & GST Configuration',
-        route: '/tax',
-        icon: 'bi-percent',
-        read: true,
-        write: true,
-        update: true,
-        delete: true
-      }
+      { code: 'DASHBOARD', name: 'Dashboard', route: '/dashboard', icon: 'bi-grid-1x2-fill', read: true, write: true, update: true, delete: true },
+      { code: 'STORE_SETTINGS', name: 'Store Settings', route: '/settings', icon: 'bi-shop-window', read: true, write: true, update: true, delete: true },
+      { code: 'TAX_SETTINGS', name: 'Tax Config', route: '/tax', icon: 'bi-percent', read: true, write: true, update: true, delete: true },
+      { code: 'WAREHOUSE_SETTINGS', name: 'Warehouse', route: '/warehouse', icon: 'bi-building-gear', read: true, write: true, update: true, delete: true },
+      { code: 'BRAND_SETTINGS', name: 'Brand Config', route: '/brand', icon: 'bi-box-fill', read: true, write: true, update: true, delete: true },
+      { code: 'RACK_SETTINGS', name: 'Rack Config', route: '/rack', icon: 'bi-box-seam', read: true, write: true, update: true, delete: true }
     ]
   }
 ];

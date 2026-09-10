@@ -1,5 +1,4 @@
-import {
-  Component,
+import { HostListener, Component,
   OnInit,
   ChangeDetectorRef
 } from '@angular/core';
@@ -22,6 +21,7 @@ import { AccessService } from '../../../services/access.service';
 })
 export class PatientDetails implements OnInit {
   isPurchaseMenuOpen = false;
+  isSupplierMenuOpen = false;
 
   // Permissions
   canUpdatePatient = true;
@@ -73,6 +73,16 @@ export class PatientDetails implements OnInit {
     this.isSidebarCollapsed = false;
     this.isDoctorMenuOpen = true;
     this.cdr.detectChanges();
+  }
+
+  
+  toggleSupplierMenu(): void {
+    this.isSupplierMenuOpen = !this.isSupplierMenuOpen;
+  }
+
+  openSupplierFromCollapsed(): void {
+    this.isSidebarCollapsed = false;
+    this.isSupplierMenuOpen = true;
   }
 
   togglePatientMenu(): void {
@@ -292,4 +302,27 @@ export class PatientDetails implements OnInit {
       }
     );
   }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent) {
+    const sidebar = document.querySelector('.sidebar');
+    const toggleBtn = document.querySelector('.btn-sidebar-toggle') || document.querySelector('.toggle-btn');
+    const target = event.target as Node;
+    
+    if (sidebar && !sidebar.contains(target) && (!toggleBtn || !toggleBtn.contains(target))) {
+      this.closeAllMenus();
+    }
+  }
+
+  closeAllMenus() {
+    const self = this as any;
+    if (typeof self.isPatientMenuOpen !== 'undefined') self.isPatientMenuOpen = false;
+    if (typeof self.isDoctorMenuOpen !== 'undefined') self.isDoctorMenuOpen = false;
+    if (typeof self.isUserMenuOpen !== 'undefined') self.isUserMenuOpen = false;
+    if (typeof self.isSettingsMenuOpen !== 'undefined') self.isSettingsMenuOpen = false;
+    if (typeof self.isSalesMenuOpen !== 'undefined') self.isSalesMenuOpen = false;
+    if (typeof self.isPurchaseMenuOpen !== 'undefined') self.isPurchaseMenuOpen = false;
+    if (typeof self.isSupplierMenuOpen !== "undefined") self.isSupplierMenuOpen = false;
+  }
+
 }

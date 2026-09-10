@@ -12,6 +12,8 @@ export interface Medicine {
   unitPrice: number;
   mrp?: number;
   gstRate?: number;
+  rackId?: number | string;
+  rackName?: string;
   stockQty?: number;
   manufacturer?: string;
   companyId?: number | string;
@@ -57,4 +59,5 @@ export class MedicineService {
     return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }
 }
+
 

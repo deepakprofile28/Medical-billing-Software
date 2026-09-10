@@ -114,11 +114,37 @@
         </div>
       </div>
 
-      <!-- 3. TABLETS & MEDICINES -->
+      <!-- SUPPLIER MANAGEMENT -->
+      <div class="nav-group">
+        <div class="menu-header" (click)="toggleSupplierMenu()" [class.expanded]="isSupplierMenuOpen" *ngIf="!isSidebarCollapsed">
+          <div class="header-left">
+            <i class="bi bi-truck header-icon" style="color: #0284c7;"></i>
+            <span>Supplier Management</span>
+          </div>
+          <i class="bi bi-chevron-down chevron-icon" [class.rotate]="isSupplierMenuOpen"></i>
+        </div>
+
+        <a *ngIf="isSidebarCollapsed" (click)="openSupplierFromCollapsed()" class="menu-item root-item" style="cursor: pointer;" title="Supplier Management">
+          <i class="bi bi-truck menu-icon" style="color: #0284c7;"></i>
+        </a>
+
+        <div class="sub-menu" *ngIf="isSupplierMenuOpen && !isSidebarCollapsed">
+          <a routerLink="/supplier-list" class="sub-menu-item">
+            <i class="bi bi-card-list sub-icon text-primary"></i>
+            <span>Supplier List</span>
+          </a>
+          <a routerLink="/supplier-registration" class="sub-menu-item">
+            <i class="bi bi-person-plus-fill sub-icon text-success"></i>
+            <span>Add Supplier</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- 3. PRODUCTS -->
       <div class="nav-group" *ngIf="canAccess('TABLETS')">
-        <a routerLink="/tablets" class="menu-item root-item" title="Tablets & Medicines">
+        <a routerLink="/tablets" class="menu-item root-item" title="Products">
           <i class="bi bi-capsule-pill menu-icon text-emerald"></i>
-          <span class="menu-text" *ngIf="!isSidebarCollapsed">Tablets & Medicines</span>
+          <span class="menu-text" *ngIf="!isSidebarCollapsed">Products</span>
         </a>
       </div>
 
@@ -268,6 +294,11 @@
             <i class="bi bi-award-fill sub-icon text-purple"></i>
             <span>Brand</span>
             <span class="count-badge" style="background: #9333ea;">DB</span>
+          </a>
+          <a routerLink="/rack" class="sub-menu-item">
+            <i class="bi bi-box-seam sub-icon text-danger"></i>
+            <span>Rack</span>
+            <span class="count-badge" style="background: #dc2626;">DB</span>
           </a>
           <a routerLink="/branch" class="sub-menu-item">
             <i class="bi bi-diagram-3-fill sub-icon text-teal"></i>

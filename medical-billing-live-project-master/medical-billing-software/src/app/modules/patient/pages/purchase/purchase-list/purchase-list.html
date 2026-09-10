@@ -1,1 +1,562 @@
-<p>purchase-list works!</p>
+<div class="dashboard-layout-wrapper" [class.sidebar-collapsed]="isSidebarCollapsed">
+
+  <!-- ================= LEFT SIDEBAR MENU (IDENTICAL TO DASHBOARD) ================= -->
+  <aside class="app-sidebar">
+    
+    <!-- Sidebar Brand Header -->
+    <div class="sidebar-brand">
+      <div class="brand-icon-box">
+        <i class="bi bi-hospital-fill"></i>
+      </div>
+      <div class="brand-details" *ngIf="!isSidebarCollapsed">
+        <h2 class="brand-title">PharmaCare</h2>
+        <span class="brand-subtitle">Clinical & Billing Hub</span>
+      </div>
+    </div>
+
+    <!-- Active Store Badge -->
+    <div class="sidebar-store-pill" *ngIf="!isSidebarCollapsed">
+      <i class="bi bi-shop-window text-emerald"></i>
+      <div class="store-text">
+        <span class="store-label">Active Store</span>
+        <strong class="store-name">{{ activeStoreName }} (#{{ activeStoreId }})</strong>
+      </div>
+    </div>
+
+    <!-- Sidebar Navigation Items -->
+    <nav class="sidebar-nav">
+      
+      <!-- 1. DASHBOARD -->
+      <div class="nav-group">
+        <a routerLink="/dashboard" class="menu-item root-item">
+          <i class="bi bi-grid-1x2-fill menu-icon"></i>
+          <span class="menu-text" *ngIf="!isSidebarCollapsed">Dashboard</span>
+          <span class="badge-live-pulse" *ngIf="!isSidebarCollapsed">Live</span>
+        </a>
+      </div>
+
+      <!-- 2. POS BILLING COUNTER -->
+      <div class="nav-group">
+        <a routerLink="/pos" class="menu-item root-item">
+          <i class="bi bi-receipt-cutoff menu-icon text-warning"></i>
+          <span class="menu-text" *ngIf="!isSidebarCollapsed">POS Billing Counter</span>
+        </a>
+      </div>
+
+      <!-- 3. SALES MENU -->
+      <div class="nav-group">
+        <div class="menu-header" (click)="isSalesMenuOpen = !isSalesMenuOpen" [class.expanded]="isSalesMenuOpen" *ngIf="!isSidebarCollapsed">
+          <div class="header-left">
+            <i class="bi bi-cart-check-fill header-icon text-success"></i>
+            <span>Sales Management</span>
+          </div>
+          <i class="bi bi-chevron-down chevron-icon" [class.rotate]="isSalesMenuOpen"></i>
+        </div>
+
+        <a *ngIf="isSidebarCollapsed" (click)="isSidebarCollapsed = false; isSalesMenuOpen = true" class="menu-item root-item" style="cursor: pointer;" title="Sales Management">
+          <i class="bi bi-cart-check-fill menu-icon text-success"></i>
+        </a>
+
+        <div class="sub-menu" *ngIf="isSalesMenuOpen && !isSidebarCollapsed">
+          <a routerLink="/sales-transactions" class="sub-menu-item">
+            <i class="bi bi-credit-card-2-front-fill sub-icon text-primary"></i>
+            <span>Transaction</span>
+          </a>
+          <a routerLink="/sales-orders" class="sub-menu-item">
+            <i class="bi bi-box-seam-fill sub-icon text-info"></i>
+            <span>Order</span>
+          </a>
+          <a routerLink="/sales-suspended" class="sub-menu-item">
+            <i class="bi bi-pause-circle-fill sub-icon text-warning"></i>
+            <span>Order Suspended</span>
+          </a>
+          <a routerLink="/sales-completed" class="sub-menu-item">
+            <i class="bi bi-check-circle-fill sub-icon text-success"></i>
+            <span>Completed</span>
+          </a>
+          <a routerLink="/sales-exchange" class="sub-menu-item">
+            <i class="bi bi-arrow-repeat sub-icon text-purple"></i>
+            <span>Exchange</span>
+          </a>
+          <a routerLink="/sales-returns" class="sub-menu-item">
+            <i class="bi bi-arrow-counterclockwise sub-icon text-danger"></i>
+            <span>Return and Refund</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- 4. PRODUCTS -->
+      <div class="nav-group">
+        <a routerLink="/tablets" class="menu-item root-item">
+          <i class="bi bi-capsule-pill menu-icon text-emerald"></i>
+          <span class="menu-text" *ngIf="!isSidebarCollapsed">Products</span>
+        </a>
+      </div>
+
+      <!-- 5. PURCHASE MENU (ACTIVE) -->
+      <div class="nav-group">
+        <div class="menu-header" (click)="isPurchaseMenuOpen = !isPurchaseMenuOpen" [class.expanded]="isPurchaseMenuOpen" *ngIf="!isSidebarCollapsed">
+          <div class="header-left">
+            <i class="bi bi-bag-check-fill header-icon" style="color: #f59e0b;"></i>
+            <span>Purchase Management</span>
+          </div>
+          <i class="bi bi-chevron-down chevron-icon" [class.rotate]="isPurchaseMenuOpen"></i>
+        </div>
+
+        <a *ngIf="isSidebarCollapsed" (click)="isSidebarCollapsed = false; isPurchaseMenuOpen = true" class="menu-item root-item" style="cursor: pointer;" title="Purchase Management">
+          <i class="bi bi-bag-check-fill menu-icon" style="color: #f59e0b;"></i>
+        </a>
+
+        <div class="sub-menu" *ngIf="isPurchaseMenuOpen && !isSidebarCollapsed">
+          <a routerLink="/purchase" routerLinkActive="active" class="sub-menu-item active">
+            <i class="bi bi-cart-plus-fill sub-icon text-info"></i>
+            <span>Purchase</span>
+          </a>
+          <a routerLink="/purchase-returns" class="sub-menu-item">
+            <i class="bi bi-arrow-return-left sub-icon text-danger"></i>
+            <span>Purchase Return</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- SUPPLIER MANAGEMENT -->
+      <div class="nav-group">
+        <div class="menu-header" (click)="toggleSupplierMenu()" [class.expanded]="isSupplierMenuOpen" *ngIf="!isSidebarCollapsed">
+          <div class="header-left">
+            <i class="bi bi-truck header-icon" style="color: #0284c7;"></i>
+            <span>Supplier Management</span>
+          </div>
+          <i class="bi bi-chevron-down chevron-icon" [class.rotate]="isSupplierMenuOpen"></i>
+        </div>
+
+        <a *ngIf="isSidebarCollapsed" (click)="openSupplierFromCollapsed()" class="menu-item root-item" style="cursor: pointer;" title="Supplier Management">
+          <i class="bi bi-truck menu-icon" style="color: #0284c7;"></i>
+        </a>
+
+        <div class="sub-menu" *ngIf="isSupplierMenuOpen && !isSidebarCollapsed">
+          <a routerLink="/supplier-list" class="sub-menu-item">
+            <i class="bi bi-card-list sub-icon text-primary"></i>
+            <span>Supplier List</span>
+          </a>
+          <a routerLink="/supplier-registration" class="sub-menu-item">
+            <i class="bi bi-person-plus-fill sub-icon text-success"></i>
+            <span>Add Supplier</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- 6. AI CLINICAL ASSISTANT -->
+      <div class="nav-group">
+        <a routerLink="/ai-assistant" class="menu-item root-item" title="AI Medical Assistant">
+          <i class="bi bi-robot menu-icon" style="color: #a855f7;"></i>
+          <span class="menu-text" *ngIf="!isSidebarCollapsed">AI Clinical Assistant</span>
+          <span class="badge-pos-pulse" style="background: #7c3aed;" *ngIf="!isSidebarCollapsed">AI DB</span>
+        </a>
+      </div>
+
+      <!-- 7. PATIENT MANAGEMENT -->
+      <div class="nav-group">
+        <div class="menu-header" (click)="togglePatientMenu()" [class.expanded]="isPatientMenuOpen" *ngIf="!isSidebarCollapsed">
+          <div class="header-left">
+            <i class="bi bi-person-vcard-fill header-icon"></i>
+            <span>Patient Management</span>
+          </div>
+          <i class="bi bi-chevron-down chevron-icon" [class.rotate]="isPatientMenuOpen"></i>
+        </div>
+
+        <a *ngIf="isSidebarCollapsed" (click)="openPatientFromCollapsed()" class="menu-item root-item" style="cursor: pointer;" title="Patient Management">
+          <i class="bi bi-person-vcard-fill menu-icon"></i>
+        </a>
+
+        <div class="sub-menu" *ngIf="isPatientMenuOpen && !isSidebarCollapsed">
+          <a routerLink="/patients" class="sub-menu-item">
+            <i class="bi bi-people-fill sub-icon"></i>
+            <span>Patient List</span>
+            <span class="count-badge">{{ totalPatientsCount }}</span>
+          </a>
+          <a routerLink="/patient-registration" class="sub-menu-item">
+            <i class="bi bi-person-plus-fill sub-icon text-success"></i>
+            <span>Add Patient</span>
+          </a>
+          <a routerLink="/patients" class="sub-menu-item">
+            <i class="bi bi-file-earmark-text-fill sub-icon text-warning"></i>
+            <span>Patient Draft</span>
+            <span class="count-badge badge-warning" *ngIf="draftsCount > 0">{{ draftsCount }}</span>
+          </a>
+          <a routerLink="/dashboard" class="sub-menu-item">
+            <i class="bi bi-graph-up-arrow sub-icon text-primary"></i>
+            <span>Patient Analysis</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- 8. DOCTOR MANAGEMENT -->
+      <div class="nav-group">
+        <div class="menu-header" (click)="toggleDoctorMenu()" [class.expanded]="isDoctorMenuOpen" *ngIf="!isSidebarCollapsed">
+          <div class="header-left">
+            <i class="bi bi-person-badge-fill header-icon text-cyan"></i>
+            <span>Doctor Management</span>
+          </div>
+          <i class="bi bi-chevron-down chevron-icon" [class.rotate]="isDoctorMenuOpen"></i>
+        </div>
+
+        <a *ngIf="isSidebarCollapsed" (click)="openDoctorFromCollapsed()" class="menu-item root-item" style="cursor: pointer;" title="Doctor Management">
+          <i class="bi bi-person-badge-fill menu-icon" style="color: #06b6d4;"></i>
+        </a>
+
+        <div class="sub-menu" *ngIf="isDoctorMenuOpen && !isSidebarCollapsed">
+          <a routerLink="/doctors" class="sub-menu-item">
+            <i class="bi bi-person-lines-fill sub-icon text-cyan"></i>
+            <span>Doctor List</span>
+          </a>
+          <a routerLink="/add-doctor" class="sub-menu-item">
+            <i class="bi bi-person-plus-fill sub-icon text-success"></i>
+            <span>Add Doctor</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- 9. USER MANAGEMENT -->
+      <div class="nav-group">
+        <div class="menu-header" (click)="toggleUserMenu()" [class.expanded]="isUserMenuOpen" *ngIf="!isSidebarCollapsed">
+          <div class="header-left">
+            <i class="bi bi-person-gear header-icon"></i>
+            <span>User Management</span>
+          </div>
+          <i class="bi bi-chevron-down chevron-icon" [class.rotate]="isUserMenuOpen"></i>
+        </div>
+
+        <a *ngIf="isSidebarCollapsed" (click)="openUserFromCollapsed()" class="menu-item root-item" style="cursor: pointer;" title="User Management">
+          <i class="bi bi-person-gear menu-icon"></i>
+        </a>
+
+        <div class="sub-menu" *ngIf="isUserMenuOpen && !isSidebarCollapsed">
+          <a routerLink="/users" class="sub-menu-item">
+            <i class="bi bi-people sub-icon"></i>
+            <span>User List</span>
+            <span class="count-badge">{{ totalUsersCount }}</span>
+          </a>
+          <a routerLink="/access" class="sub-menu-item">
+            <i class="bi bi-key-fill sub-icon text-info"></i>
+            <span>Access</span>
+            <span class="count-badge" style="background: #0284c7;">DB</span>
+          </a>
+          <a routerLink="/roles" class="sub-menu-item">
+            <i class="bi bi-shield-check sub-icon text-emerald"></i>
+            <span>Role</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- 10. SETTINGS -->
+      <div class="nav-group">
+        <div class="menu-header" (click)="toggleSettingsMenu()" [class.expanded]="isSettingsMenuOpen" *ngIf="!isSidebarCollapsed">
+          <div class="header-left">
+            <i class="bi bi-gear-fill header-icon text-secondary"></i>
+            <span>Settings</span>
+          </div>
+          <i class="bi bi-chevron-down chevron-icon" [class.rotate]="isSettingsMenuOpen"></i>
+        </div>
+
+        <a *ngIf="isSidebarCollapsed" (click)="openSettingsFromCollapsed()" class="menu-item root-item" style="cursor: pointer;" title="Settings">
+          <i class="bi bi-gear-fill menu-icon"></i>
+        </a>
+
+        <div class="sub-menu" *ngIf="isSettingsMenuOpen && !isSidebarCollapsed">
+          <a routerLink="/settings" class="sub-menu-item">
+            <i class="bi bi-shop-window sub-icon text-emerald"></i>
+            <span>Store Configuration</span>
+          </a>
+          <a routerLink="/category" class="sub-menu-item">
+            <i class="bi bi-tags-fill sub-icon text-primary"></i>
+            <span>Category</span>
+            <span class="count-badge" style="background: #2563eb;">DB</span>
+          </a>
+          <a routerLink="/tax" class="sub-menu-item">
+            <i class="bi bi-percent sub-icon text-warning"></i>
+            <span>Tax</span>
+            <span class="count-badge" style="background: #059669;">DB</span>
+          </a>
+          <a routerLink="/warehouse" class="sub-menu-item">
+            <i class="bi bi-building-gear sub-icon text-info"></i>
+            <span>Warehouse</span>
+            <span class="count-badge" style="background: #0284c7;">DB</span>
+          </a>
+          <a routerLink="/brand" class="sub-menu-item">
+            <i class="bi bi-award-fill sub-icon text-purple"></i>
+            <span>Brand</span>
+            <span class="count-badge" style="background: #9333ea;">DB</span>
+          </a>
+          <a routerLink="/rack" class="sub-menu-item">
+            <i class="bi bi-box-seam sub-icon text-danger"></i>
+            <span>Rack</span>
+            <span class="count-badge" style="background: #dc2626;">DB</span>
+          </a>
+          <a routerLink="/branch" class="sub-menu-item">
+            <i class="bi bi-diagram-3-fill sub-icon text-teal"></i>
+            <span>Branch</span>
+            <span class="count-badge" style="background: #0d9488;">DB</span>
+          </a>
+        </div>
+      </div>
+
+    </nav>
+
+    <!-- Sidebar Footer (User Info & Logout) -->
+    <div class="sidebar-footer">
+      <div class="user-brief" *ngIf="!isSidebarCollapsed">
+        <div class="user-avatar-sm">
+          {{ (loggedInUser || 'A').charAt(0).toUpperCase() }}
+        </div>
+        <div class="user-details-sm">
+          <span class="u-name">{{ loggedInUser }}</span>
+          <span class="u-role">{{ userRole }}</span>
+        </div>
+      </div>
+
+      <button type="button" class="sidebar-logout-btn" (click)="logout()" title="Sign Out">
+        <i class="bi bi-box-arrow-right"></i>
+        <span *ngIf="!isSidebarCollapsed">Logout</span>
+      </button>
+    </div>
+
+  </aside>
+
+  <!-- ================= RIGHT MAIN CONTENT AREA ================= -->
+  <main class="app-main-content">
+
+    <!-- Top Navigation Card (IDENTICAL TO DASHBOARD & TABLETS) -->
+    <header class="top-nav-card">
+      <div class="top-nav-left">
+        <button type="button" class="btn-sidebar-toggle" (click)="toggleSidebar()" title="Toggle Navigation Menu">
+          <i class="bi bi-list"></i>
+        </button>
+        <div class="page-title-wrap">
+          <h2>Purchase Management & Stock Inward</h2>
+          <div class="breadcrumb-sub">
+            <span>Home</span> / <strong>Purchases & Inward Stock</strong>
+          </div>
+        </div>
+      </div>
+
+      <!-- Actions & Sync Status -->
+      <div class="top-nav-right">
+        <div class="live-clock-pill">
+          <i class="bi bi-clock-fill text-primary"></i>
+          <span>{{ currentDateTime }}</span>
+        </div>
+
+        <button 
+          type="button" 
+          class="btn-sync-db" 
+          (click)="loadPurchases()" 
+          title="Refresh purchases from database"
+          [disabled]="loading">
+          <i class="bi bi-arrow-clockwise" [class.spin]="loading"></i>
+          <span>Refresh</span>
+        </button>
+
+        <button 
+          type="button" 
+          class="btn-pos-shortcut" 
+          style="background: linear-gradient(135deg, #10b981, #059669); color: #ffffff; border: none;"
+          (click)="openAddModal()" 
+          title="Record New Stock Inward">
+          <i class="bi bi-plus-circle-fill me-1"></i>
+          <span>+ Add New Purchase</span>
+        </button>
+
+        <a routerLink="/pos" class="btn-pos-shortcut" title="Open POS Billing">
+          <i class="bi bi-receipt-cutoff me-1"></i>
+          <span>POS Counter</span>
+        </a>
+
+        <div class="top-user-pill">
+          <div class="avatar-circle">
+            {{ (loggedInUser || 'A').charAt(0).toUpperCase() }}
+          </div>
+          <div class="user-info-text">
+            <strong>{{ loggedInUser }}</strong>
+            <span class="badge-role">{{ userRole }}</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Content Table Panel -->
+    <section class="table-card-panel">
+      <div class="table-panel-header">
+        <div class="t-header-left">
+          <h3>
+            <i class="bi bi-bag-check-fill text-emerald me-2"></i>
+            Recorded Purchases & Stock Inward ({{ filteredPurchases.length }})
+          </h3>
+          <p>Inventory received for <strong>{{ activeStoreName }} (#{{ activeStoreId }})</strong></p>
+        </div>
+
+        <!-- Search Bar -->
+        <div class="table-search-wrap">
+          <i class="bi bi-search"></i>
+          <input 
+            type="text" 
+            placeholder="Search purchase no, supplier name..." 
+            [(ngModel)]="searchQuery" />
+        </div>
+      </div>
+
+      <!-- Empty State -->
+      <div *ngIf="filteredPurchases.length === 0 && !loading" class="empty-state-box">
+        <div class="empty-icon"><i class="bi bi-bag-x"></i></div>
+        <h4>No Purchases Found</h4>
+        <p>No inward stock entries recorded yet or none matching your search query.</p>
+        <button type="button" class="btn-primary mt-3" (click)="openAddModal()">
+          <i class="bi bi-plus-lg me-1"></i> Record First Purchase
+        </button>
+      </div>
+
+      <!-- Purchases Table -->
+      <div class="table-responsive" *ngIf="filteredPurchases.length > 0">
+        <table class="inventory-table">
+          <thead>
+            <tr>
+              <th style="width: 18%">Purchase / Invoice #</th>
+              <th style="width: 22%">Supplier Name</th>
+              <th style="width: 20%">Date & Time</th>
+              <th style="width: 15%">Destination</th>
+              <th style="width: 13%" class="text-end">Total Amount</th>
+              <th style="width: 12%" class="text-center">Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let p of filteredPurchases">
+              <td>
+                <span class="font-bold text-primary font-mono">{{ p.purchaseNo }}</span>
+              </td>
+              <td>
+                <div class="font-bold">{{ p.supplierName }}</div>
+                <div class="text-muted" style="font-size: 0.8rem;" *ngIf="p.items && p.items.length">
+                  {{ p.items.length }} item(s) received
+                </div>
+              </td>
+              <td>{{ p.purchaseDate | date:'medium' }}</td>
+              <td>
+                <span class="badge" style="background: #e0f2fe; color: #0369a1; padding: 4px 8px; border-radius: 6px; font-weight: 600;">
+                  <i class="bi bi-building me-1"></i>{{ p.warehouseName || 'Main Warehouse' }}
+                </span>
+              </td>
+              <td class="text-end font-bold text-emerald" style="font-size: 1rem;">
+                ₹{{ formatAmount(p.totalAmount) }}
+              </td>
+              <td class="text-center">
+                <span class="badge" style="background: #ecfdf5; color: #059669; padding: 4px 10px; border-radius: 12px; font-weight: 600; font-size: 0.8rem;">
+                  <i class="bi bi-check-circle-fill me-1"></i>Completed
+                </span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ================= ADD PURCHASE MODAL ================= -->
+    <div class="modal-overlay" *ngIf="showModal">
+      <div class="modal-content" style="max-width: 900px; width: 90%;">
+        <div class="modal-header">
+          <h3>
+            <i class="bi bi-plus-circle-fill text-emerald me-2"></i>
+            Record New Purchase (Stock Inward)
+          </h3>
+          <button type="button" class="btn-close" (click)="closeModal()"><i class="bi bi-x-lg"></i></button>
+        </div>
+
+        <div class="modal-body">
+          <div class="form-row-3">
+            <div class="form-group-modal">
+              <label>Purchase / Invoice No *</label>
+              <input type="text" class="modal-input font-mono" [(ngModel)]="form.purchaseNo" placeholder="e.g. PUR-1002" />
+            </div>
+            <div class="form-group-modal">
+              <label>Supplier Name *</label>
+              <input type="text" class="modal-input" [(ngModel)]="form.supplierName" placeholder="e.g. Apollo Distributors" list="supplierOptionsList" />
+              <datalist id="supplierOptionsList">
+                <option *ngFor="let s of registeredSuppliers" [value]="s.name">{{ s.name }} ({{ s.city || 'Vendor' }})</option>
+              </datalist>
+            </div>
+            <div class="form-group-modal">
+              <label>Warehouse (Dest) *</label>
+              <select class="modal-select" [(ngModel)]="form.warehouseId">
+                <option *ngFor="let w of warehouses" [value]="w.id">{{ w.name }}</option>
+              </select>
+            </div>
+          </div>
+
+          <h4 class="mt-4 mb-3 border-bottom pb-2" style="font-size: 1.05rem; font-weight: 700; color: #1e293b;">
+            <i class="bi bi-capsule text-primary me-2"></i>Purchase Items (Stock Quantity Inward)
+          </h4>
+          
+          <table class="inventory-table mb-3">
+            <thead>
+              <tr>
+                <th style="width: 40%">Product / Medicine *</th>
+                <th style="width: 18%" class="text-center">Qty Received *</th>
+                <th style="width: 18%" class="text-end">Unit Cost (₹) *</th>
+                <th style="width: 16%" class="text-end">Subtotal (₹)</th>
+                <th style="width: 8%" class="text-center">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let item of form.items; let i = index">
+                <td>
+                  <select class="modal-select" [(ngModel)]="item.productId" (change)="onMedicineChange(item, i)">
+                    <option [value]="0">-- Select Product --</option>
+                    <option *ngFor="let med of medicines" [value]="med.id">
+                      {{ med.name }} (Current Stock: {{ med.stockQty || 0 }})
+                    </option>
+                  </select>
+                </td>
+                <td>
+                  <input type="number" class="modal-input text-center" [(ngModel)]="item.quantity" (ngModelChange)="calculateTotal()" min="1" />
+                </td>
+                <td>
+                  <input type="number" class="modal-input text-end" [(ngModel)]="item.unitPrice" (ngModelChange)="calculateTotal()" min="0" step="0.5" />
+                </td>
+                <td class="text-end font-bold text-emerald" style="font-size: 0.95rem;">
+                  ₹{{ formatAmount(item.subtotal) }}
+                </td>
+                <td class="text-center">
+                  <button type="button" class="btn-action btn-delete" (click)="removeItem(i)" title="Remove Item">
+                    <i class="bi bi-trash"></i>
+                  </button>
+                </td>
+              </tr>
+              <tr *ngIf="form.items.length === 0">
+                <td colspan="5" class="text-center py-3 text-muted">
+                  No items added yet. Click "+ Add Item Row" below.
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="d-flex justify-content-between align-items-center mt-3">
+            <button type="button" class="btn-secondary" (click)="addItem()">
+              <i class="bi bi-plus-lg me-1"></i> Add Item Row
+            </button>
+            <div class="total-display p-2 px-3 bg-light rounded border">
+              <strong>Grand Total:</strong> 
+              <span class="text-emerald font-bold fs-5 ms-2">₹{{ formatAmount(form.totalAmount) }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn-secondary" (click)="closeModal()">Cancel</button>
+          <button type="button" class="btn-primary" [disabled]="saving" (click)="savePurchase()">
+            <span *ngIf="saving"><i class="bi bi-arrow-repeat spin me-1"></i> Saving to Database...</span>
+            <span *ngIf="!saving"><i class="bi bi-cloud-arrow-up-fill me-1"></i> Save Purchase & Update Stock</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>

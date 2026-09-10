@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
+import { Component, HostListener, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
@@ -11,10 +11,11 @@ import { AccessService } from '../../../services/access.service';
   standalone: true,
   imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: './sales-returns.html',
-  styleUrl: '../sales-common.css'
+  styleUrl: './sales-returns.css'
 })
 export class SalesReturnsPage implements OnInit, OnDestroy {
   isPurchaseMenuOpen = false;
+  isSupplierMenuOpen = false;
 
 
   isSidebarCollapsed = false;
@@ -26,8 +27,8 @@ export class SalesReturnsPage implements OnInit, OnDestroy {
 
   loggedInUser = 'Apollo';
   userRole = 'ADMIN';
-  activeStoreName = 'Apollo Pharmacy Hub';
-  activeStoreId = '1';
+  activeStoreName = localStorage.getItem('companyName') || sessionStorage.getItem('signupCompanyName') || 'Apollo';
+  activeStoreId = localStorage.getItem('companyId') || '1';
 
   currentDateTime = '';
   private clockTimer?: ReturnType<typeof setInterval>;
@@ -85,6 +86,10 @@ export class SalesReturnsPage implements OnInit, OnDestroy {
       this.loggedInUser = user.fullName || user.username || user.email || 'Apollo';
       this.userRole = user.role || 'ADMIN';
     }
+    const store = localStorage.getItem('companyName') || sessionStorage.getItem('signupCompanyName') || localStorage.getItem('storeName');
+    if (store) this.activeStoreName = store;
+    const cid = localStorage.getItem('companyId');
+    if (cid) this.activeStoreId = cid;
   }
 
   loadReturns(): void {
@@ -179,19 +184,48 @@ export class SalesReturnsPage implements OnInit, OnDestroy {
   totalPatientsCount = 0;
   totalUsersCount = 0;
 
-  togglePatientMenu() { this.isPatientMenuOpen = !this.isPatientMenuOpen; }
+  
+  toggleSupplierMenu(): void {
+    this.isSupplierMenuOpen = !this.isSupplierMenuOpen;
+  }
+
+  openSupplierFromCollapsed(): void {
+    this.isSidebarCollapsed = false;
+    this.isSupplierMenuOpen = true;
+  }
+
+  togglePatientMenu() { const state = this.isPatientMenuOpen; this.closeAllMenus(); this.isPatientMenuOpen = !state; }
   openPatientFromCollapsed() { this.isSidebarCollapsed = false; this.isPatientMenuOpen = true; }
   
-  toggleDoctorMenu() { this.isDoctorMenuOpen = !this.isDoctorMenuOpen; }
+  toggleDoctorMenu() { const state = this.isDoctorMenuOpen; this.closeAllMenus(); this.isDoctorMenuOpen = !state; }
   openDoctorFromCollapsed() { this.isSidebarCollapsed = false; this.isDoctorMenuOpen = true; }
   
-  toggleUserMenu() { this.isUserMenuOpen = !this.isUserMenuOpen; }
+  toggleUserMenu() { const state = this.isUserMenuOpen; this.closeAllMenus(); this.isUserMenuOpen = !state; }
   openUserFromCollapsed() { this.isSidebarCollapsed = false; this.isUserMenuOpen = true; }
   
-  toggleSettingsMenu() { this.isSettingsMenuOpen = !this.isSettingsMenuOpen; }
+  toggleSettingsMenu() { const state = this.isSettingsMenuOpen; this.closeAllMenus(); this.isSettingsMenuOpen = !state; }
   openSettingsFromCollapsed() { this.isSidebarCollapsed = false; this.isSettingsMenuOpen = true; }
 
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent) {
+    const sidebar = document.querySelector('.sidebar');
+    const toggleBtn = document.querySelector('.btn-sidebar-toggle') || document.querySelector('.toggle-btn');
+    const target = event.target as Node;
+    
+    if (sidebar && !sidebar.contains(target) && (!toggleBtn || !toggleBtn.contains(target))) {
+      this.closeAllMenus();
+    }
+  }
+
+  closeAllMenus() {
+    const self = this as any;
+    if (typeof self.isPatientMenuOpen !== 'undefined') self.isPatientMenuOpen = false;
+    if (typeof self.isDoctorMenuOpen !== 'undefined') self.isDoctorMenuOpen = false;
+    if (typeof self.isUserMenuOpen !== 'undefined') self.isUserMenuOpen = false;
+    if (typeof self.isSettingsMenuOpen !== 'undefined') self.isSettingsMenuOpen = false;
+    if (typeof self.isSalesMenuOpen !== 'undefined') self.isSalesMenuOpen = false;
+    if (typeof self.isPurchaseMenuOpen !== 'undefined') self.isPurchaseMenuOpen = false;
+    if (typeof self.isSupplierMenuOpen !== "undefined") self.isSupplierMenuOpen = false;
+  }
+
 }
-
-
- 

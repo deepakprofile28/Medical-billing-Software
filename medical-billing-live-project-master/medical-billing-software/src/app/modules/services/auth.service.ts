@@ -736,10 +736,11 @@ export class AuthService {
     return localStorage.getItem('companyName');
   }
 
-  getCurrentUser(): { fullName: string; username: string; email: string; role: string } {
+  getCurrentUser(): { name: string; fullName: string; username: string; email: string; role: string } {
     const userName = localStorage.getItem('userName') || 'Apollo';
     const role = localStorage.getItem('role') || localStorage.getItem('userRole') || 'ADMIN';
     return {
+      name: userName,
       fullName: userName,
       username: userName,
       email: localStorage.getItem('userEmail') || '',

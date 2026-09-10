@@ -1,0 +1,622 @@
+<div class="dashboard-layout-wrapper" [class.sidebar-collapsed]="isSidebarCollapsed">
+  
+  <!-- ======================================================== -->
+  <!-- 1. LEFT SIDEBAR NAVIGATION                               -->
+  <!-- ======================================================== -->
+  <aside class="app-sidebar">
+    <div class="sidebar-header">
+      <div class="logo-wrapper" *ngIf="!isSidebarCollapsed">
+        <div class="logo-icon-bg">
+          <i class="bi bi-hospital-fill"></i>
+        </div>
+        <div class="logo-text">
+          <span class="brand-title">PharmaCare</span>
+          <span class="brand-subtitle">Smart Billing Cloud</span>
+        </div>
+      </div>
+      
+      <div class="logo-icon-bg collapsed-logo" *ngIf="isSidebarCollapsed">
+        <i class="bi bi-hospital-fill"></i>
+      </div>
+
+      <button class="btn-toggle-sidebar" (click)="toggleSidebar()" title="Toggle Sidebar">
+        <i class="bi" [ngClass]="isSidebarCollapsed ? 'bi-chevron-right' : 'bi-chevron-left'"></i>
+      </button>
+    </div>
+
+    <!-- Scrollable Navigation Items -->
+    <nav class="sidebar-nav custom-scrollbar">
+      
+      <!-- 1. POS BILLING -->
+      <div class="nav-group mb-2">
+        <a routerLink="/pos" class="menu-item hero-pos-item" title="Quick POS Billing">
+          <i class="bi bi-cart-check-fill menu-icon"></i>
+          <span class="menu-text" *ngIf="!isSidebarCollapsed">POS Counter</span>
+          <span class="badge-pos-pulse" *ngIf="!isSidebarCollapsed">F1</span>
+        </a>
+      </div>
+
+      <!-- DASHBOARD LINK -->
+      <div class="nav-group">
+        <a routerLink="/dashboard" class="menu-item root-item">
+          <i class="bi bi-speedometer2 menu-icon text-primary"></i>
+          <span class="menu-text" *ngIf="!isSidebarCollapsed">Dashboard</span>
+        </a>
+      </div>
+
+      <!-- 2. SALES MANAGEMENT -->
+      <div class="nav-group">
+        <div class="menu-header" (click)="toggleSalesMenu()" [class.expanded]="isSalesMenuOpen" *ngIf="!isSidebarCollapsed">
+          <div class="header-left">
+            <i class="bi bi-receipt header-icon text-indigo"></i>
+            <span>Sales Management</span>
+          </div>
+          <i class="bi bi-chevron-down chevron-icon" [class.rotate]="isSalesMenuOpen"></i>
+        </div>
+
+        <a *ngIf="isSidebarCollapsed" (click)="openSalesFromCollapsed()" class="menu-item root-item" style="cursor: pointer;" title="Sales Management">
+          <i class="bi bi-receipt menu-icon text-indigo"></i>
+        </a>
+
+        <div class="sub-menu" *ngIf="isSalesMenuOpen && !isSidebarCollapsed">
+          <a routerLink="/sales-transactions" class="sub-menu-item">
+            <i class="bi bi-cash-coin sub-icon text-primary"></i>
+            <span>Sales Transaction</span>
+          </a>
+          <a routerLink="/sales-orders" class="sub-menu-item">
+            <i class="bi bi-journal-text sub-icon text-info"></i>
+            <span>Sales Order</span>
+          </a>
+          <a routerLink="/sales-suspended" class="sub-menu-item">
+            <i class="bi bi-pause-circle-fill sub-icon text-warning"></i>
+            <span>Order Suspended</span>
+          </a>
+          <a routerLink="/sales-completed" class="sub-menu-item">
+            <i class="bi bi-check-circle-fill sub-icon text-success"></i>
+            <span>Completed</span>
+          </a>
+          <a routerLink="/sales-exchange" class="sub-menu-item">
+            <i class="bi bi-arrow-repeat sub-icon text-purple"></i>
+            <span>Exchange</span>
+          </a>
+          <a routerLink="/sales-returns" class="sub-menu-item">
+            <i class="bi bi-arrow-counterclockwise sub-icon text-danger"></i>
+            <span>Return and Refund</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- 3. PRODUCTS -->
+      <div class="nav-group">
+        <a routerLink="/tablets" class="menu-item root-item">
+          <i class="bi bi-capsule-pill menu-icon text-emerald"></i>
+          <span class="menu-text" *ngIf="!isSidebarCollapsed">Products</span>
+        </a>
+      </div>
+
+      <!-- 4. PURCHASE MANAGEMENT -->
+      <div class="nav-group">
+        <div class="menu-header" (click)="togglePurchaseMenu()" [class.expanded]="isPurchaseMenuOpen" *ngIf="!isSidebarCollapsed">
+          <div class="header-left">
+            <i class="bi bi-bag-check-fill header-icon" style="color: #f59e0b;"></i>
+            <span>Purchase Management</span>
+          </div>
+          <i class="bi bi-chevron-down chevron-icon" [class.rotate]="isPurchaseMenuOpen"></i>
+        </div>
+
+        <a *ngIf="isSidebarCollapsed" (click)="isSidebarCollapsed = false; isPurchaseMenuOpen = true" class="menu-item root-item" style="cursor: pointer;" title="Purchase Management">
+          <i class="bi bi-bag-check-fill menu-icon" style="color: #f59e0b;"></i>
+        </a>
+
+        <div class="sub-menu" *ngIf="isPurchaseMenuOpen && !isSidebarCollapsed">
+          <a routerLink="/purchase" class="sub-menu-item">
+            <i class="bi bi-cart-plus-fill sub-icon text-info"></i>
+            <span>Purchase</span>
+          </a>
+          <a routerLink="/purchase-returns" class="sub-menu-item">
+            <i class="bi bi-arrow-return-left sub-icon text-danger"></i>
+            <span>Purchase Return</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- 5. SUPPLIER MANAGEMENT (DEDICATED TOP-LEVEL MODULE) -->
+      <div class="nav-group">
+        <div class="menu-header" (click)="toggleSupplierMenu()" [class.expanded]="isSupplierMenuOpen" *ngIf="!isSidebarCollapsed">
+          <div class="header-left">
+            <i class="bi bi-truck header-icon" style="color: #0284c7;"></i>
+            <span>Supplier Management</span>
+          </div>
+          <i class="bi bi-chevron-down chevron-icon" [class.rotate]="isSupplierMenuOpen"></i>
+        </div>
+
+        <a *ngIf="isSidebarCollapsed" (click)="openSupplierFromCollapsed()" class="menu-item root-item" style="cursor: pointer;" title="Supplier Management">
+          <i class="bi bi-truck menu-icon" style="color: #0284c7;"></i>
+        </a>
+
+        <div class="sub-menu" *ngIf="isSupplierMenuOpen && !isSidebarCollapsed">
+          <a routerLink="/supplier-list" class="sub-menu-item">
+            <i class="bi bi-card-list sub-icon text-primary"></i>
+            <span>Supplier List</span>
+          </a>
+          <a routerLink="/supplier-registration" routerLinkActive="active" class="sub-menu-item active">
+            <i class="bi bi-person-plus-fill sub-icon text-success"></i>
+            <span>Add Supplier</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- 6. AI CLINICAL ASSISTANT -->
+      <div class="nav-group">
+        <a routerLink="/ai-assistant" class="menu-item root-item" title="AI Medical Assistant">
+          <i class="bi bi-robot menu-icon" style="color: #a855f7;"></i>
+          <span class="menu-text" *ngIf="!isSidebarCollapsed">AI Clinical Assistant</span>
+          <span class="badge-pos-pulse" style="background: #7c3aed;" *ngIf="!isSidebarCollapsed">AI DB</span>
+        </a>
+      </div>
+
+      <!-- 7. PATIENT MANAGEMENT -->
+      <div class="nav-group">
+        <div class="menu-header" (click)="togglePatientMenu()" [class.expanded]="isPatientMenuOpen" *ngIf="!isSidebarCollapsed">
+          <div class="header-left">
+            <i class="bi bi-person-vcard-fill header-icon"></i>
+            <span>Patient Management</span>
+          </div>
+          <i class="bi bi-chevron-down chevron-icon" [class.rotate]="isPatientMenuOpen"></i>
+        </div>
+
+        <a *ngIf="isSidebarCollapsed" (click)="openPatientFromCollapsed()" class="menu-item root-item" style="cursor: pointer;" title="Patient Management">
+          <i class="bi bi-person-vcard-fill menu-icon"></i>
+        </a>
+
+        <div class="sub-menu" *ngIf="isPatientMenuOpen && !isSidebarCollapsed">
+          <a routerLink="/patients" class="sub-menu-item">
+            <i class="bi bi-people-fill sub-icon"></i>
+            <span>Patient List</span>
+          </a>
+          <a routerLink="/patient-registration" class="sub-menu-item">
+            <i class="bi bi-person-plus-fill sub-icon text-success"></i>
+            <span>Add Patient</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- 8. DOCTOR MANAGEMENT -->
+      <div class="nav-group">
+        <div class="menu-header" (click)="toggleDoctorMenu()" [class.expanded]="isDoctorMenuOpen" *ngIf="!isSidebarCollapsed">
+          <div class="header-left">
+            <i class="bi bi-heart-pulse-fill header-icon text-danger"></i>
+            <span>Doctor Management</span>
+          </div>
+          <i class="bi bi-chevron-down chevron-icon" [class.rotate]="isDoctorMenuOpen"></i>
+        </div>
+
+        <a *ngIf="isSidebarCollapsed" (click)="openDoctorFromCollapsed()" class="menu-item root-item" style="cursor: pointer;" title="Doctor Management">
+          <i class="bi bi-heart-pulse-fill menu-icon text-danger"></i>
+        </a>
+
+        <div class="sub-menu" *ngIf="isDoctorMenuOpen && !isSidebarCollapsed">
+          <a routerLink="/doctors" class="sub-menu-item">
+            <i class="bi bi-person-lines-fill sub-icon"></i>
+            <span>Doctor Directory</span>
+          </a>
+          <a routerLink="/doctor-registration" class="sub-menu-item">
+            <i class="bi bi-person-plus sub-icon text-success"></i>
+            <span>Add Doctor</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- 9. SETTINGS & CONFIG -->
+      <div class="nav-group">
+        <div class="menu-header" (click)="toggleSettingsMenu()" [class.expanded]="isSettingsMenuOpen" *ngIf="!isSidebarCollapsed">
+          <div class="header-left">
+            <i class="bi bi-gear-fill header-icon text-secondary"></i>
+            <span>Administration</span>
+          </div>
+          <i class="bi bi-chevron-down chevron-icon" [class.rotate]="isSettingsMenuOpen"></i>
+        </div>
+
+        <a *ngIf="isSidebarCollapsed" (click)="openSettingsFromCollapsed()" class="menu-item root-item" style="cursor: pointer;" title="Administration">
+          <i class="bi bi-gear-fill menu-icon text-secondary"></i>
+        </a>
+
+        <div class="sub-menu" *ngIf="isSettingsMenuOpen && !isSidebarCollapsed">
+          <a routerLink="/users" class="sub-menu-item">
+            <i class="bi bi-people sub-icon"></i>
+            <span>User Management</span>
+          </a>
+          <a routerLink="/roles" class="sub-menu-item">
+            <i class="bi bi-shield-check sub-icon"></i>
+            <span>Role Settings</span>
+          </a>
+          <a routerLink="/access" class="sub-menu-item">
+            <i class="bi bi-lock-fill sub-icon"></i>
+            <span>Access Settings</span>
+          </a>
+          <a routerLink="/settings" class="sub-menu-item">
+            <i class="bi bi-shop sub-icon"></i>
+            <span>Store Settings</span>
+          </a>
+          <a routerLink="/tax" class="sub-menu-item">
+            <i class="bi bi-percent sub-icon"></i>
+            <span>Tax Settings</span>
+          </a>
+          <a routerLink="/warehouse" class="sub-menu-item">
+            <i class="bi bi-building-gear sub-icon"></i>
+            <span>Warehouse</span>
+          </a>
+          <a routerLink="/brand" class="sub-menu-item">
+            <i class="bi bi-tag-fill sub-icon"></i>
+            <span>Brand Settings</span>
+          </a>
+          <a routerLink="/category-settings" class="sub-menu-item">
+            <i class="bi bi-grid-fill sub-icon"></i>
+            <span>Category Settings</span>
+          </a>
+          <a routerLink="/rack" class="sub-menu-item">
+            <i class="bi bi-box-seam sub-icon"></i>
+            <span>Rack Config</span>
+          </a>
+        </div>
+      </div>
+
+    </nav>
+
+    <!-- Sidebar Footer -->
+    <div class="sidebar-footer" *ngIf="!isSidebarCollapsed">
+      <div class="user-info-card">
+        <div class="user-avatar">
+          <i class="bi bi-person-fill"></i>
+        </div>
+        <div class="user-details">
+          <span class="user-name">{{ loggedInUser }}</span>
+          <span class="user-role">{{ userRole }}</span>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ======================================================== -->
+  <!-- 2. MAIN CONTENT AREA                                     -->
+  <!-- ======================================================== -->
+  <main class="app-main-content">
+    
+    <!-- Top Bar Navigation Card -->
+    <header class="top-nav-card">
+      <div class="nav-left">
+        <button class="btn-sidebar-toggle-mobile" (click)="toggleSidebar()">
+          <i class="bi bi-list"></i>
+        </button>
+        <div class="active-store-indicator">
+          <span class="pulse-dot"></span>
+          <span class="store-label">Active Store:</span>
+          <strong class="store-name">{{ activeStoreName }} (#{{ activeStoreId }})</strong>
+        </div>
+      </div>
+
+      <div class="nav-right">
+        <div class="live-clock-badge">
+          <i class="bi bi-clock-history"></i>
+          <span>{{ currentDateTime }}</span>
+        </div>
+
+        <a routerLink="/supplier-list" class="btn-pos-shortcut" title="View Registered Suppliers" style="background: rgba(2, 132, 199, 0.1); color: #0284c7; border: 1px solid rgba(2, 132, 199, 0.25);">
+          <i class="bi bi-card-list"></i>
+          <span>Supplier Directory</span>
+        </a>
+
+        <a routerLink="/pos" class="btn-pos-shortcut" title="POS Billing Counter">
+          <i class="bi bi-cart-check-fill"></i>
+          <span>POS Billing (F1)</span>
+        </a>
+
+        <button class="btn-logout" (click)="logout()" title="Logout of Session">
+          <i class="bi bi-box-arrow-right"></i>
+        </button>
+      </div>
+    </header>
+
+    <!-- Page Content Container -->
+    <div class="dashboard-content-container">
+
+      <!-- Breadcrumb -->
+      <div class="page-breadcrumb-nav">
+        <span class="breadcrumb-item"><i class="bi bi-house-door"></i> Home</span>
+        <i class="bi bi-chevron-right breadcrumb-separator"></i>
+        <span class="breadcrumb-item">Supplier Management</span>
+        <i class="bi bi-chevron-right breadcrumb-separator"></i>
+        <span class="breadcrumb-item active">{{ isEditing ? 'Edit Supplier' : 'Add Supplier' }}</span>
+      </div>
+
+      <!-- Toast Feedback -->
+      <div class="toast-floating-banner" *ngIf="showToast" [ngClass]="toastType === 'success' ? 'toast-success' : 'toast-danger'">
+        <i class="bi" [ngClass]="toastType === 'success' ? 'bi-check-circle-fill' : 'bi-exclamation-triangle-fill'"></i>
+        <span>{{ toastMessage }}</span>
+      </div>
+
+      <!-- MAIN FORM CONTAINER CARD -->
+      <div class="form-container-card">
+        
+        <!-- Header Banner -->
+        <div class="form-header-banner">
+          <div class="banner-title-area">
+            <div class="banner-icon-bg">
+              <i class="bi" [ngClass]="isEditing ? 'bi-pencil-square' : 'bi-truck'"></i>
+            </div>
+            <div>
+              <h2>{{ isEditing ? 'Edit Supplier Details' : 'Register New Pharmaceutical Supplier' }}</h2>
+              <p>Configure authorized pharmaceutical vendor profile, regulatory licenses, credit terms & logistics for <strong>{{ activeStoreName }} (#{{ activeStoreId }})</strong></p>
+            </div>
+          </div>
+
+          <div class="banner-actions">
+            <a routerLink="/supplier-list" class="btn-secondary-link">
+              <i class="bi bi-arrow-left"></i>
+              <span>Back to Directory</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- FORM BODY SECTIONS -->
+        <div class="form-body-wrapper">
+          
+          <!-- SECTION 1: FIRM & REGULATORY CREDENTIALS -->
+          <div class="form-section-block">
+            <div class="section-title-line">
+              <i class="bi bi-building text-primary"></i>
+              <h3>1. Firm & Regulatory Information</h3>
+            </div>
+
+            <div class="grid-3-col">
+              <div class="input-field-group">
+                <label>Supplier / Company Name <span class="required-star">*</span></label>
+                <input 
+                  type="text" 
+                  class="custom-input" 
+                  [(ngModel)]="form.name" 
+                  placeholder="e.g. Apollo Healthcare Logistics Pvt Ltd" 
+                  required 
+                />
+              </div>
+
+              <div class="input-field-group">
+                <label>Supplier Code</label>
+                <input 
+                  type="text" 
+                  class="custom-input font-mono" 
+                  [(ngModel)]="form.code" 
+                  placeholder="e.g. SUP-005" 
+                />
+              </div>
+
+              <div class="input-field-group">
+                <label>GSTIN / Tax Identification</label>
+                <input 
+                  type="text" 
+                  class="custom-input" 
+                  [(ngModel)]="form.gstin" 
+                  placeholder="e.g. 33AAAAA1234A1Z5" 
+                />
+              </div>
+
+              <div class="input-field-group">
+                <label>Drug License / Form 20B/21B No.</label>
+                <input 
+                  type="text" 
+                  class="custom-input" 
+                  [(ngModel)]="form.drugLicenseNo" 
+                  placeholder="e.g. DL-TN-CHE-2024-0988" 
+                />
+              </div>
+
+              <div class="input-field-group">
+                <label>Procurement Payment Terms</label>
+                <select class="custom-select" [(ngModel)]="form.paymentTerms">
+                  <option *ngFor="let term of paymentTermOptions" [value]="term">{{ term }}</option>
+                </select>
+              </div>
+
+              <div class="input-field-group">
+                <label>Credit Limit (₹)</label>
+                <input 
+                  type="number" 
+                  class="custom-input" 
+                  [(ngModel)]="form.creditLimit" 
+                  placeholder="e.g. 100000" 
+                />
+              </div>
+            </div>
+          </div>
+
+          <!-- SECTION 2: PRIMARY CONTACT DETAILS -->
+          <div class="form-section-block">
+            <div class="section-title-line">
+              <i class="bi bi-person-lines-fill text-success"></i>
+              <h3>2. Contact Personnel & Communication</h3>
+            </div>
+
+            <div class="grid-3-col">
+              <div class="input-field-group">
+                <label>Contact Person / Sales Rep <span class="required-star">*</span></label>
+                <input 
+                  type="text" 
+                  class="custom-input" 
+                  [(ngModel)]="form.contactPerson" 
+                  placeholder="e.g. Ramesh Kumar" 
+                  required 
+                />
+              </div>
+
+              <div class="input-field-group">
+                <label>Primary Phone Number <span class="required-star">*</span></label>
+                <input 
+                  type="tel" 
+                  class="custom-input" 
+                  [(ngModel)]="form.phone" 
+                  placeholder="e.g. 9841012345" 
+                  required 
+                />
+              </div>
+
+              <div class="input-field-group">
+                <label>Official Email Address</label>
+                <input 
+                  type="email" 
+                  class="custom-input" 
+                  [(ngModel)]="form.email" 
+                  placeholder="e.g. orders@supplier.com" 
+                />
+              </div>
+            </div>
+          </div>
+
+          <!-- SECTION 3: WAREHOUSE & OPERATING ADDRESS -->
+          <div class="form-section-block">
+            <div class="section-title-line">
+              <i class="bi bi-geo-alt-fill text-danger"></i>
+              <h3>3. Warehouse & Operating Address</h3>
+            </div>
+
+            <div class="grid-full mb-3">
+              <div class="input-field-group">
+                <label>Street Address / Facility Location</label>
+                <input 
+                  type="text" 
+                  class="custom-input" 
+                  [(ngModel)]="form.address" 
+                  placeholder="e.g. Plot No. 45, SIDCO Industrial Estate, Guindy" 
+                />
+              </div>
+            </div>
+
+            <div class="grid-3-col">
+              <div class="input-field-group">
+                <label>City <span class="required-star">*</span></label>
+                <input 
+                  type="text" 
+                  class="custom-input" 
+                  [(ngModel)]="form.city" 
+                  placeholder="e.g. Chennai" 
+                  required 
+                />
+              </div>
+
+              <div class="input-field-group">
+                <label>State <span class="required-star">*</span></label>
+                <input 
+                  type="text" 
+                  class="custom-input" 
+                  [(ngModel)]="form.state" 
+                  placeholder="e.g. Tamil Nadu" 
+                  required 
+                />
+              </div>
+
+              <div class="input-field-group">
+                <label>Postal / Pincode</label>
+                <input 
+                  type="text" 
+                  class="custom-input" 
+                  [(ngModel)]="form.pincode" 
+                  placeholder="e.g. 600032" 
+                />
+              </div>
+            </div>
+          </div>
+
+          <!-- SECTION 4: BANKING & SETTLEMENT DETAILS -->
+          <div class="form-section-block">
+            <div class="section-title-line">
+              <i class="bi bi-bank text-purple"></i>
+              <h3>4. Banking & Direct Settlement (Optional)</h3>
+            </div>
+
+            <div class="grid-3-col">
+              <div class="input-field-group">
+                <label>Bank Name</label>
+                <input 
+                  type="text" 
+                  class="custom-input" 
+                  [(ngModel)]="form.bankName" 
+                  placeholder="e.g. HDFC Bank Ltd" 
+                />
+              </div>
+
+              <div class="input-field-group">
+                <label>Account Number</label>
+                <input 
+                  type="text" 
+                  class="custom-input font-mono" 
+                  [(ngModel)]="form.bankAccountNumber" 
+                  placeholder="e.g. 50200012345678" 
+                />
+              </div>
+
+              <div class="input-field-group">
+                <label>IFSC Code</label>
+                <input 
+                  type="text" 
+                  class="custom-input font-mono" 
+                  [(ngModel)]="form.ifscCode" 
+                  placeholder="e.g. HDFC0001234" 
+                />
+              </div>
+            </div>
+          </div>
+
+          <!-- SECTION 5: STATUS & NOTES -->
+          <div class="form-section-block">
+            <div class="section-title-line">
+              <i class="bi bi-toggles text-warning"></i>
+              <h3>5. Supplier Status & Internal Notes</h3>
+            </div>
+
+            <div class="grid-2-col">
+              <div class="input-field-group">
+                <label>Vendor Status</label>
+                <select class="custom-select" [(ngModel)]="form.status">
+                  <option value="ACTIVE">ACTIVE - Authorized for stock purchase inward</option>
+                  <option value="INACTIVE">INACTIVE - Procurement suspended / on hold</option>
+                </select>
+              </div>
+
+              <div class="input-field-group">
+                <label>Remarks / Procurement Notes</label>
+                <textarea 
+                  class="custom-textarea" 
+                  rows="2" 
+                  [(ngModel)]="form.notes" 
+                  placeholder="e.g. Delivers cold chain biologics within 24 hours. Discount tier: 8% on bulk purchases."
+                ></textarea>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- FORM ACTION BUTTONS FOOTER -->
+        <div class="form-actions-footer">
+          <button type="button" class="btn-cancel" (click)="resetForm()">
+            <i class="bi bi-arrow-counterclockwise"></i> Reset Form
+          </button>
+          
+          <div class="actions-right">
+            <a routerLink="/supplier-list" class="btn-back">
+              Cancel
+            </a>
+
+            <button type="button" class="btn-submit" (click)="saveSupplier()" [disabled]="saving">
+              <i class="bi bi-check2-circle" *ngIf="!saving"></i>
+              <span class="spinner-border spinner-border-sm me-1" *ngIf="saving"></span>
+              <span>{{ isEditing ? 'Update Supplier Profile' : 'Register Supplier' }}</span>
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </main>
+</div>
+

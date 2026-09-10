@@ -37,6 +37,7 @@ import { AccessService } from '../../../services/access.service';
 })
 export class PatientList implements OnInit {
   isPurchaseMenuOpen = false;
+  isSupplierMenuOpen = false;
 
   // ==========================================
   // SIDEBAR NAVIGATION & LAYOUT STATE
@@ -85,6 +86,16 @@ export class PatientList implements OnInit {
     this.isSidebarCollapsed = false;
     this.isUserMenuOpen = true;
     this.cdr.detectChanges();
+  }
+
+  
+  toggleSupplierMenu(): void {
+    this.isSupplierMenuOpen = !this.isSupplierMenuOpen;
+  }
+
+  openSupplierFromCollapsed(): void {
+    this.isSidebarCollapsed = false;
+    this.isSupplierMenuOpen = true;
   }
 
   togglePatientMenu(): void {

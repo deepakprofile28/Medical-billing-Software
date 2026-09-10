@@ -85,7 +85,7 @@
         </div>
       </div>
 
-      <!-- 3. TABLETS & MEDICINES (ACTIVE) -->
+      <!-- 3. PRODUCTS (ACTIVE) -->
       <div class="nav-group">
         
       <!-- PURCHASE MENU -->
@@ -114,9 +114,35 @@
         </div>
       </div>
 
+      <!-- SUPPLIER MANAGEMENT -->
+      <div class="nav-group">
+        <div class="menu-header" (click)="toggleSupplierMenu()" [class.expanded]="isSupplierMenuOpen" *ngIf="!isSidebarCollapsed">
+          <div class="header-left">
+            <i class="bi bi-truck header-icon" style="color: #0284c7;"></i>
+            <span>Supplier Management</span>
+          </div>
+          <i class="bi bi-chevron-down chevron-icon" [class.rotate]="isSupplierMenuOpen"></i>
+        </div>
+
+        <a *ngIf="isSidebarCollapsed" (click)="openSupplierFromCollapsed()" class="menu-item root-item" style="cursor: pointer;" title="Supplier Management">
+          <i class="bi bi-truck menu-icon" style="color: #0284c7;"></i>
+        </a>
+
+        <div class="sub-menu" *ngIf="isSupplierMenuOpen && !isSidebarCollapsed">
+          <a routerLink="/supplier-list" class="sub-menu-item">
+            <i class="bi bi-card-list sub-icon text-primary"></i>
+            <span>Supplier List</span>
+          </a>
+          <a routerLink="/supplier-registration" class="sub-menu-item">
+            <i class="bi bi-person-plus-fill sub-icon text-success"></i>
+            <span>Add Supplier</span>
+          </a>
+        </div>
+      </div>
+
       <a routerLink="/tablets" routerLinkActive="active" class="menu-item root-item">
           <i class="bi bi-capsule-pill menu-icon text-emerald"></i>
-          <span class="menu-text" *ngIf="!isSidebarCollapsed">Tablets & Medicines</span>
+          <span class="menu-text" *ngIf="!isSidebarCollapsed">Products</span>
         </a>
       </div>
 
@@ -280,6 +306,11 @@
             <span>Brand</span>
             <span class="count-badge" style="background: #9333ea;">DB</span>
           </a>
+          <a routerLink="/rack" class="sub-menu-item">
+            <i class="bi bi-box-seam sub-icon text-danger"></i>
+            <span>Rack</span>
+            <span class="count-badge" style="background: #dc2626;">DB</span>
+          </a>
           <a routerLink="/branch" class="sub-menu-item">
             <i class="bi bi-diagram-3-fill sub-icon text-teal"></i>
             <span>Branch</span>
@@ -320,7 +351,7 @@
           <i class="bi bi-list"></i>
         </button>
         <div class="page-title-wrap">
-          <h2>Tablets & Medicine Inventory</h2>
+          <h2>Products Inventory</h2>
           <div class="breadcrumb-sub">
             <span>Home</span> / <strong>MySQL Pharmacy Catalog (<code>medicines</code>)</strong>
           </div>
@@ -397,7 +428,7 @@
       <form (ngSubmit)="saveMedicine()" class="med-form-card-body">
 
         <!-- Row 1: Medicine Basic Info (Name, Generic Composition, Category) -->
-        <div class="form-row-3">
+        <div class="form-row-4">
           <!-- Medicine Name -->
           <div class="form-field">
             <div class="field-label-row">
@@ -451,7 +482,7 @@
         </div>
 
         <!-- Row 2: Batch, Expiry & Manufacturer -->
-        <div class="form-row-3">
+        <div class="form-row-4">
           <!-- Batch Number -->
           <div class="form-field">
             <label>Batch Number</label>
@@ -631,6 +662,7 @@
               <th>#</th>
               <th>Medicine Name</th>
               <th>Category</th>
+                <th>Rack</th>
               <th>Batch No</th>
               <th>Expiry</th>
               <th class="text-end">Selling Price</th>
@@ -649,6 +681,7 @@
                 <div class="med-table-gen" *ngIf="med.genericName">{{ med.genericName }}</div>
               </td>
               <td><span class="badge-cat">{{ med.category || 'General' }}</span></td>
+                <td><span class="badge-cat bg-light text-dark border">{{ med.rackName || 'Unassigned' }}</span></td>
               <td><code>{{ med.batchNo || 'N/A' }}</code></td>
               <td>
                 <span class="badge-exp">{{ med.expiryDate || 'N/A' }}</span>

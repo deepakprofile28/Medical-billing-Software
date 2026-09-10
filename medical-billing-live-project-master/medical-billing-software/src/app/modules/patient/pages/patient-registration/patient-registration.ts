@@ -1,5 +1,4 @@
-import {
-  Component,
+import { HostListener, Component,
   ElementRef,
   ViewChild,
   AfterViewInit,
@@ -40,6 +39,7 @@ import {
 })
 export class PatientRegistration implements OnInit, AfterViewInit {
   isPurchaseMenuOpen = false;
+  isSupplierMenuOpen = false;
 
   // ==========================================
   // SIDEBAR NAVIGATION & LAYOUT STATE
@@ -88,6 +88,16 @@ export class PatientRegistration implements OnInit, AfterViewInit {
     this.isSidebarCollapsed = false;
     this.isDoctorMenuOpen = true;
     this.cdr.detectChanges();
+  }
+
+  
+  toggleSupplierMenu(): void {
+    this.isSupplierMenuOpen = !this.isSupplierMenuOpen;
+  }
+
+  openSupplierFromCollapsed(): void {
+    this.isSidebarCollapsed = false;
+    this.isSupplierMenuOpen = true;
   }
 
   togglePatientMenu(): void {
@@ -1051,4 +1061,27 @@ export class PatientRegistration implements OnInit, AfterViewInit {
   goToPatients(): void {
     this.router.navigate(['/patients']);
   }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent) {
+    const sidebar = document.querySelector('.sidebar');
+    const toggleBtn = document.querySelector('.btn-sidebar-toggle') || document.querySelector('.toggle-btn');
+    const target = event.target as Node;
+    
+    if (sidebar && !sidebar.contains(target) && (!toggleBtn || !toggleBtn.contains(target))) {
+      this.closeAllMenus();
+    }
+  }
+
+  closeAllMenus() {
+    const self = this as any;
+    if (typeof self.isPatientMenuOpen !== 'undefined') self.isPatientMenuOpen = false;
+    if (typeof self.isDoctorMenuOpen !== 'undefined') self.isDoctorMenuOpen = false;
+    if (typeof self.isUserMenuOpen !== 'undefined') self.isUserMenuOpen = false;
+    if (typeof self.isSettingsMenuOpen !== 'undefined') self.isSettingsMenuOpen = false;
+    if (typeof self.isSalesMenuOpen !== 'undefined') self.isSalesMenuOpen = false;
+    if (typeof self.isPurchaseMenuOpen !== 'undefined') self.isPurchaseMenuOpen = false;
+    if (typeof self.isSupplierMenuOpen !== "undefined") self.isSupplierMenuOpen = false;
+  }
+
 }
