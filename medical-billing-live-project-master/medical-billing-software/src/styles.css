@@ -217,7 +217,49 @@ body::after{
   display: flex;
   flex-direction: column;
   gap: 8px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
 }
+
+.sidebar-nav::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+/* Global scrollbar suppression on all sidebar elements across all pages */
+.app-sidebar,
+.sidebar,
+.sidebar-nav,
+.nav-group,
+aside.app-sidebar,
+nav.sidebar-nav,
+.dashboard-layout-wrapper .app-sidebar,
+.dashboard-layout-wrapper .sidebar-nav,
+.dashboard-layout-wrapper.sidebar-collapsed .app-sidebar,
+.dashboard-layout-wrapper.sidebar-collapsed .sidebar-nav {
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+
+.app-sidebar::-webkit-scrollbar,
+.sidebar::-webkit-scrollbar,
+.sidebar-nav::-webkit-scrollbar,
+.nav-group::-webkit-scrollbar,
+aside.app-sidebar::-webkit-scrollbar,
+nav.sidebar-nav::-webkit-scrollbar,
+.dashboard-layout-wrapper .app-sidebar::-webkit-scrollbar,
+.dashboard-layout-wrapper .sidebar-nav::-webkit-scrollbar,
+.dashboard-layout-wrapper.sidebar-collapsed .app-sidebar::-webkit-scrollbar,
+.dashboard-layout-wrapper.sidebar-collapsed .sidebar-nav::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  background: transparent !important;
+}
+
 
 .nav-group {
   display: flex;

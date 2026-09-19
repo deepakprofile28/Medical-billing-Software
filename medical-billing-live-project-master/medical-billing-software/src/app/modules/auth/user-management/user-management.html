@@ -24,7 +24,7 @@
     </div>
 
     <!-- Sidebar Navigation Items -->
-    <nav class="sidebar-nav">
+    <nav class="sidebar-nav" (click)="onNavClick($event)">
       
       <!-- 1. DASHBOARD -->
       <div class="nav-group">
@@ -63,7 +63,7 @@
 
       <!-- 5. PATIENT MANAGEMENT -->
       <div class="nav-group">
-        <div class="menu-header" (click)="togglePatientMenu()" [class.expanded]="isPatientMenuOpen" *ngIf="!isSidebarCollapsed">
+        <div class="menu-header" (click)="togglePatientMenu($event)" [class.expanded]="isPatientMenuOpen" *ngIf="!isSidebarCollapsed">
           <div class="header-left">
             <i class="bi bi-person-vcard-fill header-icon"></i>
             <span>Patient Management</span>
@@ -72,7 +72,7 @@
         </div>
 
         <!-- Collapsed icon fallback -->
-        <a *ngIf="isSidebarCollapsed" (click)="openPatientFromCollapsed()" class="menu-item root-item" style="cursor: pointer;" title="Patient Management">
+        <a *ngIf="isSidebarCollapsed" (click)="openPatientFromCollapsed($event)" class="menu-item root-item" style="cursor: pointer;" title="Patient Management">
           <i class="bi bi-person-vcard-fill menu-icon"></i>
         </a>
 
@@ -107,7 +107,7 @@
 
       <!-- 5.1 DOCTOR MANAGEMENT -->
       <div class="nav-group">
-        <div class="menu-header" (click)="toggleDoctorMenu()" [class.expanded]="isDoctorMenuOpen" *ngIf="!isSidebarCollapsed">
+        <div class="menu-header" (click)="toggleDoctorMenu($event)" [class.expanded]="isDoctorMenuOpen" *ngIf="!isSidebarCollapsed">
           <div class="header-left">
             <i class="bi bi-person-badge-fill header-icon text-cyan"></i>
             <span>Doctor Management</span>
@@ -116,7 +116,7 @@
         </div>
 
         <!-- Collapsed icon fallback -->
-        <a *ngIf="isSidebarCollapsed" (click)="openDoctorFromCollapsed()" class="menu-item root-item" style="cursor: pointer;" title="Doctor Management">
+        <a *ngIf="isSidebarCollapsed" (click)="openDoctorFromCollapsed($event)" class="menu-item root-item" style="cursor: pointer;" title="Doctor Management">
           <i class="bi bi-person-badge-fill menu-icon" style="color: #06b6d4;"></i>
         </a>
 
@@ -137,7 +137,7 @@
 
       <!-- 6. USER MANAGEMENT (ACTIVE) -->
       <div class="nav-group">
-        <div class="menu-header" (click)="toggleUserMenu()" [class.expanded]="isUserMenuOpen" *ngIf="!isSidebarCollapsed">
+        <div class="menu-header" (click)="toggleUserMenu($event)" [class.expanded]="isUserMenuOpen" *ngIf="!isSidebarCollapsed">
           <div class="header-left">
             <i class="bi bi-person-gear header-icon"></i>
             <span>User Management</span>
@@ -146,7 +146,7 @@
         </div>
 
         <!-- Collapsed icon fallback -->
-        <a *ngIf="isSidebarCollapsed" (click)="openUserFromCollapsed()" class="menu-item root-item active" style="cursor: pointer;" title="User Management">
+        <a *ngIf="isSidebarCollapsed" (click)="openUserFromCollapsed($event)" class="menu-item root-item active" style="cursor: pointer;" title="User Management">
           <i class="bi bi-person-gear menu-icon"></i>
         </a>
 
@@ -175,7 +175,7 @@
 
       <!-- 7. SETTINGS & STORE MENU -->
       <div class="nav-group">
-        <div class="menu-header" (click)="toggleSettingsMenu()" [class.expanded]="isSettingsMenuOpen" *ngIf="!isSidebarCollapsed">
+        <div class="menu-header" (click)="toggleSettingsMenu($event)" [class.expanded]="isSettingsMenuOpen" *ngIf="!isSidebarCollapsed">
           <div class="header-left">
             <i class="bi bi-gear-fill header-icon text-secondary"></i>
             <span>Settings</span>
@@ -183,7 +183,7 @@
           <i class="bi bi-chevron-down chevron-icon" [class.rotate]="isSettingsMenuOpen"></i>
         </div>
 
-        <a *ngIf="isSidebarCollapsed" (click)="openSettingsFromCollapsed()" class="menu-item root-item" style="cursor: pointer;" title="Settings: Store Config, Category, Tax">
+        <a *ngIf="isSidebarCollapsed" (click)="openSettingsFromCollapsed($event)" class="menu-item root-item" style="cursor: pointer;" title="Settings: Store Config, Category, Tax">
           <i class="bi bi-gear-fill menu-icon"></i>
         </a>
 
@@ -257,7 +257,7 @@
       <!-- ================= TOP HEADER CARD ================= -->
       <div class="top-nav-card">
         <div style="display: flex; align-items: center; gap: 14px;">
-          <button type="button" class="btn-sidebar-toggle" (click)="toggleSidebar()" title="Toggle Navigation Menu">
+          <button type="button" class="btn-sidebar-toggle" (click)="toggleSidebar($event)" title="Toggle Navigation Menu">
             <i class="bi bi-list"></i>
           </button>
 

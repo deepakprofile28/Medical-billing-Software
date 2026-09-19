@@ -44,8 +44,8 @@ export class PatientRegistration implements OnInit, AfterViewInit {
   // ==========================================
   // SIDEBAR NAVIGATION & LAYOUT STATE
   // ==========================================
-  isSidebarCollapsed = false;
-  isPatientMenuOpen = true; // Auto-expanded on Patient Hub
+  isSidebarCollapsed = true;
+  isPatientMenuOpen = false; // Auto-expanded on Patient Hub
   isDoctorMenuOpen = false;
   isUserMenuOpen = false;
   isSettingsMenuOpen = false;
@@ -59,62 +59,28 @@ export class PatientRegistration implements OnInit, AfterViewInit {
   draftsCount = 0;
   totalUsersCount = 2;
 
-  toggleSidebar(): void {
-    this.isSidebarCollapsed = !this.isSidebarCollapsed;
-    if (!this.isSidebarCollapsed) {
-      this.isPatientMenuOpen = true;
-    }
-  }
-
-  openSettingsFromCollapsed(): void {
-    this.isSidebarCollapsed = false;
-    this.isSettingsMenuOpen = true;
-    this.cdr.detectChanges();
-  }
-
-  openPatientFromCollapsed(): void {
-    this.isSidebarCollapsed = false;
-    this.isPatientMenuOpen = true;
-    this.cdr.detectChanges();
-  }
-
-  openUserFromCollapsed(): void {
-    this.isSidebarCollapsed = false;
-    this.isUserMenuOpen = true;
-    this.cdr.detectChanges();
-  }
-
-  openDoctorFromCollapsed(): void {
-    this.isSidebarCollapsed = false;
-    this.isDoctorMenuOpen = true;
-    this.cdr.detectChanges();
-  }
+  
 
   
-  toggleSupplierMenu(): void {
-    this.isSupplierMenuOpen = !this.isSupplierMenuOpen;
-  }
 
-  openSupplierFromCollapsed(): void {
-    this.isSidebarCollapsed = false;
-    this.isSupplierMenuOpen = true;
-  }
+  
 
-  togglePatientMenu(): void {
-    this.isPatientMenuOpen = !this.isPatientMenuOpen;
-  }
+  
 
-  toggleDoctorMenu(): void {
-    this.isDoctorMenuOpen = !this.isDoctorMenuOpen;
-  }
+  
 
-  toggleUserMenu(): void {
-    this.isUserMenuOpen = !this.isUserMenuOpen;
-  }
+  
+  
 
-  toggleSettingsMenu(): void {
-    this.isSettingsMenuOpen = !this.isSettingsMenuOpen;
-  }
+  
+
+  
+
+  
+
+  
+
+  
 
   goBack(): void {
     if (window.history.length > 1) {
@@ -1062,26 +1028,244 @@ export class PatientRegistration implements OnInit, AfterViewInit {
     this.router.navigate(['/patients']);
   }
 
-  @HostListener('document:click', ['$event'])
-  onDocumentClick(event: MouseEvent) {
-    const sidebar = document.querySelector('.sidebar');
-    const toggleBtn = document.querySelector('.btn-sidebar-toggle') || document.querySelector('.toggle-btn');
-    const target = event.target as Node;
-    
-    if (sidebar && !sidebar.contains(target) && (!toggleBtn || !toggleBtn.contains(target))) {
+  
+
+  
+
+
+  
+
+  
+
+
+  // ==========================================
+  // SIDEBAR & SUBMENU CONTROLS (EXPAND ON CLICK & OUTSIDE CLOSE)
+  // ==========================================
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+
+  // ==========================================
+  // SIDEBAR & SUBMENU CONTROLS (EXPAND ON CLICK & OUTSIDE CLOSE)
+  // ==========================================
+  toggleSidebar(event?: MouseEvent): void {
+    if (event) {
+      event.stopPropagation();
+    }
+    this.isSidebarCollapsed = !this.isSidebarCollapsed;
+    if (this.isSidebarCollapsed) {
       this.closeAllMenus();
+    }
+    this.cdr.detectChanges();
+  }
+
+  togglePatientMenu(event?: MouseEvent): void {
+    if (event) {
+      event.stopPropagation();
+    }
+    this.isPatientMenuOpen = !this.isPatientMenuOpen;
+    this.cdr.detectChanges();
+  }
+
+  toggleDoctorMenu(event?: MouseEvent): void {
+    if (event) {
+      event.stopPropagation();
+    }
+    this.isDoctorMenuOpen = !this.isDoctorMenuOpen;
+    this.cdr.detectChanges();
+  }
+
+  toggleUserMenu(event?: MouseEvent): void {
+    if (event) {
+      event.stopPropagation();
+    }
+    this.isUserMenuOpen = !this.isUserMenuOpen;
+    this.cdr.detectChanges();
+  }
+
+  toggleSettingsMenu(event?: MouseEvent): void {
+    if (event) {
+      event.stopPropagation();
+    }
+    this.isSettingsMenuOpen = !this.isSettingsMenuOpen;
+    this.cdr.detectChanges();
+  }
+
+  toggleSupplierMenu(event?: MouseEvent): void {
+    if (event) {
+      event.stopPropagation();
+    }
+    this.isSupplierMenuOpen = !this.isSupplierMenuOpen;
+    this.cdr.detectChanges();
+  }
+
+  togglePurchaseMenu(event?: MouseEvent): void {
+    if (event) {
+      event.stopPropagation();
+    }
+    this.isPurchaseMenuOpen = !this.isPurchaseMenuOpen;
+    this.cdr.detectChanges();
+  }
+
+  toggleSalesMenu(event?: MouseEvent): void {
+    if (event) {
+      event.stopPropagation();
+    }
+    this.isSalesMenuOpen = !this.isSalesMenuOpen;
+    this.cdr.detectChanges();
+  }
+
+  openPatientFromCollapsed(event?: MouseEvent): void {
+    if (event) {
+      event.stopPropagation();
+    }
+    this.isSidebarCollapsed = false;
+    this.closeAllMenus();
+    this.isPatientMenuOpen = true;
+    this.cdr.detectChanges();
+  }
+
+  openDoctorFromCollapsed(event?: MouseEvent): void {
+    if (event) {
+      event.stopPropagation();
+    }
+    this.isSidebarCollapsed = false;
+    this.closeAllMenus();
+    this.isDoctorMenuOpen = true;
+    this.cdr.detectChanges();
+  }
+
+  openUserFromCollapsed(event?: MouseEvent): void {
+    if (event) {
+      event.stopPropagation();
+    }
+    this.isSidebarCollapsed = false;
+    this.closeAllMenus();
+    this.isUserMenuOpen = true;
+    this.cdr.detectChanges();
+  }
+
+  openSettingsFromCollapsed(event?: MouseEvent): void {
+    if (event) {
+      event.stopPropagation();
+    }
+    this.isSidebarCollapsed = false;
+    this.closeAllMenus();
+    this.isSettingsMenuOpen = true;
+    this.cdr.detectChanges();
+  }
+
+  openSupplierFromCollapsed(event?: MouseEvent): void {
+    if (event) {
+      event.stopPropagation();
+    }
+    this.isSidebarCollapsed = false;
+    this.closeAllMenus();
+    this.isSupplierMenuOpen = true;
+    this.cdr.detectChanges();
+  }
+
+  openPurchaseFromCollapsed(event?: MouseEvent): void {
+    if (event) {
+      event.stopPropagation();
+    }
+    this.isSidebarCollapsed = false;
+    this.closeAllMenus();
+    this.isPurchaseMenuOpen = true;
+    this.cdr.detectChanges();
+  }
+
+  openSalesFromCollapsed(event?: MouseEvent): void {
+    if (event) {
+      event.stopPropagation();
+    }
+    this.isSidebarCollapsed = false;
+    this.closeAllMenus();
+    this.isSalesMenuOpen = true;
+    this.cdr.detectChanges();
+  }
+
+  closeAllMenus(): void {
+    this.isPatientMenuOpen = false;
+    this.isDoctorMenuOpen = false;
+    this.isUserMenuOpen = false;
+    this.isSettingsMenuOpen = false;
+    this.isSalesMenuOpen = false;
+    this.isPurchaseMenuOpen = false;
+    this.isSupplierMenuOpen = false;
+  }
+
+  closeSidebarOnNavigate(): void {
+    this.isSidebarCollapsed = true;
+    this.closeAllMenus();
+    this.cdr.detectChanges();
+  }
+
+  onNavClick(event: MouseEvent): void {
+    const target = event.target as HTMLElement;
+    const link = target.closest('a[routerLink], a.sub-menu-item');
+    if (link) {
+      this.closeSidebarOnNavigate();
     }
   }
 
-  closeAllMenus() {
-    const self = this as any;
-    if (typeof self.isPatientMenuOpen !== 'undefined') self.isPatientMenuOpen = false;
-    if (typeof self.isDoctorMenuOpen !== 'undefined') self.isDoctorMenuOpen = false;
-    if (typeof self.isUserMenuOpen !== 'undefined') self.isUserMenuOpen = false;
-    if (typeof self.isSettingsMenuOpen !== 'undefined') self.isSettingsMenuOpen = false;
-    if (typeof self.isSalesMenuOpen !== 'undefined') self.isSalesMenuOpen = false;
-    if (typeof self.isPurchaseMenuOpen !== 'undefined') self.isPurchaseMenuOpen = false;
-    if (typeof self.isSupplierMenuOpen !== "undefined") self.isSupplierMenuOpen = false;
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    if (this.isSidebarCollapsed) {
+      return;
+    }
+    const targetEl = (event.target as HTMLElement)?.nodeType === 1 
+      ? (event.target as HTMLElement) 
+      : (event.target as HTMLElement)?.parentElement;
+    
+    // If target element was detached during re-render, do NOT close!
+    if (!targetEl || !targetEl.isConnected) {
+      return;
+    }
+
+    const clickedInsideSidebar = !!targetEl.closest?.('.app-sidebar, .sidebar');
+    const clickedToggleBtn = !!targetEl.closest?.('.btn-sidebar-toggle, .sidebar-toggle-btn, .btn-toggle-sidebar, .btn-sidebar-toggle-mobile, .toggle-btn');
+
+    if (!clickedInsideSidebar && !clickedToggleBtn) {
+      this.closeAllMenus();
+      this.isSidebarCollapsed = true;
+      this.cdr.detectChanges();
+    }
   }
 
 }

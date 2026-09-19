@@ -24,7 +24,7 @@
     </div>
 
     <!-- Sidebar Navigation Items -->
-    <nav class="sidebar-nav">
+    <nav class="sidebar-nav" (click)="onNavClick($event)">
       
       <!-- 1. DASHBOARD -->
       <div class="nav-group">
@@ -45,7 +45,7 @@
 
       <!-- SALES MENU -->
       <div class="nav-group">
-        <div class="menu-header" (click)="isSalesMenuOpen = !isSalesMenuOpen" [class.expanded]="isSalesMenuOpen" *ngIf="!isSidebarCollapsed">
+        <div class="menu-header" (click)="toggleSalesMenu($event)" [class.expanded]="isSalesMenuOpen" *ngIf="!isSidebarCollapsed">
           <div class="header-left">
             <i class="bi bi-cart-check-fill header-icon text-success"></i>
             <span>Sales Management</span>
@@ -53,26 +53,18 @@
           <i class="bi bi-chevron-down chevron-icon" [class.rotate]="isSalesMenuOpen"></i>
         </div>
 
-        <a *ngIf="isSidebarCollapsed" (click)="isSidebarCollapsed = false; isSalesMenuOpen = true" class="menu-item root-item" style="cursor: pointer;" title="Sales Management">
+        <a *ngIf="isSidebarCollapsed" (click)="openSalesFromCollapsed($event)" class="menu-item root-item" style="cursor: pointer;" title="Sales Management">
           <i class="bi bi-cart-check-fill menu-icon text-success"></i>
         </a>
 
         <div class="sub-menu" *ngIf="isSalesMenuOpen && !isSidebarCollapsed">
-          <a routerLink="/sales-transactions" class="sub-menu-item">
-            <i class="bi bi-credit-card-2-front-fill sub-icon text-primary"></i>
-            <span>Transaction</span>
-          </a>
-          <a routerLink="/sales-orders" class="sub-menu-item">
-            <i class="bi bi-box-seam-fill sub-icon text-info"></i>
-            <span>Order</span>
-          </a>
-          <a routerLink="/sales-suspended" class="sub-menu-item">
-            <i class="bi bi-pause-circle-fill sub-icon text-warning"></i>
-            <span>Order Suspended</span>
-          </a>
           <a routerLink="/sales-completed" class="sub-menu-item">
             <i class="bi bi-check-circle-fill sub-icon text-success"></i>
             <span>Completed</span>
+          </a>
+          <a routerLink="/sales-suspended" class="sub-menu-item">
+            <i class="bi bi-pause-circle-fill sub-icon text-warning"></i>
+            <span>Suspended</span>
           </a>
           <a routerLink="/sales-exchange" class="sub-menu-item">
             <i class="bi bi-arrow-repeat sub-icon text-purple"></i>
@@ -80,7 +72,7 @@
           </a>
           <a routerLink="/sales-returns" class="sub-menu-item">
             <i class="bi bi-arrow-counterclockwise sub-icon text-danger"></i>
-            <span>Return and Refund</span>
+            <span>Return</span>
           </a>
         </div>
       </div>
@@ -88,7 +80,7 @@
       
       <!-- PURCHASE MENU -->
       <div class="nav-group">
-        <div class="menu-header" (click)="isPurchaseMenuOpen = !isPurchaseMenuOpen" [class.expanded]="isPurchaseMenuOpen" *ngIf="!isSidebarCollapsed">
+        <div class="menu-header" (click)="togglePurchaseMenu($event)" [class.expanded]="isPurchaseMenuOpen" *ngIf="!isSidebarCollapsed">
           <div class="header-left">
             <i class="bi bi-bag-check-fill header-icon" style="color: #f59e0b;"></i>
             <span>Purchase Management</span>
@@ -96,7 +88,7 @@
           <i class="bi bi-chevron-down chevron-icon" [class.rotate]="isPurchaseMenuOpen"></i>
         </div>
 
-        <a *ngIf="isSidebarCollapsed" (click)="isSidebarCollapsed = false; isPurchaseMenuOpen = true" class="menu-item root-item" style="cursor: pointer;" title="Purchase Management">
+        <a *ngIf="isSidebarCollapsed" (click)="openPurchaseFromCollapsed($event)" class="menu-item root-item" style="cursor: pointer;" title="Purchase Management">
           <i class="bi bi-bag-check-fill menu-icon" style="color: #f59e0b;"></i>
         </a>
 
@@ -114,7 +106,7 @@
 
       <!-- SUPPLIER MANAGEMENT -->
       <div class="nav-group">
-        <div class="menu-header" (click)="toggleSupplierMenu()" [class.expanded]="isSupplierMenuOpen" *ngIf="!isSidebarCollapsed">
+        <div class="menu-header" (click)="toggleSupplierMenu($event)" [class.expanded]="isSupplierMenuOpen" *ngIf="!isSidebarCollapsed">
           <div class="header-left">
             <i class="bi bi-truck header-icon" style="color: #0284c7;"></i>
             <span>Supplier Management</span>
@@ -122,7 +114,7 @@
           <i class="bi bi-chevron-down chevron-icon" [class.rotate]="isSupplierMenuOpen"></i>
         </div>
 
-        <a *ngIf="isSidebarCollapsed" (click)="openSupplierFromCollapsed()" class="menu-item root-item" style="cursor: pointer;" title="Supplier Management">
+        <a *ngIf="isSidebarCollapsed" (click)="openSupplierFromCollapsed($event)" class="menu-item root-item" style="cursor: pointer;" title="Supplier Management">
           <i class="bi bi-truck menu-icon" style="color: #0284c7;"></i>
         </a>
 
@@ -157,7 +149,7 @@
 
       <!-- 5. PATIENT MANAGEMENT -->
       <div class="nav-group">
-        <div class="menu-header" (click)="togglePatientMenu()" [class.expanded]="isPatientMenuOpen" *ngIf="!isSidebarCollapsed">
+        <div class="menu-header" (click)="togglePatientMenu($event)" [class.expanded]="isPatientMenuOpen" *ngIf="!isSidebarCollapsed">
           <div class="header-left">
             <i class="bi bi-person-vcard-fill header-icon"></i>
             <span>Patient Management</span>
@@ -165,7 +157,7 @@
           <i class="bi bi-chevron-down chevron-icon" [class.rotate]="isPatientMenuOpen"></i>
         </div>
 
-        <a *ngIf="isSidebarCollapsed" (click)="openPatientFromCollapsed()" class="menu-item root-item" style="cursor: pointer;" title="Patient Management">
+        <a *ngIf="isSidebarCollapsed" (click)="openPatientFromCollapsed($event)" class="menu-item root-item" style="cursor: pointer;" title="Patient Management">
           <i class="bi bi-person-vcard-fill menu-icon"></i>
         </a>
 
@@ -192,7 +184,7 @@
 
       <!-- 5.1 DOCTOR MANAGEMENT -->
       <div class="nav-group">
-        <div class="menu-header" (click)="toggleDoctorMenu()" [class.expanded]="isDoctorMenuOpen" *ngIf="!isSidebarCollapsed">
+        <div class="menu-header" (click)="toggleDoctorMenu($event)" [class.expanded]="isDoctorMenuOpen" *ngIf="!isSidebarCollapsed">
           <div class="header-left">
             <i class="bi bi-person-badge-fill header-icon text-cyan"></i>
             <span>Doctor Management</span>
@@ -201,7 +193,7 @@
         </div>
 
         <!-- Collapsed icon fallback -->
-        <a *ngIf="isSidebarCollapsed" (click)="openDoctorFromCollapsed()" class="menu-item root-item" style="cursor: pointer;" title="Doctor Management">
+        <a *ngIf="isSidebarCollapsed" (click)="openDoctorFromCollapsed($event)" class="menu-item root-item" style="cursor: pointer;" title="Doctor Management">
           <i class="bi bi-person-badge-fill menu-icon" style="color: #06b6d4;"></i>
         </a>
 
@@ -222,7 +214,7 @@
 
       <!-- 6. USER MANAGEMENT -->
       <div class="nav-group">
-        <div class="menu-header" (click)="toggleUserMenu()" [class.expanded]="isUserMenuOpen" *ngIf="!isSidebarCollapsed">
+        <div class="menu-header" (click)="toggleUserMenu($event)" [class.expanded]="isUserMenuOpen" *ngIf="!isSidebarCollapsed">
           <div class="header-left">
             <i class="bi bi-person-gear header-icon"></i>
             <span>User Management</span>
@@ -230,7 +222,7 @@
           <i class="bi bi-chevron-down chevron-icon" [class.rotate]="isUserMenuOpen"></i>
         </div>
 
-        <a *ngIf="isSidebarCollapsed" (click)="openUserFromCollapsed()" class="menu-item root-item" style="cursor: pointer;" title="User Management">
+        <a *ngIf="isSidebarCollapsed" (click)="openUserFromCollapsed($event)" class="menu-item root-item" style="cursor: pointer;" title="User Management">
           <i class="bi bi-person-gear menu-icon"></i>
         </a>
 
@@ -254,7 +246,7 @@
 
       <!-- 7. SETTINGS & STORE MENU -->
       <div class="nav-group">
-        <div class="menu-header" (click)="toggleSettingsMenu()" [class.expanded]="isSettingsMenuOpen" *ngIf="!isSidebarCollapsed">
+        <div class="menu-header" (click)="toggleSettingsMenu($event)" [class.expanded]="isSettingsMenuOpen" *ngIf="!isSidebarCollapsed">
           <div class="header-left">
             <i class="bi bi-gear-fill header-icon text-secondary"></i>
             <span>Settings</span>
@@ -262,7 +254,7 @@
           <i class="bi bi-chevron-down chevron-icon" [class.rotate]="isSettingsMenuOpen"></i>
         </div>
 
-        <a *ngIf="isSidebarCollapsed" (click)="openSettingsFromCollapsed()" class="menu-item root-item" style="cursor: pointer;" title="Settings: Store Config, Category, Tax">
+        <a *ngIf="isSidebarCollapsed" (click)="openSettingsFromCollapsed($event)" class="menu-item root-item" style="cursor: pointer;" title="Settings: Store Config, Category, Tax">
           <i class="bi bi-gear-fill menu-icon"></i>
         </a>
 
@@ -332,7 +324,7 @@
     <!-- Top Navigation Card (EXACT MATCH TO DASHBOARD) -->
     <header class="top-nav-card">
       <div class="top-nav-left">
-        <button type="button" class="btn-sidebar-toggle" (click)="toggleSidebar()" title="Toggle Navigation Menu">
+        <button type="button" class="btn-sidebar-toggle" (click)="toggleSidebar($event)" title="Toggle Navigation Menu">
           <i class="bi bi-list"></i>
         </button>
         <div class="page-title-wrap">
@@ -369,6 +361,28 @@
           <span>+ Custom Drug</span>
         </button>
 
+        <!-- Flow Actions: Completed, Suspended, Exchange, Return -->
+        <button type="button" class="btn-top-flow btn-flow-completed" (click)="openCompletedSales()" title="Completed Invoices & Sales">
+          <i class="bi bi-check-circle-fill me-1"></i>
+          <span>Completed</span>
+        </button>
+
+        <button type="button" class="btn-top-flow btn-flow-suspended" (click)="openSuspendedModal()" title="View / Recall Suspended Orders">
+          <i class="bi bi-pause-circle-fill me-1"></i>
+          <span>Suspended</span>
+          <span class="count-chip" *ngIf="suspendedOrdersList.length > 0">{{ suspendedOrdersList.length }}</span>
+        </button>
+
+        <button type="button" class="btn-top-flow btn-flow-exchange" (click)="openExchange()" title="Medicine Exchange">
+          <i class="bi bi-arrow-repeat me-1"></i>
+          <span>Exchange</span>
+        </button>
+
+        <button type="button" class="btn-top-flow btn-flow-return" (click)="openReturn()" title="Sales Return & Refund">
+          <i class="bi bi-arrow-counterclockwise me-1"></i>
+          <span>Return</span>
+        </button>
+
         <div class="top-user-pill">
           <div class="avatar-circle">
             {{ (cashierName || 'A').charAt(0).toUpperCase() }}
@@ -382,8 +396,8 @@
     </header>
 
     <!-- Toast Notification Banner -->
-    <div *ngIf="toastMessage" class="toast-floating">
-      <i class="bi bi-check-circle-fill me-2"></i>
+    <div *ngIf="toastMessage" class="toast-floating" [class.toast-warning]="isToastWarning">
+      <i class="bi me-2" [ngClass]="isToastWarning ? 'bi-exclamation-triangle-fill text-warning' : 'bi-check-circle-fill text-emerald'"></i>
       <span>{{ toastMessage }}</span>
     </div>
 
@@ -426,12 +440,17 @@
           <div 
             class="drug-card" 
             *ngFor="let med of filteredMedicines" 
+            [class.out-of-stock]="(med.stockQty || 0) <= 0"
+            [title]="(med.stockQty || 0) <= 0 ? 'Out of Stock - Purchase required' : 'Click to add to bill'"
             (click)="addToCart(med)">
             
             <div class="drug-card-top">
               <span class="drug-cat-tag">{{ med.category || 'General' }}</span>
-              <span class="drug-stock-pill" [class.low-stock]="(med.stockQty || 0) < 50">
-                <i class="bi bi-box-seam me-1"></i>{{ med.stockQty || 0 }} in stock
+              <span class="drug-stock-pill" 
+                    [class.out-of-stock]="(med.stockQty || 0) <= 0"
+                    [class.low-stock]="(med.stockQty || 0) > 0 && (med.stockQty || 0) < 50">
+                <i class="bi" [ngClass]="(med.stockQty || 0) <= 0 ? 'bi-x-circle me-1' : 'bi-box-seam me-1'"></i>
+                {{ (med.stockQty || 0) <= 0 ? 'Out of Stock' : ((med.stockQty || 0) + ' in stock') }}
               </span>
             </div>
 
@@ -451,9 +470,13 @@
                 <span class="drug-mrp-price" *ngIf="med.mrp">MRP ₹{{ (med.mrp || 0).toFixed(2) }}</span>
               </div>
 
-              <button type="button" class="btn-add-drug" (click)="addToCart(med); $event.stopPropagation()">
-                <i class="bi bi-plus-lg"></i>
-                <span>Add</span>
+              <button type="button" 
+                      class="btn-add-drug" 
+                      [class.out-of-stock-btn]="(med.stockQty || 0) <= 0"
+                      [disabled]="(med.stockQty || 0) <= 0" 
+                      (click)="addToCart(med); $event.stopPropagation()">
+                <i class="bi" [ngClass]="(med.stockQty || 0) <= 0 ? 'bi-slash-circle' : 'bi-plus-lg'"></i>
+                <span>{{ (med.stockQty || 0) <= 0 ? 'Out of Stock' : 'Add' }}</span>
               </button>
             </div>
 
@@ -611,7 +634,10 @@
                     <strong class="item-title">{{ item.medicine.name }}</strong>
                     <div class="item-meta-sub">
                       <span>Batch: {{ item.medicine.batchNo }}</span> • 
-                      <span>GST {{ item.gstRate }}%</span>
+                      <span>GST {{ item.gstRate }}%</span> • 
+                      <span class="stock-info-tag" [class.text-danger]="(item.medicine.stockQty || 0) <= 5">
+                        Stock: {{ item.medicine.stockQty || 0 }}
+                      </span>
                     </div>
                   </td>
                   <td class="text-end font-semibold">₹{{ item.unitPrice.toFixed(2) }}</td>
@@ -623,8 +649,13 @@
                         class="qty-input" 
                         [(ngModel)]="item.quantity" 
                         (change)="onQtyInputChange(item)" 
+                        [max]="item.medicine.stockQty || 1"
                         min="1" />
-                      <button type="button" class="btn-qty" (click)="increaseQty(item)">+</button>
+                      <button type="button" 
+                              class="btn-qty" 
+                              [disabled]="item.quantity >= (item.medicine.stockQty || 0)"
+                              [class.disabled-btn]="item.quantity >= (item.medicine.stockQty || 0)"
+                              (click)="increaseQty(item)">+</button>
                     </div>
                   </td>
                   <td class="text-end item-total-price">₹{{ item.totalAmount.toFixed(2) }}</td>
@@ -752,6 +783,55 @@
             <i class="bi bi-printer-fill me-2"></i>
             <span>COMPLETE SALE & PRINT BILL (₹{{ grandTotal.toFixed(2) }})</span>
           </button>
+
+          <!-- 7. POS Flow Actions: Completed, Suspended, Exchange, Return -->
+          <div class="pos-sales-actions-grid">
+            <button 
+              type="button" 
+              class="pos-flow-action-btn btn-action-suspend" 
+              (click)="suspendCurrentSale()" 
+              [disabled]="cart.length === 0" 
+              title="Suspend / Hold current cart items">
+              <i class="bi bi-pause-circle-fill"></i>
+              <span>Suspend Bill</span>
+            </button>
+
+            <button 
+              type="button" 
+              class="pos-flow-action-btn btn-action-held" 
+              (click)="openSuspendedModal()" 
+              title="View & Resume Suspended Bills">
+              <i class="bi bi-clock-history"></i>
+              <span>Suspended ({{ suspendedOrdersList.length }})</span>
+            </button>
+
+            <button 
+              type="button" 
+              class="pos-flow-action-btn btn-action-completed" 
+              (click)="openCompletedSales()" 
+              title="View Completed Invoices">
+              <i class="bi bi-check-circle-fill"></i>
+              <span>Completed</span>
+            </button>
+
+            <button 
+              type="button" 
+              class="pos-flow-action-btn btn-action-exchange" 
+              (click)="openExchange()" 
+              title="Medicine Exchange">
+              <i class="bi bi-arrow-repeat"></i>
+              <span>Exchange</span>
+            </button>
+
+            <button 
+              type="button" 
+              class="pos-flow-action-btn btn-action-return" 
+              (click)="openReturn()" 
+              title="Sales Return & Refund">
+              <i class="bi bi-arrow-counterclockwise"></i>
+              <span>Return</span>
+            </button>
+          </div>
 
         </div>
 
@@ -976,6 +1056,136 @@
           <button type="submit" class="btn-save-med" [disabled]="!newMed.name || newMed.unitPrice <= 0">Save & Add to Bill</button>
         </div>
       </form>
+    </div>
+  </div>
+
+
+  <!-- ================= SUSPENDED (HELD) ORDERS MODAL ================= -->
+  <div class="invoice-modal-backdrop" *ngIf="showSuspendedModal">
+    <div class="pos-dialog-card">
+      <div class="modal-header">
+        <div class="d-flex align-items-center gap-2">
+          <div class="modal-header-icon bg-warning text-dark">
+            <i class="bi bi-pause-circle-fill"></i>
+          </div>
+          <div>
+            <h3 class="m-0">Suspended / Held Bills</h3>
+            <p class="modal-sub m-0">Orders on hold awaiting customer checkout</p>
+          </div>
+        </div>
+        <button type="button" class="btn-close-modal" (click)="closeSuspendedModal()">
+          <i class="bi bi-x-lg"></i>
+        </button>
+      </div>
+
+      <div class="modal-body-content">
+        <div class="empty-state-wrap text-center py-4" *ngIf="suspendedOrdersList.length === 0">
+          <i class="bi bi-inbox empty-state-icon text-muted" style="font-size: 2.5rem;"></i>
+          <h4 class="mt-2 text-dark">No Suspended Bills</h4>
+          <p class="text-muted small">There are no bills currently placed on hold.</p>
+        </div>
+
+        <div class="table-responsive" *ngIf="suspendedOrdersList.length > 0">
+          <table class="pos-modal-table">
+            <thead>
+              <tr>
+                <th>Hold No</th>
+                <th>Customer</th>
+                <th>Phone</th>
+                <th>Held Time</th>
+                <th class="text-end">Total Amount</th>
+                <th class="text-center">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let order of suspendedOrdersList">
+                <td><strong class="text-warning">#{{ order.holdNo }}</strong></td>
+                <td><strong>{{ order.customerName || 'Walk-in Customer' }}</strong></td>
+                <td>{{ order.customerPhone || 'N/A' }}</td>
+                <td>{{ (order.holdDate || order.createdAt) | date:'shortTime' }}</td>
+                <td class="text-end font-weight-bold text-dark">₹{{ (order.totalAmount || 0).toFixed(2) }}</td>
+                <td class="text-center">
+                  <button type="button" class="btn-resume-bill me-2" (click)="resumeSuspendedOrder(order)" title="Resume this bill into cart">
+                    <i class="bi bi-play-circle-fill me-1"></i> Resume
+                  </button>
+                  <button type="button" class="btn-delete-bill" (click)="deleteSuspendedOrder(order)" title="Discard bill">
+                    <i class="bi bi-trash3"></i>
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="modal-footer justify-content-between">
+        <span class="text-muted small">Total Held: <strong>{{ suspendedOrdersList.length }}</strong></span>
+        <button type="button" class="btn-cancel" (click)="closeSuspendedModal()">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= COMPLETED SALES MODAL ================= -->
+  <div class="invoice-modal-backdrop" *ngIf="showCompletedModal">
+    <div class="pos-dialog-card pos-dialog-lg">
+      <div class="modal-header">
+        <div class="d-flex align-items-center gap-2">
+          <div class="modal-header-icon bg-success text-white">
+            <i class="bi bi-check-circle-fill"></i>
+          </div>
+          <div>
+            <h3 class="m-0">Completed Sales & Invoices</h3>
+            <p class="modal-sub m-0">Recently finalized billing records and receipts</p>
+          </div>
+        </div>
+        <button type="button" class="btn-close-modal" (click)="closeCompletedModal()">
+          <i class="bi bi-x-lg"></i>
+        </button>
+      </div>
+
+      <div class="modal-body-content">
+        <div class="empty-state-wrap text-center py-4" *ngIf="completedSalesList.length === 0">
+          <i class="bi bi-receipt empty-state-icon text-muted" style="font-size: 2.5rem;"></i>
+          <h4 class="mt-2 text-dark">No Completed Sales Found</h4>
+          <p class="text-muted small">Completed sales bills will appear here.</p>
+        </div>
+
+        <div class="table-responsive" *ngIf="completedSalesList.length > 0">
+          <table class="pos-modal-table">
+            <thead>
+              <tr>
+                <th>Invoice No</th>
+                <th>Date / Time</th>
+                <th>Customer</th>
+                <th>Payment</th>
+                <th class="text-end">Amount</th>
+                <th class="text-center">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let s of completedSalesList | slice:0:15">
+                <td><strong class="text-success">{{ s.invoiceNo }}</strong></td>
+                <td>{{ (s.completionDate || s.createdAt) | date:'short' }}</td>
+                <td><strong>{{ s.customerName }}</strong></td>
+                <td><span class="badge-pay-method">{{ s.paymentMethod || 'Cash' }}</span></td>
+                <td class="text-end font-weight-bold text-dark">₹{{ (s.netAmount || s.totalAmount || 0).toFixed(2) }}</td>
+                <td class="text-center">
+                  <button type="button" class="btn-reprint-bill" (click)="reprintFromCompleted(s)" title="View & Print Invoice">
+                    <i class="bi bi-printer-fill me-1"></i> Print
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="modal-footer justify-content-between">
+        <a routerLink="/sales-completed" class="btn-view-all-sales" (click)="closeCompletedModal()">
+          <i class="bi bi-box-arrow-up-right me-1"></i> Open Full Completed Sales Page
+        </a>
+        <button type="button" class="btn-cancel" (click)="closeCompletedModal()">Close</button>
+      </div>
     </div>
   </div>
 

@@ -24,7 +24,7 @@
     </div>
 
     <!-- Sidebar Navigation Items -->
-    <nav class="sidebar-nav">
+    <nav class="sidebar-nav" (click)="onNavClick($event)">
       
       <!-- 1. DASHBOARD -->
       <div class="nav-group">
@@ -45,7 +45,7 @@
 
       <!-- SALES MENU -->
       <div class="nav-group">
-        <div class="menu-header" (click)="isSalesMenuOpen = !isSalesMenuOpen" [class.expanded]="isSalesMenuOpen" *ngIf="!isSidebarCollapsed">
+        <div class="menu-header" (click)="toggleSalesMenu($event)" [class.expanded]="isSalesMenuOpen" *ngIf="!isSidebarCollapsed">
           <div class="header-left">
             <i class="bi bi-cart-check-fill header-icon text-success"></i>
             <span>Sales Management</span>
@@ -53,26 +53,18 @@
           <i class="bi bi-chevron-down chevron-icon" [class.rotate]="isSalesMenuOpen"></i>
         </div>
 
-        <a *ngIf="isSidebarCollapsed" (click)="isSidebarCollapsed = false; isSalesMenuOpen = true" class="menu-item root-item" style="cursor: pointer;" title="Sales Management">
+        <a *ngIf="isSidebarCollapsed" (click)="openSalesFromCollapsed($event)" class="menu-item root-item" style="cursor: pointer;" title="Sales Management">
           <i class="bi bi-cart-check-fill menu-icon text-success"></i>
         </a>
 
-        <div class="sub-menu" *ngIf="isSalesMenuOpen && !isSidebarCollapsed">
-          <a routerLink="/sales-transactions" class="sub-menu-item">
-            <i class="bi bi-credit-card-2-front-fill sub-icon text-primary"></i>
-            <span>Transaction</span>
-          </a>
-          <a routerLink="/sales-orders" class="sub-menu-item">
-            <i class="bi bi-box-seam-fill sub-icon text-info"></i>
-            <span>Order</span>
-          </a>
-          <a routerLink="/sales-suspended" class="sub-menu-item">
-            <i class="bi bi-pause-circle-fill sub-icon text-warning"></i>
-            <span>Order Suspended</span>
-          </a>
+                <div class="sub-menu" *ngIf="isSalesMenuOpen && !isSidebarCollapsed">
           <a routerLink="/sales-completed" class="sub-menu-item">
             <i class="bi bi-check-circle-fill sub-icon text-success"></i>
             <span>Completed</span>
+          </a>
+          <a routerLink="/sales-suspended" class="sub-menu-item">
+            <i class="bi bi-pause-circle-fill sub-icon text-warning"></i>
+            <span>Suspended</span>
           </a>
           <a routerLink="/sales-exchange" class="sub-menu-item">
             <i class="bi bi-arrow-repeat sub-icon text-purple"></i>
@@ -80,7 +72,7 @@
           </a>
           <a routerLink="/sales-returns" class="sub-menu-item">
             <i class="bi bi-arrow-counterclockwise sub-icon text-danger"></i>
-            <span>Return and Refund</span>
+            <span>Return</span>
           </a>
         </div>
       </div>
@@ -90,7 +82,7 @@
         
       <!-- PURCHASE MENU -->
       <div class="nav-group">
-        <div class="menu-header" (click)="isPurchaseMenuOpen = !isPurchaseMenuOpen" [class.expanded]="isPurchaseMenuOpen" *ngIf="!isSidebarCollapsed">
+        <div class="menu-header" (click)="togglePurchaseMenu($event)" [class.expanded]="isPurchaseMenuOpen" *ngIf="!isSidebarCollapsed">
           <div class="header-left">
             <i class="bi bi-bag-check-fill header-icon" style="color: #f59e0b;"></i>
             <span>Purchase Management</span>
@@ -98,7 +90,7 @@
           <i class="bi bi-chevron-down chevron-icon" [class.rotate]="isPurchaseMenuOpen"></i>
         </div>
 
-        <a *ngIf="isSidebarCollapsed" (click)="isSidebarCollapsed = false; isPurchaseMenuOpen = true" class="menu-item root-item" style="cursor: pointer;" title="Purchase Management">
+        <a *ngIf="isSidebarCollapsed" (click)="openPurchaseFromCollapsed($event)" class="menu-item root-item" style="cursor: pointer;" title="Purchase Management">
           <i class="bi bi-bag-check-fill menu-icon" style="color: #f59e0b;"></i>
         </a>
 
@@ -116,7 +108,7 @@
 
       <!-- SUPPLIER MANAGEMENT -->
       <div class="nav-group">
-        <div class="menu-header" (click)="toggleSupplierMenu()" [class.expanded]="isSupplierMenuOpen" *ngIf="!isSidebarCollapsed">
+        <div class="menu-header" (click)="toggleSupplierMenu($event)" [class.expanded]="isSupplierMenuOpen" *ngIf="!isSidebarCollapsed">
           <div class="header-left">
             <i class="bi bi-truck header-icon" style="color: #0284c7;"></i>
             <span>Supplier Management</span>
@@ -124,7 +116,7 @@
           <i class="bi bi-chevron-down chevron-icon" [class.rotate]="isSupplierMenuOpen"></i>
         </div>
 
-        <a *ngIf="isSidebarCollapsed" (click)="openSupplierFromCollapsed()" class="menu-item root-item" style="cursor: pointer;" title="Supplier Management">
+        <a *ngIf="isSidebarCollapsed" (click)="openSupplierFromCollapsed($event)" class="menu-item root-item" style="cursor: pointer;" title="Supplier Management">
           <i class="bi bi-truck menu-icon" style="color: #0284c7;"></i>
         </a>
 
@@ -157,7 +149,7 @@
 
       <!-- 5. PATIENT MANAGEMENT -->
       <div class="nav-group">
-        <div class="menu-header" (click)="togglePatientMenu()" [class.expanded]="isPatientMenuOpen" *ngIf="!isSidebarCollapsed">
+        <div class="menu-header" (click)="togglePatientMenu($event)" [class.expanded]="isPatientMenuOpen" *ngIf="!isSidebarCollapsed">
           <div class="header-left">
             <i class="bi bi-person-vcard-fill header-icon"></i>
             <span>Patient Management</span>
@@ -166,7 +158,7 @@
         </div>
 
         <!-- Collapsed icon fallback -->
-        <a *ngIf="isSidebarCollapsed" (click)="openPatientFromCollapsed()" class="menu-item root-item" style="cursor: pointer;" title="Patient Management">
+        <a *ngIf="isSidebarCollapsed" (click)="openPatientFromCollapsed($event)" class="menu-item root-item" style="cursor: pointer;" title="Patient Management">
           <i class="bi bi-person-vcard-fill menu-icon"></i>
         </a>
 
@@ -201,7 +193,7 @@
 
       <!-- 5.1 DOCTOR MANAGEMENT -->
       <div class="nav-group">
-        <div class="menu-header" (click)="toggleDoctorMenu()" [class.expanded]="isDoctorMenuOpen" *ngIf="!isSidebarCollapsed">
+        <div class="menu-header" (click)="toggleDoctorMenu($event)" [class.expanded]="isDoctorMenuOpen" *ngIf="!isSidebarCollapsed">
           <div class="header-left">
             <i class="bi bi-person-badge-fill header-icon text-cyan"></i>
             <span>Doctor Management</span>
@@ -210,7 +202,7 @@
         </div>
 
         <!-- Collapsed icon fallback -->
-        <a *ngIf="isSidebarCollapsed" (click)="openDoctorFromCollapsed()" class="menu-item root-item" style="cursor: pointer;" title="Doctor Management">
+        <a *ngIf="isSidebarCollapsed" (click)="openDoctorFromCollapsed($event)" class="menu-item root-item" style="cursor: pointer;" title="Doctor Management">
           <i class="bi bi-person-badge-fill menu-icon" style="color: #06b6d4;"></i>
         </a>
 
@@ -231,7 +223,7 @@
 
       <!-- 5. USER MANAGEMENT -->
       <div class="nav-group">
-        <div class="menu-header" (click)="toggleUserMenu()" [class.expanded]="isUserMenuOpen" *ngIf="!isSidebarCollapsed">
+        <div class="menu-header" (click)="toggleUserMenu($event)" [class.expanded]="isUserMenuOpen" *ngIf="!isSidebarCollapsed">
           <div class="header-left">
             <i class="bi bi-person-gear header-icon"></i>
             <span>User Management</span>
@@ -240,7 +232,7 @@
         </div>
 
         <!-- Collapsed icon fallback -->
-        <a *ngIf="isSidebarCollapsed" (click)="openUserFromCollapsed()" class="menu-item root-item" style="cursor: pointer;" title="User Management">
+        <a *ngIf="isSidebarCollapsed" (click)="openUserFromCollapsed($event)" class="menu-item root-item" style="cursor: pointer;" title="User Management">
           <i class="bi bi-person-gear menu-icon"></i>
         </a>
 
@@ -269,7 +261,7 @@
 
       <!-- 6. SETTINGS & STORE MENU -->
       <div class="nav-group">
-        <div class="menu-header" (click)="toggleSettingsMenu()" [class.expanded]="isSettingsMenuOpen" *ngIf="!isSidebarCollapsed">
+        <div class="menu-header" (click)="toggleSettingsMenu($event)" [class.expanded]="isSettingsMenuOpen" *ngIf="!isSidebarCollapsed">
           <div class="header-left">
             <i class="bi bi-gear-fill header-icon text-secondary"></i>
             <span>Settings</span>
@@ -277,7 +269,7 @@
           <i class="bi bi-chevron-down chevron-icon" [class.rotate]="isSettingsMenuOpen"></i>
         </div>
 
-        <a *ngIf="isSidebarCollapsed" (click)="openSettingsFromCollapsed()" class="menu-item root-item" style="cursor: pointer;" title="Settings: Store Config, Category, Tax">
+        <a *ngIf="isSidebarCollapsed" (click)="openSettingsFromCollapsed($event)" class="menu-item root-item" style="cursor: pointer;" title="Settings: Store Config, Category, Tax">
           <i class="bi bi-gear-fill menu-icon"></i>
         </a>
 
@@ -347,7 +339,7 @@
     <!-- Top Navigation Card (IDENTICAL TO DASHBOARD) -->
     <header class="top-nav-card">
       <div class="top-nav-left">
-        <button type="button" class="btn-sidebar-toggle" (click)="toggleSidebar()" title="Toggle Navigation Menu">
+        <button type="button" class="btn-sidebar-toggle" (click)="toggleSidebar($event)" title="Toggle Navigation Menu">
           <i class="bi bi-list"></i>
         </button>
         <div class="page-title-wrap">
@@ -403,8 +395,8 @@
     </header>
 
     <!-- Toast Notification Banner -->
-    <div *ngIf="toastMessage" class="toast-floating">
-      <i class="bi bi-check-circle-fill me-2"></i>
+    <div *ngIf="toastMessage" class="toast-floating" [class.toast-warning]="toastType === 'warning'">
+      <i class="bi" [ngClass]="toastType === 'warning' ? 'bi-exclamation-triangle-fill text-warning me-2' : 'bi-check-circle-fill me-2'"></i>
       <span>{{ toastMessage }}</span>
     </div>
 
@@ -567,7 +559,11 @@
             <div class="input-icon-wrap">
               <i class="bi bi-percent"></i>
               <select class="pos-select" [(ngModel)]="formMedicine.gstRate" name="gstRate">
-                <option [ngValue]="0">None (0% - No GST / Exempted)</option>
+                <option [ngValue]="0">0% (Nil / Exempted)</option>
+                <option [ngValue]="5">5% GST</option>
+                <option [ngValue]="12">12% GST</option>
+                <option [ngValue]="18">18% GST</option>
+                <option [ngValue]="28">28% GST</option>
                 <option *ngFor="let t of taxes" [ngValue]="t.gstRate">
                   {{ t.gstRate }}% - {{ t.taxName }} ({{ t.taxType === 'INCLUSIVE' ? 'Inclusive MRP' : 'Exclusive +GST' }})
                 </option>
@@ -575,20 +571,38 @@
             </div>
           </div>
 
-          <!-- Stock Qty -->
+          <!-- Stock Qty (Locked) -->
           <div class="form-field">
-            <label>Initial Stock Quantity</label>
-            <div class="input-icon-wrap">
-              <i class="bi bi-box-seam"></i>
+            <div class="field-label-row">
+              <label class="mb-0">{{ isEditMode ? 'Current Stock' : 'Initial Stock' }}</label>
+              <span class="badge-stock-locked" title="Stock is read-only"><i class="bi bi-lock-fill"></i> Locked</span>
+            </div>
+            <div class="input-icon-wrap stock-locked-wrap" (click)="onStockFieldAttempt($event)">
+              <i class="bi bi-lock-fill text-amber"></i>
               <input 
                 type="number" 
-                class="pos-input" 
-                placeholder="100" 
+                class="pos-input stock-locked-input" 
+                placeholder="0" 
                 [(ngModel)]="formMedicine.stockQty" 
                 name="stockQty" 
-                min="0" />
+                readonly
+                tabindex="-1"
+                (keydown)="onStockFieldAttempt($event)"
+                (focus)="onStockFieldAttempt($event)"
+                title="Stock is read-only. Must purchase via Purchase module" />
             </div>
           </div>
+        </div>
+
+        <!-- Full-width Stock Guidance Strip -->
+        <div class="stock-banner-strip" (click)="onStockFieldAttempt($event)">
+          <div class="strip-left">
+            <i class="bi bi-info-circle-fill text-amber"></i>
+            <span>Stock quantity is read-only. To increase stock, purchase stock via <strong>Purchase Management</strong>.</span>
+          </div>
+          <button type="button" class="btn-strip-purchase" (click)="goToPurchase($event)">
+            <i class="bi bi-cart-plus-fill me-1"></i> Go to Purchase &rarr;
+          </button>
         </div>
 
         <!-- Row 4: Dedicated Action Footer Bar -->
@@ -602,13 +616,16 @@
               <i class="bi bi-arrow-counterclockwise me-1"></i>
               <span>Reset</span>
             </button>
+            <button *ngIf="isEditMode" type="button" class="btn-save-new-action" (click)="saveAsNewMedicine()" [disabled]="!formMedicine.name || formMedicine.unitPrice <= 0">
+              <i class="bi bi-plus-square-fill me-1"></i>
+              <span>+ Save as New Entry</span>
+            </button>
             <button type="submit" class="btn-submit-med" [disabled]="!formMedicine.name || formMedicine.unitPrice <= 0">
               <i class="bi" [ngClass]="isEditMode ? 'bi-check2-circle' : 'bi-plus-circle-fill'"></i>
               <span>{{ isEditMode ? 'Update Medicine' : 'Save Medicine to Database' }}</span>
             </button>
           </div>
         </div>
-
       </form>
     </section>
 
@@ -823,7 +840,11 @@
             <div class="form-group-modal">
               <label>GST Rate (%)</label>
               <select class="modal-select" [(ngModel)]="formMedicine.gstRate" name="modal_gst">
-                <option [ngValue]="0">None (0% - No GST)</option>
+                <option [ngValue]="0">0% (Nil / Exempted)</option>
+                <option [ngValue]="5">5% GST</option>
+                <option [ngValue]="12">12% GST</option>
+                <option [ngValue]="18">18% GST</option>
+                <option [ngValue]="28">28% GST</option>
                 <option *ngFor="let t of taxes" [ngValue]="t.gstRate">
                   {{ t.gstRate }}% - {{ t.taxName }}
                 </option>
@@ -831,14 +852,35 @@
             </div>
 
             <div class="form-group-modal">
-              <label>Stock Qty</label>
-              <input 
-                type="number" 
-                class="modal-input font-mono" 
-                [(ngModel)]="formMedicine.stockQty" 
-                name="modal_qty" 
-                min="0" />
+              <div class="field-label-row">
+                <label>{{ isEditMode ? 'Current Stock' : 'Initial Stock' }}</label>
+                <span class="badge-stock-locked" title="Stock is read-only"><i class="bi bi-lock-fill"></i> Locked</span>
+              </div>
+              <div class="input-icon-wrap stock-locked-wrap" (click)="onStockFieldAttempt($event)">
+                <i class="bi bi-lock-fill text-amber"></i>
+                <input 
+                  type="number" 
+                  class="modal-input font-mono stock-locked-input" 
+                  [(ngModel)]="formMedicine.stockQty" 
+                  name="modal_qty" 
+                  readonly
+                  tabindex="-1"
+                  (keydown)="onStockFieldAttempt($event)"
+                  (focus)="onStockFieldAttempt($event)"
+                  title="Stock is read-only. Must purchase via Purchase module" />
+              </div>
             </div>
+          </div>
+
+          <!-- Stock Guidance Full-width Strip inside Modal -->
+          <div class="stock-banner-strip" (click)="onStockFieldAttempt($event)">
+            <div class="strip-left">
+              <i class="bi bi-info-circle-fill text-amber"></i>
+              <span>Stock quantity is read-only. To increase stock, purchase stock via <strong>Purchase Management</strong>.</span>
+            </div>
+            <button type="button" class="btn-strip-purchase" (click)="goToPurchase($event)">
+              <i class="bi bi-cart-plus-fill me-1"></i> Go to Purchase &rarr;
+            </button>
           </div>
 
           <div class="form-group-modal">
@@ -858,15 +900,67 @@
             Cancel
           </button>
           <button 
+            *ngIf="isEditMode"
+            type="button" 
+            class="btn-save-new-modal" 
+            (click)="saveAsNewMedicine()" 
+            [disabled]="isSavingMed || !formMedicine.name || formMedicine.unitPrice <= 0"
+            title="Create a separate unique entry in database">
+            <i class="bi bi-plus-square-fill"></i>
+            <span>+ Save as New Entry</span>
+          </button>
+          <button 
             type="submit" 
             class="btn-save-modal" 
             [disabled]="isSavingMed || !formMedicine.name || formMedicine.unitPrice <= 0">
-            <i class="bi" [ngClass]="isSavingMed ? 'bi-arrow-repeat spin' : 'bi-cloud-arrow-up-fill'"></i>
+            <i class="bi" [ngClass]="isSavingMed ? 'bi-arrow-repeat spin' : (isEditMode ? 'bi-check2-circle' : 'bi-cloud-arrow-up-fill')"></i>
             <span>{{ isSavingMed ? 'Saving to Database...' : (isEditMode ? 'Update Medicine' : 'Save Medicine') }}</span>
           </button>
         </div>
       </form>
 
+    </div>
+  </div>
+
+  <!-- ================= STOCK PURCHASE NOTICE MODAL ================= -->
+  <div class="modal-backdrop-custom" *ngIf="showStockNoticeModal">
+    <div class="modal-dialog-custom modal-notice-dialog">
+      <div class="modal-header-custom modal-notice-header">
+        <div class="modal-title-with-icon">
+          <div class="notice-icon-box">
+            <i class="bi bi-box-seam-fill"></i>
+          </div>
+          <div>
+            <h3 style="margin: 0; font-size: 1.05rem;">Stock Management Policy</h3>
+            <p style="margin: 0; font-size: 0.78rem; color: #64748b;">Direct Stock Quantity Entry Restricted</p>
+          </div>
+        </div>
+        <button type="button" class="btn-close-modal" (click)="showStockNoticeModal = false">
+          <i class="bi bi-x-lg"></i>
+        </button>
+      </div>
+
+      <div class="modal-body-custom modal-notice-body">
+        <div class="notice-callout-box">
+          <i class="bi bi-exclamation-triangle-fill notice-warning-icon"></i>
+          <div class="notice-callout-content">
+            <h4>To increase stock, please go to Purchase Module to purchase stock!</h4>
+            <p>
+              Stock Quantity cannot be entered or changed directly while adding or editing a medicine. 
+              To increase medicine stock, please go to <strong>Purchase Management</strong> and create a new purchase bill.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer-custom">
+        <button type="button" class="btn-cancel-modal" (click)="showStockNoticeModal = false">
+          Close
+        </button>
+        <button type="button" class="btn-go-purchase-modal" (click)="goToPurchase($event)">
+          <i class="bi bi-cart-plus-fill me-1"></i> Go to Purchase Module
+        </button>
+      </div>
     </div>
   </div>
 </div>

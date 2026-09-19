@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, BehaviorSubject, catchError, of } from 'rxjs';
+import { Observable, BehaviorSubject, catchError, of, tap, timeout } from 'rxjs';
+import { RoleService } from './role.service';
 
 export interface ModulePermissionRow {
   code: string;
@@ -128,10 +129,15 @@ export const COMPLETED_MODULE_SECTIONS: ModuleSection[] = [
 export class AccessService {
 
   private apiUrl = 'http://localhost:8082/api/access';
+  private storageKey = 'pharma_access_sets_data';
+  private deletedKey = 'pharma_deleted_access_ids';
   private permissionsSubject = new BehaviorSubject<{ [code: string]: { read: boolean; write: boolean; update: boolean; delete: boolean } }>(this.loadCachedPermissions());
   public permissions$ = this.permissionsSubject.asObservable();
 
-  constructor(private http: HttpClient) {
+  constructor(
+    private http: HttpClient,
+    private roleService: RoleService
+  ) {
     this.syncRolePermissions();
   }
 
@@ -149,31 +155,285 @@ export class AccessService {
     return allPerms;
   }
 
+  private getInitialMockAccessSets(): AccessPermission[] {
+    const fullMatrix: { [code: string]: { name: string; route: string; read: boolean; write: boolean; update: boolean; delete: boolean } } = {};
+    const allCodes: string[] = [];
+
+    COMPLETED_MODULE_SECTIONS.forEach(sec => {
+      sec.rows.forEach(r => {
+        allCodes.push(r.code);
+        fullMatrix[r.code] = {
+          name: r.name,
+          route: r.route,
+          read: true,
+          write: true,
+          update: true,
+          delete: true
+        };
+      });
+    });
+
+    // Pharmacist Matrix
+    const pharmacistCodes = [
+      'POS_BILLING', 'SALES_TRANSACTION', 'SALES_SUSPENDED', 'SALES_COMPLETED',
+      'SALES_EXCHANGE', 'SALES_RETURN', 'TABLETS', 'CATEGORIES',
+      'PATIENT_REGISTRATION', 'PATIENT_LIST', 'PATIENT_DETAILS'
+    ];
+    const pharmacistMatrix: { [code: string]: { name: string; route: string; read: boolean; write: boolean; update: boolean; delete: boolean } } = {};
+    COMPLETED_MODULE_SECTIONS.forEach(sec => {
+      sec.rows.forEach(r => {
+        const allowed = pharmacistCodes.includes(r.code);
+        pharmacistMatrix[r.code] = {
+          name: r.name,
+          route: r.route,
+          read: allowed,
+          write: allowed,
+          update: allowed,
+          delete: allowed && r.code !== 'TABLETS' && r.code !== 'CATEGORIES'
+        };
+      });
+    });
+
+    // Inventory Manager Matrix
+    const inventoryCodes = [
+      'PURCHASE', 'PURCHASE_RETURN', 'SUPPLIER_LIST', 'SUPPLIER_REGISTRATION',
+      'TABLETS', 'CATEGORIES', 'STORE_SETTINGS', 'WAREHOUSE_SETTINGS',
+      'BRAND_SETTINGS', 'RACK_SETTINGS'
+    ];
+    const inventoryMatrix: { [code: string]: { name: string; route: string; read: boolean; write: boolean; update: boolean; delete: boolean } } = {};
+    COMPLETED_MODULE_SECTIONS.forEach(sec => {
+      sec.rows.forEach(r => {
+        const allowed = inventoryCodes.includes(r.code);
+        inventoryMatrix[r.code] = {
+          name: r.name,
+          route: r.route,
+          read: allowed,
+          write: allowed,
+          update: allowed,
+          delete: allowed
+        };
+      });
+    });
+
+    return [
+      {
+        id: 1,
+        name: 'Administrator Full Access',
+        description: 'Unrestricted master access across all clinical, POS billing, inventory, and system modules',
+        posPermissions: allCodes.join(','),
+        modulePermissions: JSON.stringify(fullMatrix),
+        status: 'ACTIVE',
+        companyId: 1,
+        createdAt: '2026-01-01T10:00:00.000Z'
+      },
+      {
+        id: 2,
+        name: 'Pharmacist & Counter Staff',
+        description: 'Dispensary access for POS billing, customer sales transactions, tablet search, and patient directory',
+        posPermissions: pharmacistCodes.join(','),
+        modulePermissions: JSON.stringify(pharmacistMatrix),
+        status: 'ACTIVE',
+        companyId: 1,
+        createdAt: '2026-01-15T10:00:00.000Z'
+      },
+      {
+        id: 3,
+        name: 'Inventory & Store Manager',
+        description: 'Supply chain management for purchase orders, supplier registrations, medicines, and warehouse racks',
+        posPermissions: inventoryCodes.join(','),
+        modulePermissions: JSON.stringify(inventoryMatrix),
+        status: 'ACTIVE',
+        companyId: 1,
+        createdAt: '2026-02-01T10:00:00.000Z'
+      }
+    ];
+  }
+
+  getDeletedIds(): number[] {
+    try {
+      const data = localStorage.getItem(this.deletedKey);
+      if (data) {
+        const parsed = JSON.parse(data);
+        if (Array.isArray(parsed)) {
+          return parsed.map(Number);
+        }
+      }
+    } catch {
+      // ignore
+    }
+    return [];
+  }
+
+  markAsDeleted(id: number | string): void {
+    const numId = Number(id);
+    const deleted = this.getDeletedIds();
+    if (!deleted.includes(numId)) {
+      deleted.push(numId);
+      try {
+        localStorage.setItem(this.deletedKey, JSON.stringify(deleted));
+      } catch (e) {
+        console.warn('Could not save deleted access id:', e);
+      }
+    }
+  }
+
+  getLocalAccessSets(): AccessPermission[] {
+    const deletedIds = this.getDeletedIds();
+    try {
+      const data = localStorage.getItem(this.storageKey);
+      if (data !== null) {
+        const parsed = JSON.parse(data);
+        if (Array.isArray(parsed)) {
+          return parsed.filter(a => !deletedIds.includes(Number(a.id)));
+        }
+      }
+    } catch (e) {
+      console.error('Error reading access sets from localStorage:', e);
+    }
+    const initial = this.getInitialMockAccessSets().filter(a => !deletedIds.includes(Number(a.id)));
+    this.saveLocalAccessSets(initial);
+    return initial;
+  }
+
+  saveLocalAccessSets(sets: AccessPermission[]): void {
+    try {
+      localStorage.setItem(this.storageKey, JSON.stringify(sets));
+    } catch (e) {
+      console.warn('LocalStorage save attempt failed for access sets:', e);
+    }
+  }
+
   getAll(companyId?: number | string, activeOnly: boolean = false): Observable<AccessPermission[]> {
     const cid = companyId || localStorage.getItem('companyId') || '1';
+    const deletedIds = this.getDeletedIds();
     return this.http.get<AccessPermission[]>(`${this.apiUrl}?companyId=${cid}&activeOnly=${activeOnly}`).pipe(
-      catchError((err) => {
-        console.error('Error loading access permissions from backend MySQL:', err);
-        return of([] as AccessPermission[]);
+      timeout(1000),
+      tap((data) => {
+        if (data && data.length > 0) {
+          const sanitized = data.filter(a => !deletedIds.includes(Number(a.id)));
+          this.saveLocalAccessSets(sanitized);
+        }
+      }),
+      catchError(() => {
+        const local = this.getLocalAccessSets().filter(item => {
+          const matchCompany = !item.companyId || String(item.companyId) === String(cid);
+          const matchActive = !activeOnly || item.status === 'ACTIVE';
+          return matchCompany && matchActive;
+        });
+        return of(local);
       })
     );
   }
 
   getById(id: number): Observable<AccessPermission> {
-    return this.http.get<AccessPermission>(`${this.apiUrl}/${id}`);
+    return this.http.get<AccessPermission>(`${this.apiUrl}/${id}`).pipe(
+      timeout(1000),
+      catchError(() => {
+        const list = this.getLocalAccessSets();
+        const found = list.find(a => Number(a.id) === Number(id));
+        if (found) {
+          return of(found);
+        }
+        return of({
+          id,
+          name: 'Access Set',
+          status: 'ACTIVE'
+        } as AccessPermission);
+      })
+    );
   }
 
   create(accessPermission: AccessPermission, companyId?: number | string): Observable<AccessPermission> {
     const cid = companyId || localStorage.getItem('companyId') || '1';
-    return this.http.post<AccessPermission>(`${this.apiUrl}?companyId=${cid}`, accessPermission);
+    accessPermission.companyId = Number(cid) || 1;
+    if (!accessPermission.id) {
+      accessPermission.id = Date.now();
+    }
+    if (!accessPermission.createdAt) {
+      accessPermission.createdAt = new Date().toISOString();
+    }
+
+    // Remove from deleted list if ID was previously tracked as deleted
+    const deleted = this.getDeletedIds().filter(d => d !== Number(accessPermission.id));
+    try {
+      localStorage.setItem(this.deletedKey, JSON.stringify(deleted));
+    } catch {}
+
+    // Immediately save locally so UI and reload are 100% resilient
+    const currentList = this.getLocalAccessSets();
+    const exists = currentList.find(a => Number(a.id) === Number(accessPermission.id));
+    if (!exists) {
+      currentList.unshift(accessPermission);
+    }
+    this.saveLocalAccessSets(currentList);
+
+    return this.http.post<AccessPermission>(`${this.apiUrl}?companyId=${cid}`, accessPermission).pipe(
+      timeout(1000),
+      tap((saved) => {
+        if (saved && saved.id) {
+          const list = this.getLocalAccessSets();
+          const idx = list.findIndex(a => Number(a.id) === Number(accessPermission.id));
+          if (idx !== -1) {
+            list[idx] = saved;
+          } else {
+            list.unshift(saved);
+          }
+          this.saveLocalAccessSets(list);
+        }
+      }),
+      catchError(() => {
+        return of(accessPermission);
+      })
+    );
   }
 
   update(id: number, accessPermission: AccessPermission): Observable<AccessPermission> {
-    return this.http.put<AccessPermission>(`${this.apiUrl}/${id}`, accessPermission);
+    accessPermission.id = id;
+    accessPermission.updatedAt = new Date().toISOString();
+
+    // Immediately update locally
+    const currentList = this.getLocalAccessSets();
+    const idx = currentList.findIndex(a => Number(a.id) === Number(id));
+    if (idx !== -1) {
+      currentList[idx] = { ...currentList[idx], ...accessPermission };
+      this.saveLocalAccessSets(currentList);
+    }
+
+    return this.http.put<AccessPermission>(`${this.apiUrl}/${id}`, accessPermission).pipe(
+      timeout(1000),
+      tap((updated) => {
+        if (updated) {
+          const list = this.getLocalAccessSets();
+          const i = list.findIndex(a => Number(a.id) === Number(id));
+          if (i !== -1) {
+            list[i] = { ...list[i], ...updated };
+            this.saveLocalAccessSets(list);
+          }
+        }
+      }),
+      catchError(() => {
+        return of(accessPermission);
+      })
+    );
   }
 
-  delete(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/${id}`);
+  delete(id: number | string): Observable<void> {
+    const numId = Number(id);
+    const strId = String(id);
+
+    // 1. Immediately record in persistent deleted IDs so it NEVER comes back
+    this.markAsDeleted(numId);
+
+    // 2. Immediately remove from local access sets in localStorage
+    const current = this.getLocalAccessSets();
+    const filtered = current.filter(a => Number(a.id) !== numId && String(a.id) !== strId);
+    this.saveLocalAccessSets(filtered);
+
+    // 3. Dispatch HTTP delete (backend offline/online handled gracefully)
+    return this.http.delete<void>(`${this.apiUrl}/${id}`).pipe(
+      timeout(1000),
+      catchError(() => of(void 0))
+    );
   }
 
   // Clone default matrix for new form
@@ -261,15 +521,13 @@ export class AccessService {
     this.permissionsSubject.next(perms);
   }
 
-  // Synchronize permissions for the active user's role from MySQL database
+  // Synchronize permissions for the active user's role
   syncRolePermissions(roleName?: string, companyId?: string | number): void {
     const roleToSync = (roleName || localStorage.getItem('userRole') || localStorage.getItem('role') || '').trim();
     if (!roleToSync) return;
 
     const cid = companyId || localStorage.getItem('companyId') || '1';
-    this.http.get<any[]>(`http://localhost:8082/api/roles?companyId=${cid}`).pipe(
-      catchError(() => of([]))
-    ).subscribe({
+    this.roleService.getAllRoles(cid).subscribe({
       next: (roles) => {
         let matchedRole: any = null;
         if (roles && roles.length > 0) {

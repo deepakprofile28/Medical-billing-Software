@@ -2,6 +2,7 @@ import { Component, HostListener, OnInit, OnDestroy, ChangeDetectorRef } from '@
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { AuthService } from '../../../services/auth.service';
 import { Supplier, SupplierService } from '../../../services/supplier.service';
 @Component({
@@ -17,7 +18,7 @@ import { Supplier, SupplierService } from '../../../services/supplier.service';
 })
 export class SupplierManagement implements OnInit, OnDestroy {
   // Sidebar states
-  isSidebarCollapsed = false;
+  isSidebarCollapsed = true;
   isPatientMenuOpen = false;
   isDoctorMenuOpen = false;
   isUserMenuOpen = false;
@@ -35,9 +36,9 @@ export class SupplierManagement implements OnInit, OnDestroy {
   private clockTimer?: ReturnType<typeof setInterval>;
 
   // Sidebar counters
-  totalPatientsCount = 0;
+  totalPatientsCount = 3;
   draftsCount = 0;
-  totalUsersCount = 0;
+  totalUsersCount = 2;
 
   // Suppliers Data & Filter
   suppliers: Supplier[] = [];
@@ -75,11 +76,23 @@ export class SupplierManagement implements OnInit, OnDestroy {
     'Advance 100%'
   ];
 
+  // Attached Documents Modal & Preview State
+  showDocModal = false;
+  selectedSupplierForDocs?: Supplier;
+  attachedDocsList: Array<{ key: string; label: string; name: string; url?: string }> = [];
+  previewDocTitle = '';
+  previewDocName = '';
+  previewDocUrlRaw = '';
+  safeDocPreviewUrl: SafeResourceUrl | null = null;
+  showDocPreviewModal = false;
+  docLoading = false;
+
   constructor(
     private supplierService: SupplierService,
     private authService: AuthService,
     private router: Router,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private sanitizer: DomSanitizer
   ) {}
 
   ngOnInit(): void {
@@ -250,73 +263,363 @@ export class SupplierManagement implements OnInit, OnDestroy {
     }
   }
 
+  // ==========================================
+  // ATTACHED DOCUMENTS & PREVIEW HANDLERS
+  // ==========================================
+  getDocCount(s: Supplier): number {
+    const keys: (keyof Supplier)[] = [
+      'gstCertificate', 'drugLicenseDoc', 'panDoc', 'fssaiDoc',
+      'visitingCardDoc', 'chequeDoc', 'agreementDoc'
+    ];
+    let count = 0;
+    for (const k of keys) {
+      const nameKey = `${String(k)}Name` as keyof Supplier;
+      if (s[k] || (s as any)[nameKey]) {
+        count++;
+      }
+    }
+    return count;
+  }
+
+  getAttachedDocs(s: Supplier): Array<{ key: string; label: string; name: string; url?: string }> {
+    const docDefs = [
+      { key: 'gstCertificate', label: 'GST Certificate', nameKey: 'gstCertificateName' },
+      { key: 'drugLicenseDoc', label: 'Drug License Form 20B/21B', nameKey: 'drugLicenseDocName' },
+      { key: 'panDoc', label: 'PAN Card', nameKey: 'panDocName' },
+      { key: 'fssaiDoc', label: 'FSSAI License', nameKey: 'fssaiDocName' },
+      { key: 'visitingCardDoc', label: 'Visiting Card / ID', nameKey: 'visitingCardDocName' },
+      { key: 'chequeDoc', label: 'Cancelled Cheque', nameKey: 'chequeDocName' },
+      { key: 'agreementDoc', label: 'Vendor Agreement / MSME', nameKey: 'agreementDocName' }
+    ];
+
+    const list: Array<{ key: string; label: string; name: string; url?: string }> = [];
+    for (const d of docDefs) {
+      const val = (s as any)[d.key];
+      const name = (s as any)[d.nameKey];
+      if (val || name) {
+        list.push({
+          key: d.key,
+          label: d.label,
+          name: name || `${d.label}.pdf`,
+          url: val
+        });
+      }
+    }
+    return list;
+  }
+
+  openDocModal(s: Supplier, event?: Event): void {
+    if (event) {
+      event.stopPropagation();
+      event.preventDefault();
+    }
+    this.selectedSupplierForDocs = s;
+    this.attachedDocsList = this.getAttachedDocs(s);
+    this.showDocModal = true;
+    this.showDocPreviewModal = false;
+    this.safeDocPreviewUrl = null;
+    this.cdr.detectChanges();
+  }
+
+  closeDocModal(): void {
+    this.showDocModal = false;
+    this.selectedSupplierForDocs = undefined;
+    this.attachedDocsList = [];
+    this.closeDocPreviewModal();
+    this.cdr.detectChanges();
+  }
+
+  async viewSupplierDoc(docItem: { key: string; label: string; name: string; url?: string }, event?: Event): Promise<void> {
+    if (event) {
+      event.stopPropagation();
+      event.preventDefault();
+    }
+    this.docLoading = true;
+    this.cdr.detectChanges();
+
+    let docUrl = docItem.url;
+    if (!docUrl || docUrl.startsWith('idb:')) {
+      const resolved = await this.supplierService.resolveDocument(docUrl, this.selectedSupplierForDocs?.id, docItem.key);
+      if (resolved) {
+        docUrl = resolved;
+      }
+    }
+
+    this.docLoading = false;
+    if (!docUrl) {
+      alert('Document data could not be retrieved.');
+      this.cdr.detectChanges();
+      return;
+    }
+
+    this.previewDocTitle = `${docItem.label} - ${this.selectedSupplierForDocs?.name || 'Supplier'}`;
+    this.previewDocName = docItem.name;
+    this.previewDocUrlRaw = docUrl;
+    this.safeDocPreviewUrl = this.sanitizer.bypassSecurityTrustResourceUrl(docUrl);
+    this.showDocPreviewModal = true;
+    this.cdr.detectChanges();
+  }
+
+  closeDocPreviewModal(): void {
+    this.showDocPreviewModal = false;
+    this.safeDocPreviewUrl = null;
+    this.previewDocUrlRaw = '';
+    this.cdr.detectChanges();
+  }
+
+  async downloadSupplierDoc(docItem: { key: string; label: string; name: string; url?: string }, event?: Event): Promise<void> {
+    if (event) {
+      event.stopPropagation();
+      event.preventDefault();
+    }
+
+    let docUrl = docItem.url;
+    if (!docUrl || docUrl.startsWith('idb:')) {
+      const resolved = await this.supplierService.resolveDocument(docUrl, this.selectedSupplierForDocs?.id, docItem.key);
+      if (resolved) {
+        docUrl = resolved;
+      }
+    }
+
+    if (!docUrl) {
+      alert('Document data could not be retrieved for download.');
+      return;
+    }
+
+    const link = document.createElement('a');
+    link.href = docUrl;
+    link.download = docItem.name || 'supplier-document';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
+
+  isPdf(fileName?: string): boolean {
+    if (!fileName) return false;
+    return fileName.toLowerCase().endsWith('.pdf');
+  }
+
   // Sidebar controls
-  toggleSidebar(): void {
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  logout(): void {
+    this.authService.logout();
+    this.router.navigate(['/login']);
+  }
+
+  
+
+  
+
+
+  // ==========================================
+  // SIDEBAR & SUBMENU CONTROLS (EXPAND ON CLICK & OUTSIDE CLOSE)
+  // ==========================================
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+
+  // ==========================================
+  // SIDEBAR & SUBMENU CONTROLS (EXPAND ON CLICK & OUTSIDE CLOSE)
+  // ==========================================
+  toggleSidebar(event?: MouseEvent): void {
+    if (event) {
+      event.stopPropagation();
+    }
     this.isSidebarCollapsed = !this.isSidebarCollapsed;
-  }
-
-  togglePatientMenu(): void {
-    this.isPatientMenuOpen = !this.isPatientMenuOpen;
-  }
-
-  toggleDoctorMenu(): void {
-    this.isDoctorMenuOpen = !this.isDoctorMenuOpen;
-  }
-
-  toggleUserMenu(): void {
-    this.isUserMenuOpen = !this.isUserMenuOpen;
-  }
-
-  toggleSettingsMenu(): void {
-    this.isSettingsMenuOpen = !this.isSettingsMenuOpen;
-  }
-
-  toggleSalesMenu(): void {
-    this.isSalesMenuOpen = !this.isSalesMenuOpen;
-  }
-
-  togglePurchaseMenu(): void {
-    this.isPurchaseMenuOpen = !this.isPurchaseMenuOpen;
-  }
-
-  toggleSupplierMenu(): void {
-    this.isSupplierMenuOpen = !this.isSupplierMenuOpen;
-  }
-
-  openSupplierFromCollapsed(): void {
-    this.isSidebarCollapsed = false;
-    this.isSupplierMenuOpen = true;
-  }
-
-  openPatientFromCollapsed(): void {
-    this.isSidebarCollapsed = false;
-    this.isPatientMenuOpen = true;
-  }
-
-  openDoctorFromCollapsed(): void {
-    this.isSidebarCollapsed = false;
-    this.isDoctorMenuOpen = true;
-  }
-
-  openSalesFromCollapsed(): void {
-    this.isSidebarCollapsed = false;
-    this.isSalesMenuOpen = true;
-  }
-
-  openSettingsFromCollapsed(): void {
-    this.isSidebarCollapsed = false;
-    this.isSettingsMenuOpen = true;
-  }
-
-  @HostListener('document:click', ['$event'])
-  onDocumentClick(event: MouseEvent): void {
-    const sidebar = document.querySelector('.sidebar');
-    const toggleBtn = document.querySelector('.btn-sidebar-toggle') || document.querySelector('.toggle-btn');
-    const target = event.target as Node;
-
-    if (sidebar && !sidebar.contains(target) && (!toggleBtn || !toggleBtn.contains(target))) {
+    if (this.isSidebarCollapsed) {
       this.closeAllMenus();
     }
+    this.cdr.detectChanges();
+  }
+
+  togglePatientMenu(event?: MouseEvent): void {
+    if (event) {
+      event.stopPropagation();
+    }
+    this.isPatientMenuOpen = !this.isPatientMenuOpen;
+    this.cdr.detectChanges();
+  }
+
+  toggleDoctorMenu(event?: MouseEvent): void {
+    if (event) {
+      event.stopPropagation();
+    }
+    this.isDoctorMenuOpen = !this.isDoctorMenuOpen;
+    this.cdr.detectChanges();
+  }
+
+  toggleUserMenu(event?: MouseEvent): void {
+    if (event) {
+      event.stopPropagation();
+    }
+    this.isUserMenuOpen = !this.isUserMenuOpen;
+    this.cdr.detectChanges();
+  }
+
+  toggleSettingsMenu(event?: MouseEvent): void {
+    if (event) {
+      event.stopPropagation();
+    }
+    this.isSettingsMenuOpen = !this.isSettingsMenuOpen;
+    this.cdr.detectChanges();
+  }
+
+  toggleSupplierMenu(event?: MouseEvent): void {
+    if (event) {
+      event.stopPropagation();
+    }
+    this.isSupplierMenuOpen = !this.isSupplierMenuOpen;
+    this.cdr.detectChanges();
+  }
+
+  togglePurchaseMenu(event?: MouseEvent): void {
+    if (event) {
+      event.stopPropagation();
+    }
+    this.isPurchaseMenuOpen = !this.isPurchaseMenuOpen;
+    this.cdr.detectChanges();
+  }
+
+  toggleSalesMenu(event?: MouseEvent): void {
+    if (event) {
+      event.stopPropagation();
+    }
+    this.isSalesMenuOpen = !this.isSalesMenuOpen;
+    this.cdr.detectChanges();
+  }
+
+  openPatientFromCollapsed(event?: MouseEvent): void {
+    if (event) {
+      event.stopPropagation();
+    }
+    this.isSidebarCollapsed = false;
+    this.closeAllMenus();
+    this.isPatientMenuOpen = true;
+    this.cdr.detectChanges();
+  }
+
+  openDoctorFromCollapsed(event?: MouseEvent): void {
+    if (event) {
+      event.stopPropagation();
+    }
+    this.isSidebarCollapsed = false;
+    this.closeAllMenus();
+    this.isDoctorMenuOpen = true;
+    this.cdr.detectChanges();
+  }
+
+  openUserFromCollapsed(event?: MouseEvent): void {
+    if (event) {
+      event.stopPropagation();
+    }
+    this.isSidebarCollapsed = false;
+    this.closeAllMenus();
+    this.isUserMenuOpen = true;
+    this.cdr.detectChanges();
+  }
+
+  openSettingsFromCollapsed(event?: MouseEvent): void {
+    if (event) {
+      event.stopPropagation();
+    }
+    this.isSidebarCollapsed = false;
+    this.closeAllMenus();
+    this.isSettingsMenuOpen = true;
+    this.cdr.detectChanges();
+  }
+
+  openSupplierFromCollapsed(event?: MouseEvent): void {
+    if (event) {
+      event.stopPropagation();
+    }
+    this.isSidebarCollapsed = false;
+    this.closeAllMenus();
+    this.isSupplierMenuOpen = true;
+    this.cdr.detectChanges();
+  }
+
+  openPurchaseFromCollapsed(event?: MouseEvent): void {
+    if (event) {
+      event.stopPropagation();
+    }
+    this.isSidebarCollapsed = false;
+    this.closeAllMenus();
+    this.isPurchaseMenuOpen = true;
+    this.cdr.detectChanges();
+  }
+
+  openSalesFromCollapsed(event?: MouseEvent): void {
+    if (event) {
+      event.stopPropagation();
+    }
+    this.isSidebarCollapsed = false;
+    this.closeAllMenus();
+    this.isSalesMenuOpen = true;
+    this.cdr.detectChanges();
   }
 
   closeAllMenus(): void {
@@ -329,9 +632,42 @@ export class SupplierManagement implements OnInit, OnDestroy {
     this.isSupplierMenuOpen = false;
   }
 
-  logout(): void {
-    this.authService.logout();
-    this.router.navigate(['/login']);
+  closeSidebarOnNavigate(): void {
+    this.isSidebarCollapsed = true;
+    this.closeAllMenus();
+    this.cdr.detectChanges();
   }
-}
 
+  onNavClick(event: MouseEvent): void {
+    const target = event.target as HTMLElement;
+    const link = target.closest('a[routerLink], a.sub-menu-item');
+    if (link) {
+      this.closeSidebarOnNavigate();
+    }
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    if (this.isSidebarCollapsed) {
+      return;
+    }
+    const targetEl = (event.target as HTMLElement)?.nodeType === 1 
+      ? (event.target as HTMLElement) 
+      : (event.target as HTMLElement)?.parentElement;
+    
+    // If target element was detached during re-render, do NOT close!
+    if (!targetEl || !targetEl.isConnected) {
+      return;
+    }
+
+    const clickedInsideSidebar = !!targetEl.closest?.('.app-sidebar, .sidebar');
+    const clickedToggleBtn = !!targetEl.closest?.('.btn-sidebar-toggle, .sidebar-toggle-btn, .btn-toggle-sidebar, .btn-sidebar-toggle-mobile, .toggle-btn');
+
+    if (!clickedInsideSidebar && !clickedToggleBtn) {
+      this.closeAllMenus();
+      this.isSidebarCollapsed = true;
+      this.cdr.detectChanges();
+    }
+  }
+
+}

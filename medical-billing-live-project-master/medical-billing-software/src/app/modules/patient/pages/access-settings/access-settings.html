@@ -382,9 +382,9 @@
             (click)="openAddForm()"
             [disabled]="!canWriteAccess"
             [class.action-disabled]="!canWriteAccess"
-            [title]="!canWriteAccess ? 'Write permission required' : 'Add Access Set'">
-            <i class="bi bi-plus-circle-fill"></i>
-            <span>+ Add Access Set</span>
+            [title]="!canWriteAccess ? 'Write permission required' : 'Create Access Set'">
+            <i class="bi bi-shield-plus"></i>
+            <span>Create Access Set</span>
           </button>
         </div>
       </header>
@@ -453,14 +453,21 @@
               <!-- Empty State -->
               <tr *ngIf="!loading && filteredList.length === 0">
                 <td colspan="5" class="empty-state-cell">
-                  <i class="bi bi-key empty-icon"></i>
-                  <h4 class="empty-title">No Access Sets Found</h4>
-                  <p class="empty-desc">
-                    {{ searchQuery ? 'No access sets match your search query.' : 'No access sets created in database yet.' }}
-                  </p>
-                  <button type="button" class="btn-empty-add" (click)="openAddForm()">
-                    <i class="bi bi-plus-lg"></i> Create First Access Set
-                  </button>
+                  <div class="empty-state-card">
+                    <div class="empty-icon-pulse-wrapper">
+                      <div class="empty-icon-inner">
+                        <i class="bi bi-shield-lock-fill"></i>
+                      </div>
+                    </div>
+                    <h3 class="empty-title">No Access Sets Found</h3>
+                    <p class="empty-desc">
+                      {{ searchQuery ? 'No access sets match your search query.' : 'Configure custom permission sets, staff privileges, and security modules for your clinic team.' }}
+                    </p>
+                    <button type="button" class="btn-create-access-hero" (click)="openAddForm()" [disabled]="!canWriteAccess" [title]="!canWriteAccess ? 'Write permission required' : 'Create First Access Set'">
+                      <i class="bi bi-shield-plus"></i>
+                      <span>Create First Access Set</span>
+                    </button>
+                  </div>
                 </td>
               </tr>
 

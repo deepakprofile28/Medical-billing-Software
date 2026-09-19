@@ -14,7 +14,7 @@
     </div>
 
     <!-- Navigation Links -->
-    <nav class="sidebar-nav">
+    <nav class="sidebar-nav" (click)="onNavClick($event)">
       
       <!-- 1. Dashboard -->
       <a routerLink="/dashboard" class="menu-item root-item" title="Dashboard">
@@ -30,7 +30,7 @@
 
       <!-- SALES MENU -->
       <div class="nav-group">
-        <div class="menu-header" (click)="isSalesMenuOpen = !isSalesMenuOpen" [class.expanded]="isSalesMenuOpen" *ngIf="!isSidebarCollapsed">
+        <div class="menu-header" (click)="toggleSalesMenu($event)" [class.expanded]="isSalesMenuOpen" *ngIf="!isSidebarCollapsed">
           <div class="header-left">
             <i class="bi bi-cart-check-fill header-icon text-success"></i>
             <span>Sales Management</span>
@@ -38,26 +38,18 @@
           <i class="bi bi-chevron-down chevron-icon" [class.rotate]="isSalesMenuOpen"></i>
         </div>
 
-        <a *ngIf="isSidebarCollapsed" (click)="isSidebarCollapsed = false; isSalesMenuOpen = true" class="menu-item root-item" style="cursor: pointer;" title="Sales Management">
+        <a *ngIf="isSidebarCollapsed" (click)="openSalesFromCollapsed($event)" class="menu-item root-item" style="cursor: pointer;" title="Sales Management">
           <i class="bi bi-cart-check-fill menu-icon text-success"></i>
         </a>
 
-        <div class="sub-menu" *ngIf="isSalesMenuOpen && !isSidebarCollapsed">
-          <a routerLink="/sales-transactions" class="sub-menu-item">
-            <i class="bi bi-credit-card-2-front-fill sub-icon text-primary"></i>
-            <span>Transaction</span>
-          </a>
-          <a routerLink="/sales-orders" class="sub-menu-item">
-            <i class="bi bi-box-seam-fill sub-icon text-info"></i>
-            <span>Order</span>
-          </a>
-          <a routerLink="/sales-suspended" class="sub-menu-item">
-            <i class="bi bi-pause-circle-fill sub-icon text-warning"></i>
-            <span>Order Suspended</span>
-          </a>
+                <div class="sub-menu" *ngIf="isSalesMenuOpen && !isSidebarCollapsed">
           <a routerLink="/sales-completed" class="sub-menu-item">
             <i class="bi bi-check-circle-fill sub-icon text-success"></i>
             <span>Completed</span>
+          </a>
+          <a routerLink="/sales-suspended" class="sub-menu-item">
+            <i class="bi bi-pause-circle-fill sub-icon text-warning"></i>
+            <span>Suspended</span>
           </a>
           <a routerLink="/sales-exchange" class="sub-menu-item">
             <i class="bi bi-arrow-repeat sub-icon text-purple"></i>
@@ -65,7 +57,7 @@
           </a>
           <a routerLink="/sales-returns" class="sub-menu-item">
             <i class="bi bi-arrow-counterclockwise sub-icon text-danger"></i>
-            <span>Return and Refund</span>
+            <span>Return</span>
           </a>
         </div>
       </div>
@@ -74,7 +66,7 @@
       
       <!-- PURCHASE MENU -->
       <div class="nav-group">
-        <div class="menu-header" (click)="isPurchaseMenuOpen = !isPurchaseMenuOpen" [class.expanded]="isPurchaseMenuOpen" *ngIf="!isSidebarCollapsed">
+        <div class="menu-header" (click)="togglePurchaseMenu($event)" [class.expanded]="isPurchaseMenuOpen" *ngIf="!isSidebarCollapsed">
           <div class="header-left">
             <i class="bi bi-bag-check-fill header-icon" style="color: #f59e0b;"></i>
             <span>Purchase Management</span>
@@ -82,7 +74,7 @@
           <i class="bi bi-chevron-down chevron-icon" [class.rotate]="isPurchaseMenuOpen"></i>
         </div>
 
-        <a *ngIf="isSidebarCollapsed" (click)="isSidebarCollapsed = false; isPurchaseMenuOpen = true" class="menu-item root-item" style="cursor: pointer;" title="Purchase Management">
+        <a *ngIf="isSidebarCollapsed" (click)="openPurchaseFromCollapsed($event)" class="menu-item root-item" style="cursor: pointer;" title="Purchase Management">
           <i class="bi bi-bag-check-fill menu-icon" style="color: #f59e0b;"></i>
         </a>
 
@@ -100,7 +92,7 @@
 
       <!-- SUPPLIER MANAGEMENT -->
       <div class="nav-group">
-        <div class="menu-header" (click)="toggleSupplierMenu()" [class.expanded]="isSupplierMenuOpen" *ngIf="!isSidebarCollapsed">
+        <div class="menu-header" (click)="toggleSupplierMenu($event)" [class.expanded]="isSupplierMenuOpen" *ngIf="!isSidebarCollapsed">
           <div class="header-left">
             <i class="bi bi-truck header-icon" style="color: #0284c7;"></i>
             <span>Supplier Management</span>
@@ -108,7 +100,7 @@
           <i class="bi bi-chevron-down chevron-icon" [class.rotate]="isSupplierMenuOpen"></i>
         </div>
 
-        <a *ngIf="isSidebarCollapsed" (click)="openSupplierFromCollapsed()" class="menu-item root-item" style="cursor: pointer;" title="Supplier Management">
+        <a *ngIf="isSidebarCollapsed" (click)="openSupplierFromCollapsed($event)" class="menu-item root-item" style="cursor: pointer;" title="Supplier Management">
           <i class="bi bi-truck menu-icon" style="color: #0284c7;"></i>
         </a>
 
@@ -131,7 +123,7 @@
 
       <!-- 4. Patient Hub -->
       <div class="menu-group" [class.open]="isPatientMenuOpen">
-        <div class="menu-header" (click)="togglePatientMenu()" *ngIf="!isSidebarCollapsed">
+        <div class="menu-header" (click)="togglePatientMenu($event)" *ngIf="!isSidebarCollapsed">
           <div class="header-left">
             <i class="bi bi-people-fill header-icon"></i>
             <span class="menu-label">Patient Hub</span>
@@ -139,7 +131,7 @@
           <i class="bi bi-chevron-down chevron-icon" [class.rotate]="isPatientMenuOpen"></i>
         </div>
 
-        <a *ngIf="isSidebarCollapsed" (click)="openPatientFromCollapsed()" class="menu-item root-item" style="cursor: pointer;" title="Patient Hub: Registration, List, Drafts">
+        <a *ngIf="isSidebarCollapsed" (click)="openPatientFromCollapsed($event)" class="menu-item root-item" style="cursor: pointer;" title="Patient Hub: Registration, List, Drafts">
           <i class="bi bi-people-fill menu-icon"></i>
         </a>
 
@@ -169,7 +161,7 @@
 
       <!-- 6. User Directory -->
       <div class="menu-group" [class.open]="isUserMenuOpen">
-        <div class="menu-header" (click)="toggleUserMenu()" *ngIf="!isSidebarCollapsed">
+        <div class="menu-header" (click)="toggleUserMenu($event)" *ngIf="!isSidebarCollapsed">
           <div class="header-left">
             <i class="bi bi-person-gear header-icon"></i>
             <span class="menu-label">Staff & Users</span>
@@ -177,7 +169,7 @@
           <i class="bi bi-chevron-down chevron-icon" [class.rotate]="isUserMenuOpen"></i>
         </div>
 
-        <a *ngIf="isSidebarCollapsed" (click)="openUserFromCollapsed()" class="menu-item root-item" style="cursor: pointer;" title="Staff Directory">
+        <a *ngIf="isSidebarCollapsed" (click)="openUserFromCollapsed($event)" class="menu-item root-item" style="cursor: pointer;" title="Staff Directory">
           <i class="bi bi-person-gear menu-icon"></i>
         </a>
 
@@ -201,7 +193,7 @@
 
       <!-- 7. Settings (Store Configuration, Category, Tax) -->
       <div class="menu-group open">
-        <div class="menu-header" (click)="toggleSettingsMenu()" *ngIf="!isSidebarCollapsed">
+        <div class="menu-header" (click)="toggleSettingsMenu($event)" *ngIf="!isSidebarCollapsed">
           <div class="header-left">
             <i class="bi bi-gear-fill header-icon"></i>
             <span class="menu-label">Settings</span>
@@ -209,7 +201,7 @@
           <i class="bi bi-chevron-down chevron-icon" [class.rotate]="isSettingsMenuOpen"></i>
         </div>
 
-        <a *ngIf="isSidebarCollapsed" (click)="openSettingsFromCollapsed()" class="menu-item root-item active" style="cursor: pointer;" title="Settings: Store Config, Category, Tax">
+        <a *ngIf="isSidebarCollapsed" (click)="openSettingsFromCollapsed($event)" class="menu-item root-item active" style="cursor: pointer;" title="Settings: Store Config, Category, Tax">
           <i class="bi bi-gear-fill menu-icon"></i>
         </a>
 
@@ -277,7 +269,7 @@
     <!-- Top Navigation Card -->
     <header class="top-nav-card">
       <div class="top-nav-left">
-        <button type="button" class="btn-sidebar-toggle" (click)="toggleSidebar()" title="Toggle Navigation Menu">
+        <button type="button" class="btn-sidebar-toggle" (click)="toggleSidebar($event)" title="Toggle Navigation Menu">
           <i class="bi bi-list"></i>
         </button>
         <div class="page-title-wrap">

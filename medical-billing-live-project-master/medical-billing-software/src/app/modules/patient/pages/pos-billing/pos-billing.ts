@@ -9,6 +9,7 @@ import { AuthService } from '../../../services/auth.service';
 import { CategoryService, Category } from '../../../services/category.service';
 import { DoctorService, Doctor } from '../../../services/doctor.service';
 import { WarehouseService, Warehouse } from '../../../services/warehouse.service';
+import { SalesService, SuspendedOrder, CompletedSale } from '../../../services/sales.service';
 
 @Component({
   selector: 'app-pos-billing',
@@ -37,7 +38,7 @@ export class PosBilling implements OnInit, OnDestroy {
   // DASHBOARD SHELL STATE (Exact match to Dashboard)
   // =====================================================
   // Default to true so Left Pane shows ONLY menu icons for wide POS alignment
-  isSidebarCollapsed = false;
+  isSidebarCollapsed = true;
   isPatientMenuOpen = false;
   isDoctorMenuOpen = false;
   isUserMenuOpen = false;
@@ -129,7 +130,18 @@ export class PosBilling implements OnInit, OnDestroy {
 
   // Toast / notification
   toastMessage = '';
+  isToastWarning = false;
   categoriesList: Category[] = [];
+
+  // =====================================================
+  // POS FLOW ACTIONS: SUSPENDED, COMPLETED, EXCHANGE, RETURN
+  // =====================================================
+  suspendedOrdersList: any[] = [];
+  showSuspendedModal = false;
+  showCompletedModal = false;
+  completedSalesList: any[] = [];
+  loadingSuspended = false;
+  loadingCompleted = false;
 
   constructor(
     private posService: PosService,
@@ -139,6 +151,7 @@ export class PosBilling implements OnInit, OnDestroy {
     private warehouseService: WarehouseService,
     private authService: AuthService,
     private categoryService: CategoryService,
+    private salesService: SalesService,
     private router: Router,
     private cdr: ChangeDetectorRef
   ) {}
@@ -152,6 +165,8 @@ export class PosBilling implements OnInit, OnDestroy {
     this.loadDoctors();
     this.loadCategories();
     this.loadWarehouses();
+    this.loadSuspendedOrders();
+    this.loadCompletedSales();
   }
 
   loadDoctors(): void {
@@ -249,62 +264,28 @@ export class PosBilling implements OnInit, OnDestroy {
     });
   }
 
-  toggleSidebar(): void {
-    this.isSidebarCollapsed = !this.isSidebarCollapsed;
-    if (!this.isSidebarCollapsed) {
-      this.isSettingsMenuOpen = true;
-    }
-  }
-
-  openSettingsFromCollapsed(): void {
-    this.isSidebarCollapsed = false;
-    this.isSettingsMenuOpen = true;
-    this.cdr.detectChanges();
-  }
-
-  openPatientFromCollapsed(): void {
-    this.isSidebarCollapsed = false;
-    this.isPatientMenuOpen = true;
-    this.cdr.detectChanges();
-  }
-
-  openDoctorFromCollapsed(): void {
-    this.isSidebarCollapsed = false;
-    this.isDoctorMenuOpen = true;
-    this.cdr.detectChanges();
-  }
-
-  openUserFromCollapsed(): void {
-    this.isSidebarCollapsed = false;
-    this.isUserMenuOpen = true;
-    this.cdr.detectChanges();
-  }
+  
 
   
-  toggleSupplierMenu(): void {
-    this.isSupplierMenuOpen = !this.isSupplierMenuOpen;
-  }
 
-  openSupplierFromCollapsed(): void {
-    this.isSidebarCollapsed = false;
-    this.isSupplierMenuOpen = true;
-  }
+  
 
-  togglePatientMenu(): void {
-    this.isPatientMenuOpen = !this.isPatientMenuOpen;
-  }
+  
 
-  toggleDoctorMenu(): void {
-    this.isDoctorMenuOpen = !this.isDoctorMenuOpen;
-  }
+  
 
-  toggleUserMenu(): void {
-    this.isUserMenuOpen = !this.isUserMenuOpen;
-  }
+  
+  
 
-  toggleSettingsMenu(): void {
-    this.isSettingsMenuOpen = !this.isSettingsMenuOpen;
-  }
+  
+
+  
+
+  
+
+  
+
+  
 
   logout(): void {
     if (confirm('Are you sure you want to sign out?')) {
@@ -322,6 +303,7 @@ export class PosBilling implements OnInit, OnDestroy {
         if (meds && meds.length > 0) {
           this.allMedicines = meds;
           this.applyMedicineFilter();
+          this.syncCartWithCatalog();
           this.cdr.detectChanges();
         } else {
           // Fallback to fetch all medicines if specific companyId is empty
@@ -329,6 +311,7 @@ export class PosBilling implements OnInit, OnDestroy {
             next: (all) => {
               this.allMedicines = all || [];
               this.applyMedicineFilter();
+              this.syncCartWithCatalog();
               this.cdr.detectChanges();
             }
           });
@@ -340,11 +323,37 @@ export class PosBilling implements OnInit, OnDestroy {
           next: (all) => {
             this.allMedicines = all || [];
             this.applyMedicineFilter();
+            this.syncCartWithCatalog();
             this.cdr.detectChanges();
           }
         });
       }
     });
+  }
+
+  private syncCartWithCatalog(): void {
+    if (!this.cart || this.cart.length === 0) return;
+    const initialCount = this.cart.length;
+    this.cart = this.cart.filter(item => {
+      const match = this.allMedicines.find(m => m.id === item.medicine.id);
+      if (match) {
+        item.medicine.stockQty = match.stockQty !== undefined && match.stockQty !== null ? Number(match.stockQty) : 0;
+      }
+      return (item.medicine.stockQty || 0) > 0;
+    });
+
+    for (const item of this.cart) {
+      const maxStock = item.medicine.stockQty || 0;
+      if (item.quantity > maxStock) {
+        item.quantity = maxStock;
+      }
+      this.recalculateItem(item);
+    }
+    this.calculateCartTotals();
+
+    if (this.cart.length < initialCount) {
+      this.showToast('⚠️ Out-of-stock items were removed from active cart.', true);
+    }
   }
 
   loadPatients(): void {
@@ -389,8 +398,18 @@ export class PosBilling implements OnInit, OnDestroy {
   // CART OPERATIONS
   // =====================================================
   addToCart(med: MedicineItem): void {
+    const availableStock = med.stockQty !== undefined && med.stockQty !== null ? Number(med.stockQty) : 0;
+    if (availableStock <= 0) {
+      this.showToast(`⚠️ Out of Stock: "${med.name}" has 0 stock! Please purchase stock first.`, true);
+      return;
+    }
+
     const existingIndex = this.cart.findIndex(i => i.medicine.id === med.id && i.medicine.batchNo === med.batchNo);
     if (existingIndex >= 0) {
+      if (this.cart[existingIndex].quantity >= availableStock) {
+        this.showToast(`⚠️ Stock Limit Reached: Only ${availableStock} units available for "${med.name}"!`, true);
+        return;
+      }
       this.cart[existingIndex].quantity++;
       this.recalculateItem(this.cart[existingIndex]);
     } else {
@@ -413,6 +432,13 @@ export class PosBilling implements OnInit, OnDestroy {
   }
 
   increaseQty(item: CartItem): void {
+    const availableStock = item.medicine.stockQty !== undefined && item.medicine.stockQty !== null 
+      ? Number(item.medicine.stockQty) 
+      : 0;
+    if (item.quantity >= availableStock) {
+      this.showToast(`⚠️ Stock Limit Reached: Only ${availableStock} units available for "${item.medicine.name}"!`, true);
+      return;
+    }
     item.quantity++;
     this.recalculateItem(item);
     this.calculateCartTotals();
@@ -429,8 +455,20 @@ export class PosBilling implements OnInit, OnDestroy {
   }
 
   onQtyInputChange(item: CartItem): void {
+    const availableStock = item.medicine.stockQty !== undefined && item.medicine.stockQty !== null 
+      ? Number(item.medicine.stockQty) 
+      : 0;
+    if (availableStock <= 0) {
+      this.removeFromCart(item);
+      this.showToast(`⚠️ "${item.medicine.name}" is out of stock and removed from cart.`, true);
+      return;
+    }
     if (!item.quantity || item.quantity < 1) {
       item.quantity = 1;
+    }
+    if (item.quantity > availableStock) {
+      item.quantity = availableStock;
+      this.showToast(`⚠️ Quantity adjusted to available stock (${availableStock}) for "${item.medicine.name}"!`, true);
     }
     this.recalculateItem(item);
     this.calculateCartTotals();
@@ -620,6 +658,50 @@ export class PosBilling implements OnInit, OnDestroy {
     this.currentInvoice = invoice;
     this.showInvoiceModal = true;
     this.showToast(`Invoice #${invoice.invoiceNo} Generated!`);
+
+    // Sync to Completed Sales records
+    const completedRecord: CompletedSale = {
+      invoiceNo: invoice.invoiceNo,
+      customerName: invoice.customerName || invoice.patientName || 'Walk-in Customer',
+      paymentMethod: invoice.paymentMethod,
+      totalAmount: invoice.subtotal,
+      netAmount: invoice.grandTotal,
+      status: 'COMPLETED',
+      companyId: this.activeStoreId
+    };
+    this.salesService.createCompleted(completedRecord, this.activeStoreId).subscribe({
+      next: () => { this.loadCompletedSales(); },
+      error: () => { this.loadCompletedSales(); }
+    });
+
+    // Deduct stock for sold items in backend database
+    for (const item of this.cart) {
+      const medId = item.medicine.id;
+      if (medId) {
+        const match = this.allMedicines.find(m => m.id === medId);
+        const currentStock = match && match.stockQty !== undefined ? Number(match.stockQty) : (item.medicine.stockQty || 0);
+        const newStock = Math.max(0, currentStock - item.quantity);
+        if (match) {
+          match.stockQty = newStock;
+        }
+        item.medicine.stockQty = newStock;
+
+        this.medicineService.getMedicineById(medId).subscribe({
+          next: (dbMed) => {
+            if (dbMed) {
+              dbMed.stockQty = newStock;
+              this.medicineService.updateMedicine(medId, dbMed).subscribe({
+                next: () => {
+                  this.applyMedicineFilter();
+                },
+                error: (err) => console.warn(`Failed to update stock for ${dbMed.name}:`, err)
+              });
+            }
+          },
+          error: (err) => console.warn(`Failed to fetch medicine ${medId}:`, err)
+        });
+      }
+    }
   }
 
   printInvoice(): void {
@@ -698,7 +780,11 @@ export class PosBilling implements OnInit, OnDestroy {
           stockQty: saved.stockQty !== undefined ? saved.stockQty : 0,
           manufacturer: saved.manufacturer || ''
         };
-        this.addToCart(item);
+        if ((item.stockQty || 0) > 0) {
+          this.addToCart(item);
+        } else {
+          this.showToast(`⚠️ "${saved.name}" saved with 0 stock. Stock purchase required before billing.`, true);
+        }
       },
       error: (err) => {
         console.error('Error saving custom medicine:', err);
@@ -707,34 +793,533 @@ export class PosBilling implements OnInit, OnDestroy {
     });
   }
 
-  private showToast(msg: string): void {
+  private showToast(msg: string, isWarning = false): void {
     this.toastMessage = msg;
+    this.isToastWarning = isWarning;
     setTimeout(() => {
       this.toastMessage = '';
+      this.isToastWarning = false;
       this.cdr.detectChanges();
-    }, 2600);
+    }, 3000);
   }
 
-  @HostListener('document:click', ['$event'])
-  onDocumentClick(event: MouseEvent) {
-    const sidebar = document.querySelector('.sidebar');
-    const toggleBtn = document.querySelector('.btn-sidebar-toggle') || document.querySelector('.toggle-btn');
-    const target = event.target as Node;
-    
-    if (sidebar && !sidebar.contains(target) && (!toggleBtn || !toggleBtn.contains(target))) {
+  
+
+  
+
+
+  
+
+  
+
+
+  // ==========================================
+  // SIDEBAR & SUBMENU CONTROLS (EXPAND ON CLICK & OUTSIDE CLOSE)
+  // ==========================================
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+
+  // ==========================================
+  // SIDEBAR & SUBMENU CONTROLS (EXPAND ON CLICK & OUTSIDE CLOSE)
+  // ==========================================
+  toggleSidebar(event?: MouseEvent): void {
+    if (event) {
+      event.stopPropagation();
+    }
+    this.isSidebarCollapsed = !this.isSidebarCollapsed;
+    if (this.isSidebarCollapsed) {
       this.closeAllMenus();
+    }
+    this.cdr.detectChanges();
+  }
+
+  togglePatientMenu(event?: MouseEvent): void {
+    if (event) {
+      event.stopPropagation();
+    }
+    this.isPatientMenuOpen = !this.isPatientMenuOpen;
+    this.cdr.detectChanges();
+  }
+
+  toggleDoctorMenu(event?: MouseEvent): void {
+    if (event) {
+      event.stopPropagation();
+    }
+    this.isDoctorMenuOpen = !this.isDoctorMenuOpen;
+    this.cdr.detectChanges();
+  }
+
+  toggleUserMenu(event?: MouseEvent): void {
+    if (event) {
+      event.stopPropagation();
+    }
+    this.isUserMenuOpen = !this.isUserMenuOpen;
+    this.cdr.detectChanges();
+  }
+
+  toggleSettingsMenu(event?: MouseEvent): void {
+    if (event) {
+      event.stopPropagation();
+    }
+    this.isSettingsMenuOpen = !this.isSettingsMenuOpen;
+    this.cdr.detectChanges();
+  }
+
+  toggleSupplierMenu(event?: MouseEvent): void {
+    if (event) {
+      event.stopPropagation();
+    }
+    this.isSupplierMenuOpen = !this.isSupplierMenuOpen;
+    this.cdr.detectChanges();
+  }
+
+  togglePurchaseMenu(event?: MouseEvent): void {
+    if (event) {
+      event.stopPropagation();
+    }
+    this.isPurchaseMenuOpen = !this.isPurchaseMenuOpen;
+    this.cdr.detectChanges();
+  }
+
+  toggleSalesMenu(event?: MouseEvent): void {
+    if (event) {
+      event.stopPropagation();
+    }
+    this.isSalesMenuOpen = !this.isSalesMenuOpen;
+    this.cdr.detectChanges();
+  }
+
+  openPatientFromCollapsed(event?: MouseEvent): void {
+    if (event) {
+      event.stopPropagation();
+    }
+    this.isSidebarCollapsed = false;
+    this.closeAllMenus();
+    this.isPatientMenuOpen = true;
+    this.cdr.detectChanges();
+  }
+
+  openDoctorFromCollapsed(event?: MouseEvent): void {
+    if (event) {
+      event.stopPropagation();
+    }
+    this.isSidebarCollapsed = false;
+    this.closeAllMenus();
+    this.isDoctorMenuOpen = true;
+    this.cdr.detectChanges();
+  }
+
+  openUserFromCollapsed(event?: MouseEvent): void {
+    if (event) {
+      event.stopPropagation();
+    }
+    this.isSidebarCollapsed = false;
+    this.closeAllMenus();
+    this.isUserMenuOpen = true;
+    this.cdr.detectChanges();
+  }
+
+  openSettingsFromCollapsed(event?: MouseEvent): void {
+    if (event) {
+      event.stopPropagation();
+    }
+    this.isSidebarCollapsed = false;
+    this.closeAllMenus();
+    this.isSettingsMenuOpen = true;
+    this.cdr.detectChanges();
+  }
+
+  openSupplierFromCollapsed(event?: MouseEvent): void {
+    if (event) {
+      event.stopPropagation();
+    }
+    this.isSidebarCollapsed = false;
+    this.closeAllMenus();
+    this.isSupplierMenuOpen = true;
+    this.cdr.detectChanges();
+  }
+
+  openPurchaseFromCollapsed(event?: MouseEvent): void {
+    if (event) {
+      event.stopPropagation();
+    }
+    this.isSidebarCollapsed = false;
+    this.closeAllMenus();
+    this.isPurchaseMenuOpen = true;
+    this.cdr.detectChanges();
+  }
+
+  openSalesFromCollapsed(event?: MouseEvent): void {
+    if (event) {
+      event.stopPropagation();
+    }
+    this.isSidebarCollapsed = false;
+    this.closeAllMenus();
+    this.isSalesMenuOpen = true;
+    this.cdr.detectChanges();
+  }
+
+  closeAllMenus(): void {
+    this.isPatientMenuOpen = false;
+    this.isDoctorMenuOpen = false;
+    this.isUserMenuOpen = false;
+    this.isSettingsMenuOpen = false;
+    this.isSalesMenuOpen = false;
+    this.isPurchaseMenuOpen = false;
+    this.isSupplierMenuOpen = false;
+  }
+
+  closeSidebarOnNavigate(): void {
+    this.isSidebarCollapsed = true;
+    this.closeAllMenus();
+    this.cdr.detectChanges();
+  }
+
+  onNavClick(event: MouseEvent): void {
+    const target = event.target as HTMLElement;
+    const link = target.closest('a[routerLink], a.sub-menu-item');
+    if (link) {
+      this.closeSidebarOnNavigate();
     }
   }
 
-  closeAllMenus() {
-    const self = this as any;
-    if (typeof self.isPatientMenuOpen !== 'undefined') self.isPatientMenuOpen = false;
-    if (typeof self.isDoctorMenuOpen !== 'undefined') self.isDoctorMenuOpen = false;
-    if (typeof self.isUserMenuOpen !== 'undefined') self.isUserMenuOpen = false;
-    if (typeof self.isSettingsMenuOpen !== 'undefined') self.isSettingsMenuOpen = false;
-    if (typeof self.isSalesMenuOpen !== 'undefined') self.isSalesMenuOpen = false;
-    if (typeof self.isPurchaseMenuOpen !== 'undefined') self.isPurchaseMenuOpen = false;
-    if (typeof self.isSupplierMenuOpen !== "undefined") self.isSupplierMenuOpen = false;
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    if (this.isSidebarCollapsed) {
+      return;
+    }
+    const targetEl = (event.target as HTMLElement)?.nodeType === 1 
+      ? (event.target as HTMLElement) 
+      : (event.target as HTMLElement)?.parentElement;
+    
+    // If target element was detached during re-render, do NOT close!
+    if (!targetEl || !targetEl.isConnected) {
+      return;
+    }
+
+    const clickedInsideSidebar = !!targetEl.closest?.('.app-sidebar, .sidebar');
+    const clickedToggleBtn = !!targetEl.closest?.('.btn-sidebar-toggle, .sidebar-toggle-btn, .btn-toggle-sidebar, .btn-sidebar-toggle-mobile, .toggle-btn');
+
+    if (!clickedInsideSidebar && !clickedToggleBtn) {
+      this.closeAllMenus();
+      this.isSidebarCollapsed = true;
+      this.cdr.detectChanges();
+    }
+  }
+
+  // =====================================================
+  // POS FLOW: SUSPENDED (HOLD BILL) & COMPLETED SALES
+  // =====================================================
+  suspendCurrentSale(): void {
+    if (!this.cart || this.cart.length === 0) {
+      alert('Cart is empty! Please add medicines before suspending the bill.');
+      return;
+    }
+
+    const holdNo = 'HOLD-' + Math.floor(1000 + Math.random() * 9000);
+    const cartSnapshot = JSON.stringify(this.cart);
+    const total = this.grandTotal;
+    const custName = this.customerName || 'Walk-in Customer';
+    const custPhone = this.customerMobile || '';
+    const dateStr = new Date().toISOString();
+
+    const newHoldOrder: SuspendedOrder = {
+      holdNo: holdNo,
+      holdDate: dateStr,
+      customerName: custName,
+      customerPhone: custPhone,
+      totalAmount: total,
+      holdReason: cartSnapshot,
+      suspendedStatus: 'ON_HOLD',
+      status: 'ACTIVE',
+      companyId: this.activeStoreId
+    };
+
+    // Save locally for instant offline recovery
+    try {
+      const localList = JSON.parse(localStorage.getItem('medbill_suspended_local') || '[]');
+      localList.unshift(newHoldOrder);
+      localStorage.setItem('medbill_suspended_local', JSON.stringify(localList));
+      localStorage.setItem(`medbill_held_items_${holdNo}`, cartSnapshot);
+    } catch (e) {
+      console.warn('LocalStorage error saving suspended bill:', e);
+    }
+
+    // Persist via SalesService backend
+    this.salesService.createSuspended(newHoldOrder, this.activeStoreId).subscribe({
+      next: (created) => {
+        if (created && created.id) {
+          newHoldOrder.id = created.id;
+        }
+        this.loadSuspendedOrders();
+      },
+      error: (err) => {
+        console.warn('Backend suspended save error, stored locally:', err);
+        this.loadSuspendedOrders();
+      }
+    });
+
+    this.showToast(`Bill Suspended as #${holdNo}!`);
+    this.startNewSale();
+  }
+
+  loadSuspendedOrders(): void {
+    this.loadingSuspended = true;
+    this.salesService.getSuspended(this.activeStoreId).subscribe({
+      next: (data) => {
+        let list = data || [];
+        // Merge with local storage entries
+        try {
+          const localList: any[] = JSON.parse(localStorage.getItem('medbill_suspended_local') || '[]');
+          if (localList && localList.length > 0) {
+            const existingNos = new Set(list.map(o => o.holdNo));
+            for (const item of localList) {
+              if (!existingNos.has(item.holdNo)) {
+                list.push(item);
+              }
+            }
+          }
+        } catch {}
+        this.suspendedOrdersList = list;
+        this.loadingSuspended = false;
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        try {
+          this.suspendedOrdersList = JSON.parse(localStorage.getItem('medbill_suspended_local') || '[]');
+        } catch {
+          this.suspendedOrdersList = [];
+        }
+        this.loadingSuspended = false;
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  openSuspendedModal(): void {
+    this.loadSuspendedOrders();
+    this.showSuspendedModal = true;
+  }
+
+  closeSuspendedModal(): void {
+    this.showSuspendedModal = false;
+  }
+
+  resumeSuspendedOrder(order: any): void {
+    if (!order) return;
+
+    if (this.cart.length > 0) {
+      const confirmReplace = confirm('You have items in the current cart. Restoring this suspended bill will replace the current cart. Proceed?');
+      if (!confirmReplace) return;
+    }
+
+    let items: CartItem[] = [];
+    if (order.holdReason && typeof order.holdReason === 'string' && order.holdReason.startsWith('[')) {
+      try {
+        items = JSON.parse(order.holdReason);
+      } catch {}
+    }
+    if ((!items || items.length === 0) && order.holdNo) {
+      try {
+        const stored = localStorage.getItem(`medbill_held_items_${order.holdNo}`);
+        if (stored) items = JSON.parse(stored);
+      } catch {}
+    }
+
+    if (items && items.length > 0) {
+      const validItems: CartItem[] = [];
+      let removedCount = 0;
+      for (const it of items) {
+        const match = this.allMedicines.find(m => m.id === it.medicine.id);
+        const currentStock = match && match.stockQty !== undefined ? Number(match.stockQty) : (it.medicine.stockQty || 0);
+        it.medicine.stockQty = currentStock;
+        if (currentStock <= 0) {
+          removedCount++;
+          continue;
+        }
+        if (it.quantity > currentStock) {
+          it.quantity = currentStock;
+        }
+        this.recalculateItem(it);
+        validItems.push(it);
+      }
+      this.cart = validItems;
+      if (removedCount > 0) {
+        this.showToast(`⚠️ ${removedCount} out-of-stock item(s) removed from resumed bill.`, true);
+      }
+    }
+
+    this.customerName = order.customerName || 'Walk-in Customer';
+    this.customerMobile = order.customerPhone || '';
+    this.isWalkInCustomer = (this.customerName === 'Walk-in Customer');
+    this.calculateCartTotals();
+
+    // Delete from suspended list
+    this.deleteSuspendedOrder(order, false);
+    this.closeSuspendedModal();
+    this.showToast(`Resumed Bill #${order.holdNo} into Cart!`);
+  }
+
+  deleteSuspendedOrder(order: any, showToast = true): void {
+    if (order.id) {
+      this.salesService.deleteSuspended(order.id).subscribe({
+        next: () => this.loadSuspendedOrders(),
+        error: () => this.loadSuspendedOrders()
+      });
+    }
+    try {
+      let localList: any[] = JSON.parse(localStorage.getItem('medbill_suspended_local') || '[]');
+      localList = localList.filter(o => o.holdNo !== order.holdNo);
+      localStorage.setItem('medbill_suspended_local', JSON.stringify(localList));
+      localStorage.removeItem(`medbill_held_items_${order.holdNo}`);
+    } catch {}
+
+    this.suspendedOrdersList = this.suspendedOrdersList.filter(o => o.holdNo !== order.holdNo);
+    if (showToast) {
+      this.showToast(`Deleted Suspended Bill #${order.holdNo}`);
+    }
+    this.cdr.detectChanges();
+  }
+
+  openCompletedSales(): void {
+    this.loadCompletedSales();
+    this.showCompletedModal = true;
+  }
+
+  closeCompletedModal(): void {
+    this.showCompletedModal = false;
+  }
+
+  loadCompletedSales(): void {
+    this.loadingCompleted = true;
+    this.salesService.getCompleted(this.activeStoreId).subscribe({
+      next: (data) => {
+        let list = data || [];
+        try {
+          const invoices: any[] = this.posService.getInvoices();
+          if (invoices && invoices.length > 0) {
+            const existingNos = new Set(list.map((c: any) => c.invoiceNo));
+            for (const inv of invoices) {
+              if (!existingNos.has(inv.invoiceNo)) {
+                list.push({
+                  invoiceNo: inv.invoiceNo,
+                  customerName: inv.customerName || inv.patientName || 'Customer',
+                  paymentMethod: inv.paymentMethod,
+                  totalAmount: inv.subtotal,
+                  netAmount: inv.grandTotal,
+                  completionDate: inv.dateTime,
+                  status: 'COMPLETED'
+                });
+              }
+            }
+          }
+        } catch {}
+        this.completedSalesList = list;
+        this.loadingCompleted = false;
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        try {
+          const invoices: any[] = this.posService.getInvoices();
+          this.completedSalesList = (invoices || []).map((inv: any) => ({
+            invoiceNo: inv.invoiceNo,
+            customerName: inv.customerName || inv.patientName || 'Customer',
+            paymentMethod: inv.paymentMethod,
+            totalAmount: inv.subtotal,
+            netAmount: inv.grandTotal,
+            completionDate: inv.dateTime,
+            status: 'COMPLETED'
+          }));
+        } catch {
+          this.completedSalesList = [];
+        }
+        this.loadingCompleted = false;
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  reprintFromCompleted(completed: any): void {
+    try {
+      const allInvoices: any[] = this.posService.getInvoices();
+      const match = (allInvoices || []).find((i: any) => i.invoiceNo === completed.invoiceNo);
+      if (match) {
+        this.currentInvoice = match;
+        this.showCompletedModal = false;
+        this.showInvoiceModal = true;
+        return;
+      }
+    } catch {}
+
+    this.currentInvoice = {
+      invoiceNo: completed.invoiceNo,
+      dateTime: completed.completionDate || new Date().toISOString(),
+      storeName: this.activeStoreName,
+      storeAddress: this.activeStoreAddress,
+      storeGstin: this.activeStoreGstin,
+      storeDlNo: this.activeStoreDlNo,
+      cashierName: this.cashierName,
+      patientName: completed.customerName,
+      patientMobile: 'N/A',
+      items: [],
+      subtotal: completed.totalAmount || completed.netAmount,
+      discountAmount: 0,
+      taxableAmount: completed.totalAmount || completed.netAmount,
+      cgstTotal: 0,
+      sgstTotal: 0,
+      roundOff: 0,
+      grandTotal: completed.netAmount || completed.totalAmount,
+      paymentMethod: completed.paymentMethod || 'Cash',
+      amountReceived: completed.netAmount || completed.totalAmount,
+      changeDue: 0,
+      status: 'Completed'
+    };
+    this.showCompletedModal = false;
+    this.showInvoiceModal = true;
+  }
+
+  openExchange(): void {
+    this.router.navigate(['/sales-exchange']);
+  }
+
+  openReturn(): void {
+    this.router.navigate(['/sales-returns']);
   }
 
 }

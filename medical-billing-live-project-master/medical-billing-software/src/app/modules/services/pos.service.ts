@@ -125,4 +125,8 @@ export class PosService {
       return [];
     }
   }
+
+  getRecentInvoices(): PosInvoice[] {
+    return this.getInvoices();
+  }
 }

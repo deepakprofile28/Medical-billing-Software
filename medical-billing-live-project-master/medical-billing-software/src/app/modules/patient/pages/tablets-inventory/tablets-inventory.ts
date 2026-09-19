@@ -30,7 +30,7 @@ export class TabletsInventory implements OnInit, OnDestroy {
   canDeleteMed = true;
 
   // Layout & Navigation State matching Dashboard (Closed by default)
-  isSidebarCollapsed = false;
+  isSidebarCollapsed = true;
   isPatientMenuOpen = false;
   isDoctorMenuOpen = false;
   isUserMenuOpen = false;
@@ -69,15 +69,17 @@ export class TabletsInventory implements OnInit, OnDestroy {
     unitPrice: 0,
     mrp: 0,
     gstRate: 12,
-    stockQty: 100,
+    stockQty: 0,
     manufacturer: ''
   };
 
   // AI Auto-Fill State
   aiLoading = false;
 
-  // Toast
+  // Toast & Alert State
   toastMessage = '';
+  toastType: 'success' | 'warning' | 'info' = 'success';
+  showStockNoticeModal = false;
   taxes: TaxConfiguration[] = [];
   categoriesList: Category[] = [];
   racksList: Rack[] = [];
@@ -218,62 +220,28 @@ export class TabletsInventory implements OnInit, OnDestroy {
     });
   }
 
-  toggleSidebar(): void {
-    this.isSidebarCollapsed = !this.isSidebarCollapsed;
-    if (!this.isSidebarCollapsed) {
-      this.isSettingsMenuOpen = true;
-    }
-  }
-
-  openSettingsFromCollapsed(): void {
-    this.isSidebarCollapsed = false;
-    this.isSettingsMenuOpen = true;
-    this.cdr.detectChanges();
-  }
-
-  openPatientFromCollapsed(): void {
-    this.isSidebarCollapsed = false;
-    this.isPatientMenuOpen = true;
-    this.cdr.detectChanges();
-  }
-
-  openUserFromCollapsed(): void {
-    this.isSidebarCollapsed = false;
-    this.isUserMenuOpen = true;
-    this.cdr.detectChanges();
-  }
-
-  openDoctorFromCollapsed(): void {
-    this.isSidebarCollapsed = false;
-    this.isDoctorMenuOpen = true;
-    this.cdr.detectChanges();
-  }
+  
 
   
-  toggleSupplierMenu(): void {
-    this.isSupplierMenuOpen = !this.isSupplierMenuOpen;
-  }
 
-  openSupplierFromCollapsed(): void {
-    this.isSidebarCollapsed = false;
-    this.isSupplierMenuOpen = true;
-  }
+  
 
-  togglePatientMenu(): void {
-    this.isPatientMenuOpen = !this.isPatientMenuOpen;
-  }
+  
 
-  toggleDoctorMenu(): void {
-    this.isDoctorMenuOpen = !this.isDoctorMenuOpen;
-  }
+  
 
-  toggleUserMenu(): void {
-    this.isUserMenuOpen = !this.isUserMenuOpen;
-  }
+  
+  
 
-  toggleSettingsMenu(): void {
-    this.isSettingsMenuOpen = !this.isSettingsMenuOpen;
-  }
+  
+
+  
+
+  
+
+  
+
+  
 
   logout(): void {
     if (confirm('Are you sure you want to sign out?')) {
@@ -351,7 +319,9 @@ export class TabletsInventory implements OnInit, OnDestroy {
       unitPrice: Number(this.formMedicine.unitPrice) || 0,
       mrp: Number(this.formMedicine.mrp) || Number(this.formMedicine.unitPrice) || 0,
       gstRate: Number(this.formMedicine.gstRate) !== undefined ? Number(this.formMedicine.gstRate) : 12,
-      stockQty: Number(this.formMedicine.stockQty) || 0,
+      stockQty: (this.isEditMode && this.currentEditId)
+        ? ((this.medicines.find(m => m.id === this.currentEditId)?.stockQty) ?? Number(this.formMedicine.stockQty) ?? 0)
+        : 0,
       manufacturer: this.formMedicine.manufacturer ? this.formMedicine.manufacturer.trim() : '',
       companyId: this.activeStoreId
     };
@@ -391,6 +361,49 @@ export class TabletsInventory implements OnInit, OnDestroy {
         }
       });
     }
+  }
+
+  saveAsNewMedicine(): void {
+    if (!this.formMedicine.name.trim()) {
+      alert('Please enter a Medicine Name.');
+      return;
+    }
+    if (this.formMedicine.unitPrice <= 0) {
+      alert('Please enter a valid Selling Price.');
+      return;
+    }
+
+    this.isSavingMed = true;
+    const payload: Medicine = {
+      name: this.formMedicine.name.trim(),
+      genericName: this.formMedicine.genericName ? this.formMedicine.genericName.trim() : '',
+      category: this.formMedicine.category || 'Tablets',
+      batchNo: this.formMedicine.batchNo ? this.formMedicine.batchNo.trim() : '',
+      expiryDate: this.formMedicine.expiryDate ? this.formMedicine.expiryDate.trim() : '',
+      unitPrice: Number(this.formMedicine.unitPrice) || 0,
+      mrp: Number(this.formMedicine.mrp) || Number(this.formMedicine.unitPrice) || 0,
+      gstRate: Number(this.formMedicine.gstRate) !== undefined ? Number(this.formMedicine.gstRate) : 12,
+      stockQty: 0,
+      manufacturer: this.formMedicine.manufacturer ? this.formMedicine.manufacturer.trim() : '',
+      companyId: this.activeStoreId
+    };
+
+    this.medicineService.addMedicine(payload, this.activeStoreId).subscribe({
+      next: (res) => {
+        this.isSavingMed = false;
+        this.showMedModal = false;
+        this.showToast(`Created new unique entry for "${this.formMedicine.name}" (ID: #${res.id || ''}) in database!`);
+        this.resetForm();
+        this.loadMedicines();
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        this.isSavingMed = false;
+        console.error('Error creating unique medicine entry:', err);
+        alert('Failed to create new unique entry. Please verify backend is running on port 8082.');
+        this.cdr.detectChanges();
+      }
+    });
   }
 
   editMedicine(m: Medicine): void {
@@ -469,7 +482,7 @@ export class TabletsInventory implements OnInit, OnDestroy {
       unitPrice: 0,
       mrp: 0,
       gstRate: 12,
-      stockQty: 100,
+      stockQty: 0,
       manufacturer: ''
     };
   }
@@ -478,34 +491,274 @@ export class TabletsInventory implements OnInit, OnDestroy {
     this.router.navigate(['/pos']);
   }
 
-  private showToast(msg: string): void {
+  onStockFieldAttempt(event?: Event): void {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+    this.showToast('⚠️ To increase stock, please go to Purchase Module to purchase stock!', 'warning');
+    this.showStockNoticeModal = true;
+    this.cdr.detectChanges();
+  }
+
+  goToPurchase(event?: Event): void {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+    this.showStockNoticeModal = false;
+    this.showMedModal = false;
+    this.router.navigate(['/purchase']);
+  }
+
+  showToast(msg: string, type: 'success' | 'warning' | 'info' = 'success'): void {
     this.toastMessage = msg;
+    this.toastType = type;
+    this.cdr.detectChanges();
     setTimeout(() => {
       this.toastMessage = '';
       this.cdr.detectChanges();
-    }, 2800);
+    }, 3500);
   }
 
-  @HostListener('document:click', ['$event'])
-  onDocumentClick(event: MouseEvent) {
-    const sidebar = document.querySelector('.sidebar');
-    const toggleBtn = document.querySelector('.btn-sidebar-toggle') || document.querySelector('.toggle-btn');
-    const target = event.target as Node;
-    
-    if (sidebar && !sidebar.contains(target) && (!toggleBtn || !toggleBtn.contains(target))) {
+  
+
+  
+
+
+  
+
+  
+
+
+  // ==========================================
+  // SIDEBAR & SUBMENU CONTROLS (EXPAND ON CLICK & OUTSIDE CLOSE)
+  // ==========================================
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+
+  // ==========================================
+  // SIDEBAR & SUBMENU CONTROLS (EXPAND ON CLICK & OUTSIDE CLOSE)
+  // ==========================================
+  toggleSidebar(event?: MouseEvent): void {
+    if (event) {
+      event.stopPropagation();
+    }
+    this.isSidebarCollapsed = !this.isSidebarCollapsed;
+    if (this.isSidebarCollapsed) {
       this.closeAllMenus();
+    }
+    this.cdr.detectChanges();
+  }
+
+  togglePatientMenu(event?: MouseEvent): void {
+    if (event) {
+      event.stopPropagation();
+    }
+    this.isPatientMenuOpen = !this.isPatientMenuOpen;
+    this.cdr.detectChanges();
+  }
+
+  toggleDoctorMenu(event?: MouseEvent): void {
+    if (event) {
+      event.stopPropagation();
+    }
+    this.isDoctorMenuOpen = !this.isDoctorMenuOpen;
+    this.cdr.detectChanges();
+  }
+
+  toggleUserMenu(event?: MouseEvent): void {
+    if (event) {
+      event.stopPropagation();
+    }
+    this.isUserMenuOpen = !this.isUserMenuOpen;
+    this.cdr.detectChanges();
+  }
+
+  toggleSettingsMenu(event?: MouseEvent): void {
+    if (event) {
+      event.stopPropagation();
+    }
+    this.isSettingsMenuOpen = !this.isSettingsMenuOpen;
+    this.cdr.detectChanges();
+  }
+
+  toggleSupplierMenu(event?: MouseEvent): void {
+    if (event) {
+      event.stopPropagation();
+    }
+    this.isSupplierMenuOpen = !this.isSupplierMenuOpen;
+    this.cdr.detectChanges();
+  }
+
+  togglePurchaseMenu(event?: MouseEvent): void {
+    if (event) {
+      event.stopPropagation();
+    }
+    this.isPurchaseMenuOpen = !this.isPurchaseMenuOpen;
+    this.cdr.detectChanges();
+  }
+
+  toggleSalesMenu(event?: MouseEvent): void {
+    if (event) {
+      event.stopPropagation();
+    }
+    this.isSalesMenuOpen = !this.isSalesMenuOpen;
+    this.cdr.detectChanges();
+  }
+
+  openPatientFromCollapsed(event?: MouseEvent): void {
+    if (event) {
+      event.stopPropagation();
+    }
+    this.isSidebarCollapsed = false;
+    this.closeAllMenus();
+    this.isPatientMenuOpen = true;
+    this.cdr.detectChanges();
+  }
+
+  openDoctorFromCollapsed(event?: MouseEvent): void {
+    if (event) {
+      event.stopPropagation();
+    }
+    this.isSidebarCollapsed = false;
+    this.closeAllMenus();
+    this.isDoctorMenuOpen = true;
+    this.cdr.detectChanges();
+  }
+
+  openUserFromCollapsed(event?: MouseEvent): void {
+    if (event) {
+      event.stopPropagation();
+    }
+    this.isSidebarCollapsed = false;
+    this.closeAllMenus();
+    this.isUserMenuOpen = true;
+    this.cdr.detectChanges();
+  }
+
+  openSettingsFromCollapsed(event?: MouseEvent): void {
+    if (event) {
+      event.stopPropagation();
+    }
+    this.isSidebarCollapsed = false;
+    this.closeAllMenus();
+    this.isSettingsMenuOpen = true;
+    this.cdr.detectChanges();
+  }
+
+  openSupplierFromCollapsed(event?: MouseEvent): void {
+    if (event) {
+      event.stopPropagation();
+    }
+    this.isSidebarCollapsed = false;
+    this.closeAllMenus();
+    this.isSupplierMenuOpen = true;
+    this.cdr.detectChanges();
+  }
+
+  openPurchaseFromCollapsed(event?: MouseEvent): void {
+    if (event) {
+      event.stopPropagation();
+    }
+    this.isSidebarCollapsed = false;
+    this.closeAllMenus();
+    this.isPurchaseMenuOpen = true;
+    this.cdr.detectChanges();
+  }
+
+  openSalesFromCollapsed(event?: MouseEvent): void {
+    if (event) {
+      event.stopPropagation();
+    }
+    this.isSidebarCollapsed = false;
+    this.closeAllMenus();
+    this.isSalesMenuOpen = true;
+    this.cdr.detectChanges();
+  }
+
+  closeAllMenus(): void {
+    this.isPatientMenuOpen = false;
+    this.isDoctorMenuOpen = false;
+    this.isUserMenuOpen = false;
+    this.isSettingsMenuOpen = false;
+    this.isSalesMenuOpen = false;
+    this.isPurchaseMenuOpen = false;
+    this.isSupplierMenuOpen = false;
+  }
+
+  closeSidebarOnNavigate(): void {
+    this.isSidebarCollapsed = true;
+    this.closeAllMenus();
+    this.cdr.detectChanges();
+  }
+
+  onNavClick(event: MouseEvent): void {
+    const target = event.target as HTMLElement;
+    const link = target.closest('a[routerLink], a.sub-menu-item');
+    if (link) {
+      this.closeSidebarOnNavigate();
     }
   }
 
-  closeAllMenus() {
-    const self = this as any;
-    if (typeof self.isPatientMenuOpen !== 'undefined') self.isPatientMenuOpen = false;
-    if (typeof self.isDoctorMenuOpen !== 'undefined') self.isDoctorMenuOpen = false;
-    if (typeof self.isUserMenuOpen !== 'undefined') self.isUserMenuOpen = false;
-    if (typeof self.isSettingsMenuOpen !== 'undefined') self.isSettingsMenuOpen = false;
-    if (typeof self.isSalesMenuOpen !== 'undefined') self.isSalesMenuOpen = false;
-    if (typeof self.isPurchaseMenuOpen !== 'undefined') self.isPurchaseMenuOpen = false;
-    if (typeof self.isSupplierMenuOpen !== "undefined") self.isSupplierMenuOpen = false;
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    if (this.isSidebarCollapsed) {
+      return;
+    }
+    const targetEl = (event.target as HTMLElement)?.nodeType === 1 
+      ? (event.target as HTMLElement) 
+      : (event.target as HTMLElement)?.parentElement;
+    
+    // If target element was detached during re-render, do NOT close!
+    if (!targetEl || !targetEl.isConnected) {
+      return;
+    }
+
+    const clickedInsideSidebar = !!targetEl.closest?.('.app-sidebar, .sidebar');
+    const clickedToggleBtn = !!targetEl.closest?.('.btn-sidebar-toggle, .sidebar-toggle-btn, .btn-toggle-sidebar, .btn-sidebar-toggle-mobile, .toggle-btn');
+
+    if (!clickedInsideSidebar && !clickedToggleBtn) {
+      this.closeAllMenus();
+      this.isSidebarCollapsed = true;
+      this.cdr.detectChanges();
+    }
   }
 
 }

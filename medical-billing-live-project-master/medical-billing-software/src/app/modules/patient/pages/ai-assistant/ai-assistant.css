@@ -1043,3 +1043,30 @@
   z-index: 9999;
 }
 
+
+/* Sidebar scrollbar suppression */
+.app-sidebar,
+.sidebar-nav,
+.nav-group {
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+
+.app-sidebar::-webkit-scrollbar,
+.sidebar-nav::-webkit-scrollbar,
+.nav-group::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+.dashboard-layout-wrapper.sidebar-collapsed .sidebar-nav {
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+
+.dashboard-layout-wrapper.sidebar-collapsed .sidebar-nav::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}

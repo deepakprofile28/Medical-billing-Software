@@ -3,78 +3,71 @@
   <!-- ======================================================== -->
   <!-- 1. LEFT SIDEBAR NAVIGATION                               -->
   <!-- ======================================================== -->
+  <!-- ================= LEFT SIDEBAR MENU (IDENTICAL TO DASHBOARD) ================= -->
   <aside class="app-sidebar">
-    <!-- Brand / Logo Area -->
-    <div class="sidebar-header">
-      <div class="logo-wrapper" *ngIf="!isSidebarCollapsed">
-        <div class="logo-icon-bg">
-          <i class="bi bi-hospital-fill"></i>
-        </div>
-        <div class="logo-text">
-          <span class="brand-title">PharmaCare</span>
-          <span class="brand-subtitle">Smart Billing Cloud</span>
-        </div>
-      </div>
-      
-      <div class="logo-icon-bg collapsed-logo" *ngIf="isSidebarCollapsed">
+    
+    <!-- Sidebar Brand Header -->
+    <div class="sidebar-brand">
+      <div class="brand-icon-box">
         <i class="bi bi-hospital-fill"></i>
       </div>
-
-      <button class="btn-toggle-sidebar" (click)="toggleSidebar()" title="Toggle Sidebar">
-        <i class="bi" [ngClass]="isSidebarCollapsed ? 'bi-chevron-right' : 'bi-chevron-left'"></i>
-      </button>
+      <div class="brand-details" *ngIf="!isSidebarCollapsed">
+        <h2 class="brand-title">PharmaCare</h2>
+        <span class="brand-subtitle">Clinical & Billing Hub</span>
+      </div>
     </div>
 
-    <!-- Scrollable Navigation Items -->
-    <nav class="sidebar-nav custom-scrollbar">
-      
-      <!-- 1. POS BILLING (PRIMARY HERO BUTTON) -->
-      <div class="nav-group mb-2">
-        <a routerLink="/pos" class="menu-item hero-pos-item" title="Quick POS Billing">
-          <i class="bi bi-cart-check-fill menu-icon"></i>
-          <span class="menu-text" *ngIf="!isSidebarCollapsed">POS Counter</span>
-          <span class="badge-pos-pulse" *ngIf="!isSidebarCollapsed">F1</span>
-        </a>
+    <!-- Active Store Badge -->
+    <div class="sidebar-store-pill" *ngIf="!isSidebarCollapsed">
+      <i class="bi bi-shop-window text-emerald"></i>
+      <div class="store-text">
+        <span class="store-label">Active Store</span>
+        <strong class="store-name">{{ activeStoreName }} (#{{ activeStoreId }})</strong>
       </div>
+    </div>
 
-      <!-- DASHBOARD LINK -->
+    <!-- Sidebar Navigation Items -->
+    <nav class="sidebar-nav" (click)="onNavClick($event)">
+      
+      <!-- 1. DASHBOARD -->
       <div class="nav-group">
         <a routerLink="/dashboard" class="menu-item root-item">
-          <i class="bi bi-speedometer2 menu-icon text-primary"></i>
+          <i class="bi bi-grid-1x2-fill menu-icon"></i>
           <span class="menu-text" *ngIf="!isSidebarCollapsed">Dashboard</span>
+          <span class="badge-live-pulse" *ngIf="!isSidebarCollapsed">Live</span>
         </a>
       </div>
 
-      <!-- 2. SALES MANAGEMENT -->
+      <!-- 2. POS BILLING COUNTER -->
       <div class="nav-group">
-        <div class="menu-header" (click)="toggleSalesMenu()" [class.expanded]="isSalesMenuOpen" *ngIf="!isSidebarCollapsed">
+        <a routerLink="/pos" class="menu-item root-item">
+          <i class="bi bi-receipt-cutoff menu-icon text-warning"></i>
+          <span class="menu-text" *ngIf="!isSidebarCollapsed">POS Billing Counter</span>
+        </a>
+      </div>
+
+      <!-- 3. SALES MENU -->
+      <div class="nav-group">
+        <div class="menu-header" (click)="toggleSalesMenu($event)" [class.expanded]="isSalesMenuOpen" *ngIf="!isSidebarCollapsed">
           <div class="header-left">
-            <i class="bi bi-receipt header-icon text-indigo"></i>
+            <i class="bi bi-cart-check-fill header-icon text-success"></i>
             <span>Sales Management</span>
           </div>
           <i class="bi bi-chevron-down chevron-icon" [class.rotate]="isSalesMenuOpen"></i>
         </div>
 
-        <a *ngIf="isSidebarCollapsed" (click)="openSalesFromCollapsed()" class="menu-item root-item" style="cursor: pointer;" title="Sales Management">
-          <i class="bi bi-receipt menu-icon text-indigo"></i>
+        <a *ngIf="isSidebarCollapsed" (click)="openSalesFromCollapsed($event)" class="menu-item root-item" style="cursor: pointer;" title="Sales Management">
+          <i class="bi bi-cart-check-fill menu-icon text-success"></i>
         </a>
 
         <div class="sub-menu" *ngIf="isSalesMenuOpen && !isSidebarCollapsed">
-          <a routerLink="/sales-transactions" class="sub-menu-item">
-            <i class="bi bi-cash-coin sub-icon text-primary"></i>
-            <span>Sales Transaction</span>
-          </a>
-          <a routerLink="/sales-orders" class="sub-menu-item">
-            <i class="bi bi-journal-text sub-icon text-info"></i>
-            <span>Sales Order</span>
-          </a>
-          <a routerLink="/sales-suspended" class="sub-menu-item">
-            <i class="bi bi-pause-circle-fill sub-icon text-warning"></i>
-            <span>Order Suspended</span>
-          </a>
           <a routerLink="/sales-completed" class="sub-menu-item">
             <i class="bi bi-check-circle-fill sub-icon text-success"></i>
             <span>Completed</span>
+          </a>
+          <a routerLink="/sales-suspended" class="sub-menu-item">
+            <i class="bi bi-pause-circle-fill sub-icon text-warning"></i>
+            <span>Suspended</span>
           </a>
           <a routerLink="/sales-exchange" class="sub-menu-item">
             <i class="bi bi-arrow-repeat sub-icon text-purple"></i>
@@ -82,12 +75,12 @@
           </a>
           <a routerLink="/sales-returns" class="sub-menu-item">
             <i class="bi bi-arrow-counterclockwise sub-icon text-danger"></i>
-            <span>Return and Refund</span>
+            <span>Return</span>
           </a>
         </div>
       </div>
 
-      <!-- 3. PRODUCTS -->
+      <!-- 4. PRODUCTS -->
       <div class="nav-group">
         <a routerLink="/tablets" class="menu-item root-item">
           <i class="bi bi-capsule-pill menu-icon text-emerald"></i>
@@ -95,9 +88,9 @@
         </a>
       </div>
 
-      <!-- 4. PURCHASE MANAGEMENT -->
+      <!-- 5. PURCHASE MENU -->
       <div class="nav-group">
-        <div class="menu-header" (click)="togglePurchaseMenu()" [class.expanded]="isPurchaseMenuOpen" *ngIf="!isSidebarCollapsed">
+        <div class="menu-header" (click)="togglePurchaseMenu($event)" [class.expanded]="isPurchaseMenuOpen" *ngIf="!isSidebarCollapsed">
           <div class="header-left">
             <i class="bi bi-bag-check-fill header-icon" style="color: #f59e0b;"></i>
             <span>Purchase Management</span>
@@ -105,7 +98,7 @@
           <i class="bi bi-chevron-down chevron-icon" [class.rotate]="isPurchaseMenuOpen"></i>
         </div>
 
-        <a *ngIf="isSidebarCollapsed" (click)="isSidebarCollapsed = false; isPurchaseMenuOpen = true" class="menu-item root-item" style="cursor: pointer;" title="Purchase Management">
+        <a *ngIf="isSidebarCollapsed" (click)="openPurchaseFromCollapsed($event)" class="menu-item root-item" style="cursor: pointer;" title="Purchase Management">
           <i class="bi bi-bag-check-fill menu-icon" style="color: #f59e0b;"></i>
         </a>
 
@@ -121,9 +114,9 @@
         </div>
       </div>
 
-      <!-- 5. SUPPLIER MANAGEMENT (DEDICATED TOP-LEVEL MODULE) -->
+      <!-- 6. SUPPLIER MANAGEMENT (ACTIVE) -->
       <div class="nav-group">
-        <div class="menu-header" (click)="toggleSupplierMenu()" [class.expanded]="isSupplierMenuOpen" *ngIf="!isSidebarCollapsed">
+        <div class="menu-header" (click)="toggleSupplierMenu($event)" [class.expanded]="isSupplierMenuOpen" *ngIf="!isSidebarCollapsed">
           <div class="header-left">
             <i class="bi bi-truck header-icon" style="color: #0284c7;"></i>
             <span>Supplier Management</span>
@@ -131,7 +124,7 @@
           <i class="bi bi-chevron-down chevron-icon" [class.rotate]="isSupplierMenuOpen"></i>
         </div>
 
-        <a *ngIf="isSidebarCollapsed" (click)="openSupplierFromCollapsed()" class="menu-item root-item" style="cursor: pointer;" title="Supplier Management">
+        <a *ngIf="isSidebarCollapsed" (click)="openSupplierFromCollapsed($event)" class="menu-item root-item" style="cursor: pointer;" title="Supplier Management">
           <i class="bi bi-truck menu-icon" style="color: #0284c7;"></i>
         </a>
 
@@ -147,7 +140,7 @@
         </div>
       </div>
 
-      <!-- 5. AI CLINICAL ASSISTANT -->
+      <!-- 7. AI CLINICAL ASSISTANT -->
       <div class="nav-group">
         <a routerLink="/ai-assistant" class="menu-item root-item" title="AI Medical Assistant">
           <i class="bi bi-robot menu-icon" style="color: #a855f7;"></i>
@@ -156,9 +149,9 @@
         </a>
       </div>
 
-      <!-- 6. PATIENT MANAGEMENT -->
+      <!-- 8. PATIENT MANAGEMENT -->
       <div class="nav-group">
-        <div class="menu-header" (click)="togglePatientMenu()" [class.expanded]="isPatientMenuOpen" *ngIf="!isSidebarCollapsed">
+        <div class="menu-header" (click)="togglePatientMenu($event)" [class.expanded]="isPatientMenuOpen" *ngIf="!isSidebarCollapsed">
           <div class="header-left">
             <i class="bi bi-person-vcard-fill header-icon"></i>
             <span>Patient Management</span>
@@ -166,7 +159,7 @@
           <i class="bi bi-chevron-down chevron-icon" [class.rotate]="isPatientMenuOpen"></i>
         </div>
 
-        <a *ngIf="isSidebarCollapsed" (click)="openPatientFromCollapsed()" class="menu-item root-item" style="cursor: pointer;" title="Patient Management">
+        <a *ngIf="isSidebarCollapsed" (click)="openPatientFromCollapsed($event)" class="menu-item root-item" style="cursor: pointer;" title="Patient Management">
           <i class="bi bi-person-vcard-fill menu-icon"></i>
         </a>
 
@@ -174,163 +167,209 @@
           <a routerLink="/patients" class="sub-menu-item">
             <i class="bi bi-people-fill sub-icon"></i>
             <span>Patient List</span>
+            <span class="count-badge">{{ totalPatientsCount }}</span>
           </a>
           <a routerLink="/patient-registration" class="sub-menu-item">
             <i class="bi bi-person-plus-fill sub-icon text-success"></i>
             <span>Add Patient</span>
           </a>
+          <a routerLink="/patients" class="sub-menu-item">
+            <i class="bi bi-file-earmark-text-fill sub-icon text-warning"></i>
+            <span>Patient Draft</span>
+            <span class="count-badge badge-warning" *ngIf="draftsCount > 0">{{ draftsCount }}</span>
+          </a>
+          <a routerLink="/dashboard" class="sub-menu-item">
+            <i class="bi bi-graph-up-arrow sub-icon text-primary"></i>
+            <span>Patient Analysis</span>
+          </a>
         </div>
       </div>
 
-      <!-- 7. DOCTOR MANAGEMENT -->
+      <!-- 9. DOCTOR MANAGEMENT -->
       <div class="nav-group">
-        <div class="menu-header" (click)="toggleDoctorMenu()" [class.expanded]="isDoctorMenuOpen" *ngIf="!isSidebarCollapsed">
+        <div class="menu-header" (click)="toggleDoctorMenu($event)" [class.expanded]="isDoctorMenuOpen" *ngIf="!isSidebarCollapsed">
           <div class="header-left">
-            <i class="bi bi-heart-pulse-fill header-icon text-danger"></i>
+            <i class="bi bi-person-badge-fill header-icon text-cyan"></i>
             <span>Doctor Management</span>
           </div>
           <i class="bi bi-chevron-down chevron-icon" [class.rotate]="isDoctorMenuOpen"></i>
         </div>
 
-        <a *ngIf="isSidebarCollapsed" (click)="openDoctorFromCollapsed()" class="menu-item root-item" style="cursor: pointer;" title="Doctor Management">
-          <i class="bi bi-heart-pulse-fill menu-icon text-danger"></i>
+        <a *ngIf="isSidebarCollapsed" (click)="openDoctorFromCollapsed($event)" class="menu-item root-item" style="cursor: pointer;" title="Doctor Management">
+          <i class="bi bi-person-badge-fill menu-icon" style="color: #06b6d4;"></i>
         </a>
 
         <div class="sub-menu" *ngIf="isDoctorMenuOpen && !isSidebarCollapsed">
           <a routerLink="/doctors" class="sub-menu-item">
-            <i class="bi bi-person-lines-fill sub-icon"></i>
-            <span>Doctor Directory</span>
+            <i class="bi bi-person-lines-fill sub-icon text-cyan"></i>
+            <span>Doctor List</span>
           </a>
-          <a routerLink="/doctor-registration" class="sub-menu-item">
-            <i class="bi bi-person-plus sub-icon text-success"></i>
+          <a routerLink="/add-doctor" class="sub-menu-item">
+            <i class="bi bi-person-plus-fill sub-icon text-success"></i>
             <span>Add Doctor</span>
           </a>
         </div>
       </div>
 
-      <!-- 8. SETTINGS & CONFIG -->
+      <!-- 10. USER MANAGEMENT -->
       <div class="nav-group">
-        <div class="menu-header" (click)="toggleSettingsMenu()" [class.expanded]="isSettingsMenuOpen" *ngIf="!isSidebarCollapsed">
+        <div class="menu-header" (click)="toggleUserMenu($event)" [class.expanded]="isUserMenuOpen" *ngIf="!isSidebarCollapsed">
+          <div class="header-left">
+            <i class="bi bi-person-gear header-icon"></i>
+            <span>User Management</span>
+          </div>
+          <i class="bi bi-chevron-down chevron-icon" [class.rotate]="isUserMenuOpen"></i>
+        </div>
+
+        <a *ngIf="isSidebarCollapsed" (click)="openUserFromCollapsed($event)" class="menu-item root-item" style="cursor: pointer;" title="User Management">
+          <i class="bi bi-person-gear menu-icon"></i>
+        </a>
+
+        <div class="sub-menu" *ngIf="isUserMenuOpen && !isSidebarCollapsed">
+          <a routerLink="/users" class="sub-menu-item">
+            <i class="bi bi-people sub-icon"></i>
+            <span>User List</span>
+            <span class="count-badge">{{ totalUsersCount }}</span>
+          </a>
+          <a routerLink="/access" class="sub-menu-item">
+            <i class="bi bi-key-fill sub-icon text-info"></i>
+            <span>Access</span>
+            <span class="count-badge" style="background: #0284c7;">DB</span>
+          </a>
+          <a routerLink="/roles" class="sub-menu-item">
+            <i class="bi bi-shield-check sub-icon text-emerald"></i>
+            <span>Role</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- 11. SETTINGS -->
+      <div class="nav-group">
+        <div class="menu-header" (click)="toggleSettingsMenu($event)" [class.expanded]="isSettingsMenuOpen" *ngIf="!isSidebarCollapsed">
           <div class="header-left">
             <i class="bi bi-gear-fill header-icon text-secondary"></i>
-            <span>Administration</span>
+            <span>Settings</span>
           </div>
           <i class="bi bi-chevron-down chevron-icon" [class.rotate]="isSettingsMenuOpen"></i>
         </div>
 
-        <a *ngIf="isSidebarCollapsed" (click)="openSettingsFromCollapsed()" class="menu-item root-item" style="cursor: pointer;" title="Administration">
-          <i class="bi bi-gear-fill menu-icon text-secondary"></i>
+        <a *ngIf="isSidebarCollapsed" (click)="openSettingsFromCollapsed($event)" class="menu-item root-item" style="cursor: pointer;" title="Settings">
+          <i class="bi bi-gear-fill menu-icon"></i>
         </a>
 
         <div class="sub-menu" *ngIf="isSettingsMenuOpen && !isSidebarCollapsed">
-          <a routerLink="/users" class="sub-menu-item">
-            <i class="bi bi-people sub-icon"></i>
-            <span>User Management</span>
-          </a>
-          <a routerLink="/roles" class="sub-menu-item">
-            <i class="bi bi-shield-check sub-icon"></i>
-            <span>Role Settings</span>
-          </a>
-          <a routerLink="/access" class="sub-menu-item">
-            <i class="bi bi-lock-fill sub-icon"></i>
-            <span>Access Settings</span>
-          </a>
           <a routerLink="/settings" class="sub-menu-item">
-            <i class="bi bi-shop sub-icon"></i>
-            <span>Store Settings</span>
+            <i class="bi bi-shop-window sub-icon text-emerald"></i>
+            <span>Store Configuration</span>
+          </a>
+          <a routerLink="/category" class="sub-menu-item">
+            <i class="bi bi-tags-fill sub-icon text-primary"></i>
+            <span>Category</span>
+            <span class="count-badge" style="background: #2563eb;">DB</span>
           </a>
           <a routerLink="/tax" class="sub-menu-item">
-            <i class="bi bi-percent sub-icon"></i>
-            <span>Tax Settings</span>
+            <i class="bi bi-percent sub-icon text-warning"></i>
+            <span>Tax</span>
+            <span class="count-badge" style="background: #059669;">DB</span>
           </a>
           <a routerLink="/warehouse" class="sub-menu-item">
-            <i class="bi bi-building-gear sub-icon"></i>
+            <i class="bi bi-building-gear sub-icon text-info"></i>
             <span>Warehouse</span>
+            <span class="count-badge" style="background: #0284c7;">DB</span>
           </a>
           <a routerLink="/brand" class="sub-menu-item">
-            <i class="bi bi-tag-fill sub-icon"></i>
-            <span>Brand Settings</span>
-          </a>
-          <a routerLink="/category-settings" class="sub-menu-item">
-            <i class="bi bi-grid-fill sub-icon"></i>
-            <span>Category Settings</span>
+            <i class="bi bi-award-fill sub-icon text-purple"></i>
+            <span>Brand</span>
+            <span class="count-badge" style="background: #9333ea;">DB</span>
           </a>
           <a routerLink="/rack" class="sub-menu-item">
-            <i class="bi bi-box-seam sub-icon"></i>
-            <span>Rack Config</span>
+            <i class="bi bi-box-seam sub-icon text-danger"></i>
+            <span>Rack</span>
+            <span class="count-badge" style="background: #dc2626;">DB</span>
+          </a>
+          <a routerLink="/branch" class="sub-menu-item">
+            <i class="bi bi-diagram-3-fill sub-icon text-teal"></i>
+            <span>Branch</span>
+            <span class="count-badge" style="background: #0d9488;">DB</span>
           </a>
         </div>
       </div>
 
     </nav>
 
-    <!-- Sidebar Footer / User Profile -->
-    <div class="sidebar-footer" *ngIf="!isSidebarCollapsed">
-      <div class="user-info-card">
-        <div class="user-avatar">
-          <i class="bi bi-person-fill"></i>
+    <!-- Sidebar Footer (User Info & Logout) -->
+    <div class="sidebar-footer">
+      <div class="user-brief" *ngIf="!isSidebarCollapsed">
+        <div class="user-avatar-sm">
+          {{ (loggedInUser || 'A').charAt(0).toUpperCase() }}
         </div>
-        <div class="user-details">
-          <span class="user-name">{{ loggedInUser }}</span>
-          <span class="user-role">{{ userRole }}</span>
+        <div class="user-details-sm">
+          <span class="u-name">{{ loggedInUser }}</span>
+          <span class="u-role">{{ userRole }}</span>
         </div>
       </div>
+
+      <button type="button" class="sidebar-logout-btn" (click)="logout()" title="Sign Out">
+        <i class="bi bi-box-arrow-right"></i>
+        <span *ngIf="!isSidebarCollapsed">Logout</span>
+      </button>
     </div>
+
   </aside>
 
-  <!-- ======================================================== -->
-  <!-- 2. MAIN CONTENT AREA                                     -->
-  <!-- ======================================================== -->
+  <!-- ================= RIGHT MAIN CONTENT AREA ================= -->
   <main class="app-main-content">
     
-    <!-- Top Bar Navigation Card -->
+    <!-- Top Navigation Card (IDENTICAL TO DASHBOARD & PURCHASE & TABLETS) -->
     <header class="top-nav-card">
-      <div class="nav-left">
-        <button class="btn-sidebar-toggle-mobile" (click)="toggleSidebar()">
+      <div class="top-nav-left">
+        <button type="button" class="btn-sidebar-toggle" (click)="toggleSidebar($event)" title="Toggle Navigation Menu">
           <i class="bi bi-list"></i>
         </button>
-        <div class="active-store-indicator">
-          <span class="pulse-dot"></span>
-          <span class="store-label">Active Store:</span>
-          <strong class="store-name">{{ activeStoreName }} (#{{ activeStoreId }})</strong>
+        <div class="page-title-wrap">
+          <h2>Supplier Management & Directory</h2>
+          <div class="breadcrumb-sub">
+            <span>Home</span> / <span>Supplier Management</span> / <strong>Supplier List</strong>
+          </div>
         </div>
       </div>
 
-      <div class="nav-right">
-        <!-- Digital Clock -->
-        <div class="live-clock-badge">
-          <i class="bi bi-clock-history"></i>
+      <!-- Actions & Sync Status -->
+      <div class="top-nav-right">
+        <div class="live-clock-pill">
+          <i class="bi bi-clock-fill text-primary"></i>
           <span>{{ currentDateTime }}</span>
         </div>
 
-        <a routerLink="/pos" class="btn-pos-shortcut" title="Open POS Billing Counter">
-          <i class="bi bi-cart-check-fill"></i>
-          <span>POS Billing (F1)</span>
+        <button 
+          type="button" 
+          class="btn-sync-db" 
+          (click)="loadSuppliers()" 
+          title="Refresh suppliers from database"
+          [disabled]="loading">
+          <i class="bi bi-arrow-clockwise" [class.spin]="loading"></i>
+          <span>Refresh</span>
+        </button>
+
+        <a routerLink="/supplier-registration" class="btn-pos-shortcut" style="background: linear-gradient(135deg, #10b981, #059669); color: #ffffff; border: none;" title="Register New Supplier">
+          <i class="bi bi-person-plus-fill me-1"></i>
+          <span>+ Add Supplier</span>
         </a>
 
-        <a routerLink="/purchase" class="btn-pos-shortcut" title="View Inward Purchases" style="background: rgba(245, 158, 11, 0.12); color: #b45309; border: 1px solid rgba(245, 158, 11, 0.3);">
-          <i class="bi bi-bag-check-fill"></i>
-          <span>Purchase</span>
+        <a routerLink="/pos" class="btn-pos-shortcut" title="Open POS Billing">
+          <i class="bi bi-receipt-cutoff me-1"></i>
+          <span>POS Counter</span>
         </a>
 
-        <!-- Logout Button -->
-        <button class="btn-logout" (click)="logout()" title="Logout of Session">
+        <button type="button" class="btn-sync-db" (click)="logout()" title="Sign Out">
           <i class="bi bi-box-arrow-right"></i>
+          <span>Logout</span>
         </button>
       </div>
     </header>
 
     <!-- Page Content Container -->
     <div class="dashboard-content-container">
-
-      <!-- Breadcrumbs -->
-      <div class="page-breadcrumb-nav">
-        <span class="breadcrumb-item"><i class="bi bi-house-door"></i> Home</span>
-        <i class="bi bi-chevron-right breadcrumb-separator"></i>
-        <span class="breadcrumb-item">Purchase Management</span>
-        <i class="bi bi-chevron-right breadcrumb-separator"></i>
-        <span class="breadcrumb-item active">Supplier Management</span>
-      </div>
 
       <!-- STAT CARDS ROW -->
       <div class="supplier-stats-grid">
@@ -364,17 +403,6 @@
             <span class="stat-label">Inactive / On Hold</span>
             <h3 class="stat-value">{{ inactiveCount }}</h3>
             <span class="stat-desc">Temporarily disabled</span>
-          </div>
-        </div>
-
-        <div class="stat-card">
-          <div class="stat-icon-wrapper purple">
-            <i class="bi bi-cash-stack"></i>
-          </div>
-          <div class="stat-content">
-            <span class="stat-label">Payment Terms</span>
-            <h3 class="stat-value">Net 30d Avg</h3>
-            <span class="stat-desc">Standard procurement cycle</span>
           </div>
         </div>
       </div>
@@ -427,12 +455,11 @@
             <thead>
               <tr>
                 <th style="width: 10%">Code</th>
-                <th style="width: 25%">Supplier Name & GSTIN</th>
+                <th style="width: 27%">Supplier Name & GSTIN</th>
                 <th style="width: 18%">Contact Person</th>
-                <th style="width: 15%">Phone / Email</th>
-                <th style="width: 12%">Location</th>
-                <th style="width: 10%">Payment Terms</th>
-                <th style="width: 10%">Status</th>
+                <th style="width: 17%">Phone / Email</th>
+                <th style="width: 14%">Location</th>
+                <th style="width: 14%">Status</th>
                 <th style="width: 10%; text-align: center;">Actions</th>
               </tr>
             </thead>
@@ -449,6 +476,16 @@
                     <div class="font-bold text-dark">{{ s.name }}</div>
                     <div class="text-xs text-muted" *ngIf="s.gstin">
                       <i class="bi bi-receipt-cutoff"></i> GSTIN: {{ s.gstin }}
+                    </div>
+                    <!-- Attached Compliance Documents Badges -->
+                    <div class="supplier-docs-chips" *ngIf="getDocCount(s) > 0">
+                      <span class="badge-doc-count" (click)="openDocModal(s, $event)" title="Click to view all attached documents">
+                        <i class="bi bi-paperclip"></i> {{ getDocCount(s) }} Docs Attached
+                      </span>
+                      <span class="doc-type-tag" *ngIf="s.gstCertificate || s.gstCertificateName" (click)="openDocModal(s, $event)" title="GST Certificate">GST</span>
+                      <span class="doc-type-tag" *ngIf="s.drugLicenseDoc || s.drugLicenseDocName" (click)="openDocModal(s, $event)" title="Drug License 20B/21B">DL</span>
+                      <span class="doc-type-tag" *ngIf="s.panDoc || s.panDocName" (click)="openDocModal(s, $event)" title="PAN Document">PAN</span>
+                      <span class="doc-type-tag" *ngIf="s.fssaiDoc || s.fssaiDocName" (click)="openDocModal(s, $event)" title="FSSAI License">FSSAI</span>
                     </div>
                   </div>
                 </td>
@@ -481,11 +518,6 @@
                   </div>
                 </td>
 
-                <!-- Payment Terms -->
-                <td>
-                  <span class="badge-terms">{{ s.paymentTerms || 'Net 30 Days' }}</span>
-                </td>
-
                 <!-- Status -->
                 <td>
                   <button 
@@ -502,9 +534,9 @@
                 <!-- Actions -->
                 <td style="text-align: center;">
                   <div class="table-actions">
-                    <button class="btn-action-icon edit-btn" (click)="openEditModal(s)" title="Edit Supplier Details">
-                      <i class="bi bi-pencil-square"></i>
-                    </button>
+                    <a [routerLink]="['/supplier-registration']" [queryParams]="{ id: s.id }" class="btn-action-icon edit-full-btn" title="Full Edit & Regulatory Documents">
+                      <i class="bi bi-file-earmark-medical"></i>
+                    </a>
                     <button class="btn-action-icon delete-btn" (click)="deleteSupplier(s)" title="Delete Supplier">
                       <i class="bi bi-trash3"></i>
                     </button>
@@ -514,7 +546,7 @@
 
               <!-- Empty State -->
               <tr *ngIf="filteredSuppliers.length === 0">
-                <td colspan="8" class="empty-state-cell">
+                <td colspan="7" class="empty-state-cell">
                   <div class="empty-state">
                     <i class="bi bi-truck empty-icon"></i>
                     <h4>No Suppliers Found</h4>
@@ -637,21 +669,12 @@
         </div>
       </div>
 
-      <div class="form-row-2col">
-        <div class="form-group">
-          <label>Payment Terms</label>
-          <select class="modal-select" [(ngModel)]="form.paymentTerms">
-            <option *ngFor="let term of paymentTermOptions" [value]="term">{{ term }}</option>
-          </select>
-        </div>
-
-        <div class="form-group">
-          <label>Status</label>
-          <select class="modal-select" [(ngModel)]="form.status">
-            <option value="ACTIVE">Active</option>
-            <option value="INACTIVE">Inactive</option>
-          </select>
-        </div>
+      <div class="form-group">
+        <label>Status</label>
+        <select class="modal-select" [(ngModel)]="form.status">
+          <option value="ACTIVE">Active</option>
+          <option value="INACTIVE">Inactive</option>
+        </select>
       </div>
 
       <div class="form-group">
@@ -706,6 +729,111 @@
         <i class="bi bi-check2-circle" *ngIf="!saving"></i>
         <span class="spinner-border spinner-border-sm me-1" *ngIf="saving"></span>
         <span>{{ isEditing ? 'Update Supplier' : 'Save Supplier' }}</span>
+      </button>
+    </div>
+
+  </div>
+</div>
+
+<!-- ======================================================== -->
+<!-- 4. ATTACHED DOCUMENTS MODAL & PREVIEW                     -->
+<!-- ======================================================== -->
+<div class="modal-backdrop-overlay" *ngIf="showDocModal" (click)="closeDocModal()">
+  <div class="modal-dialog-container modal-doc-custom" (click)="$event.stopPropagation()">
+    
+    <div class="modal-header-custom">
+      <div class="modal-title-box">
+        <div class="modal-header-icon" style="background: linear-gradient(135deg, #6366f1, #4f46e5); color: #ffffff;">
+          <i class="bi bi-file-earmark-medical"></i>
+        </div>
+        <div>
+          <h3>Attached Regulatory Documents</h3>
+          <p class="modal-subtitle">
+            Vendor: <strong>{{ selectedSupplierForDocs?.name }}</strong> 
+            <span class="badge-code ms-2">{{ selectedSupplierForDocs?.code }}</span>
+          </p>
+        </div>
+      </div>
+      <button class="modal-btn-close" (click)="closeDocModal()">
+        <i class="bi bi-x-lg"></i>
+      </button>
+    </div>
+
+    <div class="modal-body-custom doc-modal-body custom-scrollbar">
+      <!-- Loading indicator -->
+      <div class="doc-loading-banner" *ngIf="docLoading">
+        <span class="spinner-border spinner-border-sm me-2"></span>
+        <span>Loading document data...</span>
+      </div>
+
+      <!-- In-Modal Document Preview Frame -->
+      <div class="doc-preview-container" *ngIf="showDocPreviewModal">
+        <div class="preview-header-bar">
+          <div class="preview-title-wrap">
+            <i class="bi" [ngClass]="isPdf(previewDocName) ? 'bi-file-earmark-pdf-fill text-danger' : 'bi-file-earmark-image-fill text-primary'"></i>
+            <span class="preview-title-text">{{ previewDocTitle }}</span>
+          </div>
+          <div class="preview-actions">
+            <button class="btn-preview-action" (click)="downloadSupplierDoc({ key: '', label: previewDocTitle, name: previewDocName, url: previewDocUrlRaw })" title="Download Document">
+              <i class="bi bi-download"></i> Download
+            </button>
+            <button class="btn-preview-close" (click)="closeDocPreviewModal()" title="Close Preview">
+              <i class="bi bi-x-lg"></i> Close Preview
+            </button>
+          </div>
+        </div>
+
+        <div class="preview-viewport-box custom-scrollbar">
+          <iframe 
+            *ngIf="isPdf(previewDocName) && safeDocPreviewUrl" 
+            [src]="safeDocPreviewUrl" 
+            class="doc-iframe"
+            title="PDF Preview"
+          ></iframe>
+          <div class="image-preview-center" *ngIf="!isPdf(previewDocName) && previewDocUrlRaw">
+            <img [src]="previewDocUrlRaw" alt="Document Preview" class="doc-img-fluid" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Document List Grid -->
+      <div class="attached-docs-grid" *ngIf="attachedDocsList.length > 0">
+        <div class="doc-card-item" *ngFor="let doc of attachedDocsList">
+          <div class="doc-card-icon">
+            <i class="bi" [ngClass]="isPdf(doc.name) ? 'bi-file-earmark-pdf-fill text-danger' : 'bi-file-earmark-image-fill text-primary'"></i>
+          </div>
+          <div class="doc-card-details">
+            <div class="doc-card-label">{{ doc.label }}</div>
+            <div class="doc-card-filename text-truncate" [title]="doc.name">{{ doc.name }}</div>
+          </div>
+          <div class="doc-card-actions">
+            <button class="btn-doc-view" (click)="viewSupplierDoc(doc, $event)" title="View Preview">
+              <i class="bi bi-eye"></i> View
+            </button>
+            <button class="btn-doc-download" (click)="downloadSupplierDoc(doc, $event)" title="Download">
+              <i class="bi bi-download"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Empty state if no docs -->
+      <div class="doc-empty-state" *ngIf="attachedDocsList.length === 0">
+        <i class="bi bi-folder2-open empty-icon"></i>
+        <h5>No Documents Attached</h5>
+        <p>This supplier currently has no regulatory or compliance certificates uploaded.</p>
+        <a [routerLink]="['/supplier-registration']" [queryParams]="{ id: selectedSupplierForDocs?.id }" (click)="closeDocModal()" class="btn-add-docs-link">
+          <i class="bi bi-cloud-arrow-up"></i> Upload Documents in Supplier Registration
+        </a>
+      </div>
+    </div>
+
+    <div class="modal-footer-custom">
+      <a [routerLink]="['/supplier-registration']" [queryParams]="{ id: selectedSupplierForDocs?.id }" (click)="closeDocModal()" class="btn-edit-docs-link">
+        <i class="bi bi-pencil-square"></i> Open Full Edit to Add / Replace Documents
+      </a>
+      <button class="btn-modal-cancel" (click)="closeDocModal()">
+        Close
       </button>
     </div>
 

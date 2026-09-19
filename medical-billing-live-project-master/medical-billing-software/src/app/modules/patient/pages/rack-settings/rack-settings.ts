@@ -7,7 +7,7 @@ import { Component, HostListener } from '@angular/core';
   styleUrl: './rack-settings.css',
 })
 export class RackSettings {
-  isSidebarCollapsed = false;
+  isSidebarCollapsed = true;
   isSupplierMenuOpen = false;
   isPurchaseMenuOpen = false;
 
@@ -16,8 +16,8 @@ export class RackSettings {
   }
 
   openSupplierFromCollapsed(): void {
-    this.isSidebarCollapsed = false;
-    this.isSupplierMenuOpen = true;
+    this.isSidebarCollapsed = true;
+    this.isSupplierMenuOpen = false;
   }
 
   @HostListener('document:click', ['$event'])
@@ -28,6 +28,7 @@ export class RackSettings {
     
     if (sidebar && !sidebar.contains(target) && (!toggleBtn || !toggleBtn.contains(target))) {
       this.closeAllMenus();
+      this.isSidebarCollapsed = true;
     }
   }
 
@@ -41,4 +42,26 @@ export class RackSettings {
     if (typeof self.isPurchaseMenuOpen !== 'undefined') self.isPurchaseMenuOpen = false;
     if (typeof self.isSupplierMenuOpen !== 'undefined') self.isSupplierMenuOpen = false;
   }
+
+  closeSidebarOnNavigate(): void {
+    this.isSidebarCollapsed = true;
+    this.closeAllMenus();
+  }
+
+  onNavClick(event: MouseEvent): void {
+    const target = event.target as HTMLElement;
+    const link = target.closest('a[routerLink], a.sub-menu-item');
+    if (link) {
+      this.closeSidebarOnNavigate();
+    }
+  }
+
+
+  toggleSidebar(): void {
+    this.isSidebarCollapsed = !this.isSidebarCollapsed;
+    if (this.isSidebarCollapsed) {
+      this.closeAllMenus();
+    }
+  }
 }
+

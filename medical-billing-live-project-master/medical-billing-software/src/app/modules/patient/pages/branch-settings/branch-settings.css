@@ -164,3 +164,30 @@
 .btn-cancel { padding: 8px 16px; border: 1px solid var(--border); background: #fff; border-radius: 6px; font-weight: 600; cursor: pointer; }
 .btn-save { padding: 8px 20px; color: #fff; border: none; border-radius: 6px; font-weight: 700; cursor: pointer; }
 
+
+/* Sidebar scrollbar suppression */
+.app-sidebar,
+.sidebar-nav,
+.nav-group {
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+
+.app-sidebar::-webkit-scrollbar,
+.sidebar-nav::-webkit-scrollbar,
+.nav-group::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+.dashboard-layout-wrapper.sidebar-collapsed .sidebar-nav {
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+
+.dashboard-layout-wrapper.sidebar-collapsed .sidebar-nav::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
