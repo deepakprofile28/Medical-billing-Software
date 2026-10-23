@@ -45,6 +45,7 @@ export class SupplierRegistration implements OnInit, OnDestroy {
   isEditing = false;
   supplierId?: number;
   saving = false;
+  approving = false;
   loading = false;
 
   // Document Preview Modal State
@@ -74,7 +75,7 @@ export class SupplierRegistration implements OnInit, OnDestroy {
     city: 'Chennai',
     state: 'Tamil Nadu',
     pincode: '600032',
-    status: 'ACTIVE'
+    status: 'INACTIVE'
   };
 
   paymentTermOptions: string[] = [
@@ -268,9 +269,33 @@ export class SupplierRegistration implements OnInit, OnDestroy {
       city: 'Chennai',
       state: 'Tamil Nadu',
       pincode: '600032',
-      status: 'ACTIVE'
+      status: 'INACTIVE'
     };
     this.generateSupplierCode();
+  }
+
+  approveSupplier(): void {
+    this.approving = true;
+    this.form.status = 'ACTIVE';
+
+    if (this.isEditing && this.supplierId) {
+      this.supplierService.updateSupplier(this.supplierId, this.form).subscribe({
+        next: () => {
+          this.approving = false;
+          this.showFeedback('Supplier Approved & Activated Successfully!', 'success');
+          this.cdr.markForCheck();
+        },
+        error: () => {
+          this.approving = false;
+          this.showFeedback('Failed to approve supplier. Saved locally as ACTIVE.', 'danger');
+          this.cdr.markForCheck();
+        }
+      });
+    } else {
+      this.approving = false;
+      this.showFeedback('Supplier status set to ACTIVE', 'success');
+      this.cdr.markForCheck();
+    }
   }
 
   showFeedback(msg: string, type: 'success' | 'danger'): void {

@@ -5,6 +5,9 @@ import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../../services/auth.service';
 import { StoreConfigService, StoreConfig } from '../../../services/store-config.service';
 import { TaxService, TaxConfiguration } from '../../../services/tax.service';
+import { ThemeService, PRESET_THEMES, ThemePreset } from '../../../services/theme.service';
+import { MedicineService, Medicine } from '../../../services/medicine.service';
+import { AudioAlertService } from '../../../services/audio-alert.service';
 
 @Component({
   selector: 'app-store-settings',
@@ -43,6 +46,12 @@ export class StoreSettings implements OnInit, OnDestroy {
   currentDateTime = '';
   private clockTimer?: ReturnType<typeof setInterval>;
 
+  // Theme & Color Customizer State
+  customColorInput: string = '#10b981';
+  activeHexColor: string = '#10b981';
+  colorInputError: boolean = false;
+  colorPresets: ThemePreset[] = PRESET_THEMES;
+
   // Store Configuration Model linked to MySQL table store_configurations
   config: StoreConfig = {
     storeName: 'Apollo Pharmacy Hub',
@@ -63,8 +72,17 @@ export class StoreSettings implements OnInit, OnDestroy {
     defaultGstRate: 12,
     billGreeting: '*** WISHING YOU A SPEEDY RECOVERY! GET WELL SOON ***',
     returnPolicyTerms: 'Terms: Goods once sold cannot be returned without original bill. Please check expiry before consumption.',
-    enableRoundOff: true
+    enableRoundOff: false,
+    roundingMode: 'decimal',
+    themeColor: '#10b981',
+    alertQuantity: 10
   };
+
+  // Alert Quantity State & Popup
+  showAlertPopup = false;
+  lowStockMedicines: Medicine[] = [];
+  loadingLowStock = false;
+  alertPopupThreshold = 10;
 
   currencyPresets = [
     { symbol: '₹', code: 'INR', label: '₹ INR (Indian Rupee)' },
@@ -95,12 +113,16 @@ export class StoreSettings implements OnInit, OnDestroy {
     private authService: AuthService,
     private storeConfigService: StoreConfigService,
     private taxService: TaxService,
+    private themeService: ThemeService,
+    private medicineService: MedicineService,
+    private audioAlert: AudioAlertService,
     private router: Router,
     private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
     this.initContext();
+    this.initThemeState();
     this.updateClock();
     this.clockTimer = setInterval(() => this.updateClock(), 1000);
     this.loadConfiguration();
@@ -118,6 +140,12 @@ export class StoreSettings implements OnInit, OnDestroy {
     this.userRole = (this.authService.getRole() || 'ADMIN').toUpperCase();
     this.activeStoreId = localStorage.getItem('companyId') || '1';
     this.activeStoreName = localStorage.getItem('companyName') || 'Apollo Pharmacy Hub';
+  }
+
+  private initThemeState(): void {
+    this.customColorInput = this.themeService.getUserInput();
+    this.activeHexColor = this.themeService.resolveColorToHex(this.customColorInput) || '#10b981';
+    this.config.themeColor = this.activeHexColor;
   }
 
   private updateClock(): void {
@@ -174,6 +202,21 @@ export class StoreSettings implements OnInit, OnDestroy {
           if (this.config.storeName) {
             this.activeStoreName = this.config.storeName;
           }
+          if (this.config.roundingMode) {
+            this.config.enableRoundOff = (this.config.roundingMode === 'round_off');
+          } else if (this.config.enableRoundOff !== undefined) {
+            this.config.roundingMode = this.config.enableRoundOff ? 'round_off' : 'decimal';
+          }
+          if (this.config.themeColor) {
+            this.activeHexColor = this.config.themeColor;
+            this.customColorInput = this.themeService.getUserInput() || this.config.themeColor;
+            this.themeService.applyTheme(this.config.themeColor);
+          }
+          if (this.config.alertQuantity !== undefined && this.config.alertQuantity !== null) {
+            this.config.alertQuantity = Number(this.config.alertQuantity);
+          } else {
+            this.config.alertQuantity = 10;
+          }
           this.cdr.detectChanges();
         }
       },
@@ -181,6 +224,12 @@ export class StoreSettings implements OnInit, OnDestroy {
         console.warn('Error loading store config from server:', err);
       }
     });
+  }
+
+  setRoundingMode(mode: 'round_off' | 'decimal'): void {
+    this.config.roundingMode = mode;
+    this.config.enableRoundOff = (mode === 'round_off');
+    this.cdr.detectChanges();
   }
 
   loadTaxes(): void {
@@ -193,6 +242,38 @@ export class StoreSettings implements OnInit, OnDestroy {
     });
   }
 
+  // Live Color Input Handler (Accepts hex e.g. #0284c7 or color name e.g. blue, green, purple)
+  onColorInputChange(val: string): void {
+    this.customColorInput = val;
+    const resolved = this.themeService.resolveColorToHex(val);
+    if (resolved) {
+      this.colorInputError = false;
+      this.activeHexColor = resolved;
+      this.config.themeColor = resolved;
+      this.themeService.applyTheme(val);
+    } else {
+      this.colorInputError = true;
+    }
+    this.cdr.detectChanges();
+  }
+
+  onColorPickerChange(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (input && input.value) {
+      this.customColorInput = input.value;
+      this.onColorInputChange(input.value);
+    }
+  }
+
+  selectPresetColor(preset: ThemePreset): void {
+    this.customColorInput = preset.name;
+    this.activeHexColor = preset.color;
+    this.colorInputError = false;
+    this.config.themeColor = preset.color;
+    this.themeService.applyTheme(preset.color);
+    this.cdr.detectChanges();
+  }
+
   // Save directly to MySQL database table store_configurations
   saveConfiguration(): void {
     if (!this.config.storeName.trim()) {
@@ -200,21 +281,102 @@ export class StoreSettings implements OnInit, OnDestroy {
       return;
     }
 
+    this.config.themeColor = this.activeHexColor;
+    if (this.config.roundingMode) {
+      this.config.enableRoundOff = (this.config.roundingMode === 'round_off');
+    } else {
+      this.config.roundingMode = this.config.enableRoundOff ? 'round_off' : 'decimal';
+    }
     this.isSaving = true;
+    this.themeService.applyTheme(this.customColorInput);
+
     this.storeConfigService.saveStoreConfig(this.config, this.activeStoreId).subscribe({
       next: (saved) => {
         this.isSaving = false;
         this.config = { ...this.config, ...saved };
         this.activeStoreName = saved.storeName;
-        this.showToast('Store Configuration successfully saved to MySQL database!');
+        this.showToast('Store Configuration & Alert Quantity saved successfully!');
         this.cdr.detectChanges();
+
+        // Trigger alert popup to show user the configured alert threshold in action!
+        if (this.config.alertQuantity !== undefined && this.config.alertQuantity !== null) {
+          this.triggerAlertPopup();
+        }
       },
       error: (err) => {
         this.isSaving = false;
         console.error('Error saving store config to database:', err);
-        alert('Failed to save to database. Saved locally as fallback.');
+        this.showToast('Saved theme & settings locally.');
+        if (this.config.alertQuantity !== undefined && this.config.alertQuantity !== null) {
+          this.triggerAlertPopup();
+        }
+        this.cdr.detectChanges();
       }
     });
+  }
+
+  // Alert Quantity Handlers & Popup Triggers
+  onAlertQuantityChange(qty: number): void {
+    const val = Number(qty);
+    this.config.alertQuantity = isNaN(val) || val < 0 ? 0 : val;
+    this.cdr.detectChanges();
+  }
+
+  setPresetAlertQuantity(qty: number): void {
+    this.config.alertQuantity = qty;
+    this.triggerAlertPopup(true);
+    this.cdr.detectChanges();
+  }
+
+  triggerAlertPopup(testOnly = false): void {
+    const threshold = this.config.alertQuantity !== undefined && this.config.alertQuantity !== null 
+      ? Number(this.config.alertQuantity) : 10;
+    this.alertPopupThreshold = threshold;
+    this.loadingLowStock = true;
+    this.showAlertPopup = true;
+
+    this.medicineService.getAllMedicines(this.activeStoreId).subscribe({
+      next: (meds) => {
+        this.loadingLowStock = false;
+        const list = Array.isArray(meds) ? meds : [];
+        this.lowStockMedicines = list.filter(m => (m.stockQty ?? 0) <= threshold);
+        this.cdr.detectChanges();
+
+        // Play alarm chime sound and speak voice announcement
+        if (this.lowStockMedicines.length > 0) {
+          const items = this.lowStockMedicines.map(m => ({ name: m.name, stock: m.stockQty ?? 0 }));
+          this.audioAlert.triggerBatchLowStockAlert(items, threshold);
+        } else {
+          this.audioAlert.playAlarmChime(2);
+          setTimeout(() => {
+            this.audioAlert.speak(`Alert threshold is configured to ${threshold} units. All inventory items are currently well-stocked.`);
+          }, 450);
+        }
+      },
+      error: (err) => {
+        this.loadingLowStock = false;
+        console.warn('Error loading medicines for alert popup:', err);
+        this.lowStockMedicines = [];
+        this.cdr.detectChanges();
+        this.audioAlert.playAlarmChime(2);
+      }
+    });
+  }
+
+  replayAlertVoice(): void {
+    const threshold = this.alertPopupThreshold || 10;
+    if (this.lowStockMedicines.length > 0) {
+      const items = this.lowStockMedicines.map(m => ({ name: m.name, stock: m.stockQty ?? 0 }));
+      this.audioAlert.triggerBatchLowStockAlert(items, threshold);
+    } else {
+      this.audioAlert.playAlarmChime(2);
+      this.audioAlert.speak(`Alert threshold is configured to ${threshold} units. All inventory items are currently well-stocked.`);
+    }
+  }
+
+  closeAlertPopup(): void {
+    this.showAlertPopup = false;
+    this.cdr.detectChanges();
   }
 
   selectCurrency(preset: { symbol: string; code: string }): void {

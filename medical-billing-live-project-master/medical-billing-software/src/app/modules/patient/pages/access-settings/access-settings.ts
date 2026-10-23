@@ -427,6 +427,13 @@ export class AccessSettings implements OnInit, OnDestroy {
     return 0;
   }
 
+  getTotalModulesCount(): number {
+    if (!this.permissionSections || this.permissionSections.length === 0) {
+      return this.accessService.getDefaultSections().reduce((acc, sec) => acc + sec.rows.length, 0);
+    }
+    return this.permissionSections.reduce((acc, sec) => acc + sec.rows.length, 0);
+  }
+
   getActiveModuleNames(item: AccessPermission): string[] {
     if (!item.modulePermissions) return [];
     try {

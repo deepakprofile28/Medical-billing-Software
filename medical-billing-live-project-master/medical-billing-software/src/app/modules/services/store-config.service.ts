@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable, tap, catchError, of } from 'rxjs';
+import { ThemeService } from './theme.service';
 
 export interface StoreConfig {
   id?: number;
@@ -23,6 +24,9 @@ export interface StoreConfig {
   billGreeting?: string;
   returnPolicyTerms?: string;
   enableRoundOff?: boolean;
+  roundingMode?: 'round_off' | 'decimal';
+  themeColor?: string;
+  alertQuantity?: number;
   companyId?: number | string;
 }
 
@@ -53,13 +57,19 @@ export class StoreConfigService {
     defaultGstRate: 12,
     billGreeting: '*** WISHING YOU A SPEEDY RECOVERY! GET WELL SOON ***',
     returnPolicyTerms: 'Terms: Goods once sold cannot be returned without original bill. Please check expiry before consumption.',
-    enableRoundOff: true
+    enableRoundOff: false,
+    roundingMode: 'decimal',
+    themeColor: '#10b981',
+    alertQuantity: 10
   };
 
   private configSubject = new BehaviorSubject<StoreConfig>(this.loadCachedConfig());
   public config$ = this.configSubject.asObservable();
 
-  constructor(private http: HttpClient) {}
+  constructor(
+    private http: HttpClient,
+    private themeService: ThemeService
+  ) {}
 
   private loadCachedConfig(): StoreConfig {
     try {
@@ -107,15 +117,32 @@ export class StoreConfigService {
 
   private applyConfig(config: StoreConfig): void {
     const merged = { ...this.defaultConfig, ...config };
+
+    if (merged.roundingMode) {
+      merged.enableRoundOff = merged.roundingMode === 'round_off';
+    } else if (merged.enableRoundOff !== undefined) {
+      merged.roundingMode = merged.enableRoundOff ? 'round_off' : 'decimal';
+    } else {
+      merged.roundingMode = 'decimal';
+      merged.enableRoundOff = false;
+    }
+
     this.configSubject.next(merged);
 
     try {
       localStorage.setItem(this.STORAGE_KEY, JSON.stringify(merged));
+      localStorage.setItem('medbill_rounding_mode', merged.roundingMode);
       if (merged.storeName) {
         localStorage.setItem('companyName', merged.storeName);
       }
       if (merged.currencySymbol) {
         localStorage.setItem('medbill_currency_symbol', merged.currencySymbol);
+      }
+      if (merged.themeColor) {
+        this.themeService.applyTheme(merged.themeColor);
+      }
+      if (merged.alertQuantity !== undefined && merged.alertQuantity !== null) {
+        localStorage.setItem('medbill_alert_quantity', merged.alertQuantity.toString());
       }
     } catch (e) {
       console.warn('Error syncing config to localStorage:', e);
@@ -124,6 +151,15 @@ export class StoreConfigService {
 
   getCurrentConfig(): StoreConfig {
     return this.configSubject.value;
+  }
+
+  getAlertQuantity(): number {
+    const val = this.configSubject.value?.alertQuantity;
+    if (val !== undefined && val !== null && !isNaN(Number(val))) {
+      return Number(val);
+    }
+    const cached = localStorage.getItem('medbill_alert_quantity');
+    return cached && !isNaN(Number(cached)) ? Number(cached) : 10;
   }
 }
 

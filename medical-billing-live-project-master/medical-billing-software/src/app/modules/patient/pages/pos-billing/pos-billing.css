@@ -1716,16 +1716,12 @@
 }
 
 @media print {
-  body * { visibility: hidden; }
   .no-print { display: none !important; }
-  .invoice-modal-backdrop, .invoice-sheet-container {
-    position: absolute; left: 0; top: 0; width: 100%; margin: 0; padding: 0;
-    background: transparent !important;
-  }
-  .invoice-printable-content, .invoice-printable-content * { visibility: visible; }
-  .invoice-printable-content {
-    position: absolute; left: 0; top: 0; width: 100% !important;
-    box-shadow: none !important; padding: 0 !important;
+  .pos-billing-layout,
+  .pos-top-bar,
+  .pos-left-pane,
+  .pos-checkout-panel {
+    display: none !important;
   }
 }
 

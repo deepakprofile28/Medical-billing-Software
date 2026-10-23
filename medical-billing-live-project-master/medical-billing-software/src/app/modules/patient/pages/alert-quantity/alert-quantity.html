@@ -1,0 +1,759 @@
+<div class="dashboard-layout-wrapper" [class.sidebar-collapsed]="isSidebarCollapsed">
+
+  <!-- ================= LEFT SIDEBAR MENU ================= -->
+  <aside class="app-sidebar">
+    
+    <!-- Sidebar Brand Header -->
+    <div class="sidebar-brand">
+      <div class="brand-icon-box">
+        <i class="bi bi-hospital-fill"></i>
+      </div>
+      <div class="brand-details" *ngIf="!isSidebarCollapsed">
+        <h2 class="brand-title">PharmaCare</h2>
+        <span class="brand-subtitle">Clinical & Billing Hub</span>
+      </div>
+    </div>
+
+    <!-- Active Store Badge -->
+    <div class="sidebar-store-pill" *ngIf="!isSidebarCollapsed">
+      <i class="bi bi-shop-window text-emerald"></i>
+      <div class="store-text">
+        <span class="store-label">Active Store</span>
+        <strong class="store-name">{{ activeStoreName }} (#{{ activeStoreId }})</strong>
+      </div>
+    </div>
+
+    <!-- Sidebar Navigation Items -->
+    <nav class="sidebar-nav">
+      
+      <!-- 1. DASHBOARD -->
+      <div class="nav-group">
+        <a routerLink="/dashboard" class="menu-item root-item" title="Dashboard">
+          <i class="bi bi-grid-1x2-fill menu-icon"></i>
+          <span class="menu-text" *ngIf="!isSidebarCollapsed">Dashboard</span>
+          <span class="badge-live-pulse" *ngIf="!isSidebarCollapsed">Live</span>
+        </a>
+      </div>
+
+      <!-- 2. POS BILLING COUNTER -->
+      <div class="nav-group">
+        <a routerLink="/pos" class="menu-item root-item" title="POS Billing Counter">
+          <i class="bi bi-receipt-cutoff menu-icon text-warning"></i>
+          <span class="menu-text" *ngIf="!isSidebarCollapsed">POS Billing Counter</span>
+        </a>
+      </div>
+
+      <!-- SALES MENU -->
+      <div class="nav-group">
+        <div class="menu-header" (click)="toggleSalesMenu($event)" [class.expanded]="isSalesMenuOpen" *ngIf="!isSidebarCollapsed">
+          <div class="header-left">
+            <i class="bi bi-cart-check-fill header-icon text-success"></i>
+            <span>Sales Management</span>
+          </div>
+          <i class="bi bi-chevron-down chevron-icon" [class.rotate]="isSalesMenuOpen"></i>
+        </div>
+
+        <a *ngIf="isSidebarCollapsed" (click)="openSalesFromCollapsed($event)" class="menu-item root-item" style="cursor: pointer;" title="Sales Management">
+          <i class="bi bi-cart-check-fill menu-icon text-success"></i>
+        </a>
+
+        <div class="sub-menu" *ngIf="isSalesMenuOpen && !isSidebarCollapsed">
+          <a routerLink="/sales-completed" class="sub-menu-item">
+            <i class="bi bi-check-circle-fill sub-icon text-success"></i>
+            <span>Completed</span>
+          </a>
+          <a routerLink="/sales-suspended" class="sub-menu-item">
+            <i class="bi bi-pause-circle-fill sub-icon text-warning"></i>
+            <span>Suspended</span>
+          </a>
+          <a routerLink="/sales-exchange" class="sub-menu-item">
+            <i class="bi bi-arrow-repeat sub-icon text-purple"></i>
+            <span>Exchange</span>
+          </a>
+          <a routerLink="/sales-returns" class="sub-menu-item">
+            <i class="bi bi-arrow-counterclockwise sub-icon text-danger"></i>
+            <span>Return</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- PURCHASE MENU (ACTIVE) -->
+      <div class="nav-group">
+        <div class="menu-header" (click)="togglePurchaseMenu($event)" [class.expanded]="isPurchaseMenuOpen" *ngIf="!isSidebarCollapsed">
+          <div class="header-left">
+            <i class="bi bi-bag-check-fill header-icon" style="color: #f59e0b;"></i>
+            <span>Purchase Management</span>
+          </div>
+          <i class="bi bi-chevron-down chevron-icon" [class.rotate]="isPurchaseMenuOpen"></i>
+        </div>
+
+        <a *ngIf="isSidebarCollapsed" (click)="openPurchaseFromCollapsed($event)" class="menu-item root-item" style="cursor: pointer;" title="Purchase Management">
+          <i class="bi bi-bag-check-fill menu-icon" style="color: #f59e0b;"></i>
+        </a>
+
+        <div class="sub-menu" *ngIf="isPurchaseMenuOpen && !isSidebarCollapsed">
+          <a routerLink="/purchase" class="sub-menu-item">
+            <i class="bi bi-cart-plus-fill sub-icon text-info"></i>
+            <span>Purchase</span>
+          </a>
+          <a routerLink="/purchase-returns" class="sub-menu-item">
+            <i class="bi bi-arrow-return-left sub-icon text-danger"></i>
+            <span>Purchase Return</span>
+          </a>
+          <a routerLink="/alert-quantity" routerLinkActive="active" class="sub-menu-item">
+            <i class="bi bi-exclamation-triangle-fill sub-icon text-warning"></i>
+            <span>Alert Quantity</span>
+            <span class="badge-pill-alert" *ngIf="summary.totalAlertsCount > 0">{{ summary.totalAlertsCount }}</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- SUPPLIER MANAGEMENT -->
+      <div class="nav-group">
+        <div class="menu-header" (click)="toggleSupplierMenu($event)" [class.expanded]="isSupplierMenuOpen" *ngIf="!isSidebarCollapsed">
+          <div class="header-left">
+            <i class="bi bi-truck header-icon" style="color: #0284c7;"></i>
+            <span>Supplier Management</span>
+          </div>
+          <i class="bi bi-chevron-down chevron-icon" [class.rotate]="isSupplierMenuOpen"></i>
+        </div>
+
+        <a *ngIf="isSidebarCollapsed" (click)="openSupplierFromCollapsed($event)" class="menu-item root-item" style="cursor: pointer;" title="Supplier Management">
+          <i class="bi bi-truck menu-icon" style="color: #0284c7;"></i>
+        </a>
+
+        <div class="sub-menu" *ngIf="isSupplierMenuOpen && !isSidebarCollapsed">
+          <a routerLink="/supplier-list" class="sub-menu-item">
+            <i class="bi bi-card-list sub-icon text-primary"></i>
+            <span>Supplier List</span>
+          </a>
+          <a routerLink="/supplier-registration" class="sub-menu-item">
+            <i class="bi bi-person-plus-fill sub-icon text-success"></i>
+            <span>Add Supplier</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- 3. PRODUCTS -->
+      <div class="nav-group">
+        <a routerLink="/tablets" class="menu-item root-item" title="Products">
+          <i class="bi bi-capsule-pill menu-icon text-emerald"></i>
+          <span class="menu-text" *ngIf="!isSidebarCollapsed">Products</span>
+        </a>
+      </div>
+
+      <!-- 4. AI CLINICAL ASSISTANT -->
+      <div class="nav-group">
+        <a routerLink="/ai-assistant" class="menu-item root-item" title="AI Medical Assistant">
+          <i class="bi bi-robot menu-icon" style="color: #a855f7;"></i>
+          <span class="menu-text" *ngIf="!isSidebarCollapsed">AI Clinical Assistant</span>
+          <span class="badge-pos-pulse" style="background: #7c3aed;" *ngIf="!isSidebarCollapsed">AI DB</span>
+        </a>
+      </div>
+
+      <!-- 5. PATIENT MANAGEMENT -->
+      <div class="nav-group">
+        <div class="menu-header" (click)="togglePatientMenu($event)" [class.expanded]="isPatientMenuOpen" *ngIf="!isSidebarCollapsed">
+          <div class="header-left">
+            <i class="bi bi-person-vcard-fill header-icon"></i>
+            <span>Patient Management</span>
+          </div>
+          <i class="bi bi-chevron-down chevron-icon" [class.rotate]="isPatientMenuOpen"></i>
+        </div>
+
+        <a *ngIf="isSidebarCollapsed" (click)="openPatientFromCollapsed($event)" class="menu-item root-item" style="cursor: pointer;" title="Patient Management">
+          <i class="bi bi-person-vcard-fill menu-icon"></i>
+        </a>
+
+        <div class="sub-menu" *ngIf="isPatientMenuOpen && !isSidebarCollapsed">
+          <a routerLink="/patients" class="sub-menu-item">
+            <i class="bi bi-people-fill sub-icon"></i>
+            <span>Patient List</span>
+            <span class="count-badge">{{ totalPatientsCount }}</span>
+          </a>
+          <a routerLink="/patient-registration" class="sub-menu-item">
+            <i class="bi bi-person-plus-fill sub-icon text-success"></i>
+            <span>Add Patient</span>
+          </a>
+          <a routerLink="/patient-drafts" class="sub-menu-item">
+            <i class="bi bi-file-earmark-text-fill sub-icon text-warning"></i>
+            <span>Patient Draft</span>
+            <span class="count-badge badge-warning" *ngIf="draftsCount > 0">{{ draftsCount }}</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- 6. DOCTOR MANAGEMENT -->
+      <div class="nav-group">
+        <div class="menu-header" (click)="toggleDoctorMenu($event)" [class.expanded]="isDoctorMenuOpen" *ngIf="!isSidebarCollapsed">
+          <div class="header-left">
+            <i class="bi bi-person-badge-fill header-icon text-cyan"></i>
+            <span>Doctor Management</span>
+          </div>
+          <i class="bi bi-chevron-down chevron-icon" [class.rotate]="isDoctorMenuOpen"></i>
+        </div>
+
+        <a *ngIf="isSidebarCollapsed" (click)="openDoctorFromCollapsed($event)" class="menu-item root-item" style="cursor: pointer;" title="Doctor Management">
+          <i class="bi bi-person-badge-fill menu-icon" style="color: #06b6d4;"></i>
+        </a>
+
+        <div class="sub-menu" *ngIf="isDoctorMenuOpen && !isSidebarCollapsed">
+          <a routerLink="/doctors" class="sub-menu-item">
+            <i class="bi bi-person-lines-fill sub-icon text-cyan"></i>
+            <span>Doctor List</span>
+          </a>
+          <a routerLink="/add-doctor" class="sub-menu-item">
+            <i class="bi bi-person-plus-fill sub-icon text-success"></i>
+            <span>Add Doctor</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- 7. USER MANAGEMENT -->
+      <div class="nav-group">
+        <div class="menu-header" (click)="toggleUserMenu($event)" [class.expanded]="isUserMenuOpen" *ngIf="!isSidebarCollapsed">
+          <div class="header-left">
+            <i class="bi bi-person-gear header-icon"></i>
+            <span>User Management</span>
+          </div>
+          <i class="bi bi-chevron-down chevron-icon" [class.rotate]="isUserMenuOpen"></i>
+        </div>
+
+        <a *ngIf="isSidebarCollapsed" (click)="openUserFromCollapsed($event)" class="menu-item root-item" style="cursor: pointer;" title="User Management">
+          <i class="bi bi-person-gear menu-icon"></i>
+        </a>
+
+        <div class="sub-menu" *ngIf="isUserMenuOpen && !isSidebarCollapsed">
+          <a routerLink="/users" class="sub-menu-item">
+            <i class="bi bi-people sub-icon"></i>
+            <span>User List</span>
+            <span class="count-badge">{{ totalUsersCount }}</span>
+          </a>
+          <a routerLink="/access" class="sub-menu-item">
+            <i class="bi bi-key-fill sub-icon text-info"></i>
+            <span>Access</span>
+            <span class="count-badge" style="background: #0284c7;">DB</span>
+          </a>
+          <a routerLink="/roles" class="sub-menu-item">
+            <i class="bi bi-shield-check sub-icon text-emerald"></i>
+            <span>Role</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- 8. SETTINGS & STORE MENU -->
+      <div class="nav-group">
+        <div class="menu-header" (click)="toggleSettingsMenu($event)" [class.expanded]="isSettingsMenuOpen" *ngIf="!isSidebarCollapsed">
+          <div class="header-left">
+            <i class="bi bi-gear-fill header-icon text-secondary"></i>
+            <span>Settings</span>
+          </div>
+          <i class="bi bi-chevron-down chevron-icon" [class.rotate]="isSettingsMenuOpen"></i>
+        </div>
+
+        <a *ngIf="isSidebarCollapsed" (click)="openSettingsFromCollapsed($event)" class="menu-item root-item" style="cursor: pointer;" title="Settings: Store Config, Category, Tax">
+          <i class="bi bi-gear-fill menu-icon"></i>
+        </a>
+
+        <div class="sub-menu" *ngIf="isSettingsMenuOpen && !isSidebarCollapsed">
+          <a routerLink="/settings" class="sub-menu-item">
+            <i class="bi bi-shop-window sub-icon text-emerald"></i>
+            <span>Store Configuration</span>
+          </a>
+          <a routerLink="/category" class="sub-menu-item">
+            <i class="bi bi-tags-fill sub-icon text-primary"></i>
+            <span>Category</span>
+            <span class="count-badge" style="background: #2563eb;">DB</span>
+          </a>
+          <a routerLink="/tax" class="sub-menu-item">
+            <i class="bi bi-percent sub-icon text-warning"></i>
+            <span>Tax</span>
+            <span class="count-badge" style="background: #059669;">DB</span>
+          </a>
+          <a routerLink="/warehouse" class="sub-menu-item">
+            <i class="bi bi-building-gear sub-icon text-info"></i>
+            <span>Warehouse</span>
+            <span class="count-badge" style="background: #0284c7;">DB</span>
+          </a>
+          <a routerLink="/brand" class="sub-menu-item">
+            <i class="bi bi-award-fill sub-icon text-purple"></i>
+            <span>Brand</span>
+            <span class="count-badge" style="background: #9333ea;">DB</span>
+          </a>
+          <a routerLink="/rack" class="sub-menu-item">
+            <i class="bi bi-box-seam sub-icon text-danger"></i>
+            <span>Rack</span>
+            <span class="count-badge" style="background: #dc2626;">DB</span>
+          </a>
+          <a routerLink="/branch" class="sub-menu-item">
+            <i class="bi bi-diagram-3-fill sub-icon text-teal"></i>
+            <span>Branch</span>
+            <span class="count-badge" style="background: #0d9488;">DB</span>
+          </a>
+        </div>
+      </div>
+
+    </nav>
+
+    <!-- Sidebar Footer -->
+    <div class="sidebar-footer">
+      <div class="user-brief" *ngIf="!isSidebarCollapsed">
+        <div class="user-avatar-sm">
+          {{ (loggedInUser || 'A').charAt(0).toUpperCase() }}
+        </div>
+        <div class="user-details-sm">
+          <span class="u-name">{{ loggedInUser }}</span>
+          <span class="u-role">{{ userRole }}</span>
+        </div>
+      </div>
+
+      <button type="button" class="sidebar-logout-btn" (click)="logout()" title="Logout">
+        <i class="bi bi-box-arrow-right"></i>
+      </button>
+    </div>
+  </aside>
+
+  <!-- ================= RIGHT MAIN CONTENT AREA ================= -->
+  <main class="app-main-content">
+    <!-- Top Navigation Card -->
+    <header class="top-nav-card">
+      <div class="top-nav-left">
+        <button type="button" class="btn-sidebar-toggle" (click)="toggleSidebar($event)" title="Toggle Navigation Menu">
+          <i class="bi bi-list"></i>
+        </button>
+        <div class="page-title-wrap">
+          <h2>Stock Alert Quantity Monitoring</h2>
+          <div class="breadcrumb-sub">
+            <span>Purchase Management</span> / <strong>Alert Quantity & Reorder Control</strong>
+          </div>
+        </div>
+      </div>
+
+      <!-- Actions & Sync Status -->
+      <div class="top-nav-right">
+        <div class="live-clock-pill">
+          <i class="bi bi-clock-fill text-primary"></i>
+          <span>{{ currentDateTime }}</span>
+        </div>
+
+        <button 
+          type="button" 
+          class="btn btn-secondary" 
+          (click)="loadData()" 
+          title="Refresh alert quantities from database"
+          [disabled]="loading">
+          <i class="bi bi-arrow-clockwise" [class.spin]="loading"></i>
+          <span>Refresh</span>
+        </button>
+
+        <button 
+          type="button" 
+          class="btn btn-primary" 
+          (click)="openBulkModal()" 
+          title="Bulk Set Alert Threshold">
+          <i class="bi bi-sliders2-vertical me-1"></i>
+          <span>Bulk Set Threshold</span>
+        </button>
+
+        <a routerLink="/purchase" class="btn btn-secondary" title="Open Purchase Orders">
+          <i class="bi bi-bag-plus-fill me-1 text-warning"></i>
+          <span>Purchase Orders</span>
+        </a>
+
+        <div class="top-user-pill">
+          <div class="avatar-circle">
+            {{ (loggedInUser || 'A').charAt(0).toUpperCase() }}
+          </div>
+          <div class="user-info-text">
+            <strong>{{ loggedInUser }}</strong>
+            <span class="badge-role">{{ userRole }}</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- METRICS SUMMARY CARDS -->
+    <div class="metrics-grid">
+      <!-- 1. Total Products -->
+      <div class="metric-card metric-blue">
+        <div class="metric-icon-wrap">
+          <i class="bi bi-capsule-pill"></i>
+        </div>
+        <div class="metric-content">
+          <span class="metric-title">Tracked Products</span>
+          <h3 class="metric-value">{{ summary.totalProducts }}</h3>
+          <span class="metric-sub">Catalog medicines</span>
+        </div>
+      </div>
+
+      <!-- 2. Out of Stock -->
+      <div class="metric-card metric-red" [class.pulsing-alert]="summary.outOfStockCount > 0" (click)="setStatusFilter('OUT_OF_STOCK')">
+        <div class="metric-icon-wrap">
+          <i class="bi bi-x-octagon-fill"></i>
+        </div>
+        <div class="metric-content">
+          <span class="metric-title">Out of Stock</span>
+          <h3 class="metric-value">{{ summary.outOfStockCount }}</h3>
+          <span class="metric-sub text-danger-sub">Immediate reorder required</span>
+        </div>
+      </div>
+
+      <!-- 3. Low Stock Alert -->
+      <div class="metric-card metric-amber" [class.pulsing-alert]="summary.lowStockCount > 0" (click)="setStatusFilter('LOW_STOCK')">
+        <div class="metric-icon-wrap">
+          <i class="bi bi-exclamation-triangle-fill"></i>
+        </div>
+        <div class="metric-content">
+          <span class="metric-title">Low Stock Alert</span>
+          <h3 class="metric-value">{{ summary.lowStockCount }}</h3>
+          <span class="metric-sub text-warning-sub">Below threshold limit</span>
+        </div>
+      </div>
+
+      <!-- 4. Adequate Stock -->
+      <div class="metric-card metric-green" (click)="setStatusFilter('ADEQUATE')">
+        <div class="metric-icon-wrap">
+          <i class="bi bi-check-circle-fill"></i>
+        </div>
+        <div class="metric-content">
+          <span class="metric-title">Sufficient Stock</span>
+          <h3 class="metric-value">{{ summary.adequateStockCount }}</h3>
+          <span class="metric-sub text-success-sub">Safe inventory level</span>
+        </div>
+      </div>
+
+      <!-- 5. Total Units -->
+      <div class="metric-card metric-purple">
+        <div class="metric-icon-wrap">
+          <i class="bi bi-boxes"></i>
+        </div>
+        <div class="metric-content">
+          <span class="metric-title">Total Units</span>
+          <h3 class="metric-value">{{ summary.totalUnits }}</h3>
+          <span class="metric-sub">Total stock in store</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- FILTER & ACTION TOOLBAR -->
+    <div class="toolbar-panel">
+      <div class="toolbar-left">
+        <!-- Status Tabs -->
+        <div class="status-tab-group">
+          <button class="status-tab" [class.active]="selectedStatusFilter === 'ALL'" (click)="setStatusFilter('ALL')">
+            All Products
+            <span class="tab-badge badge-all">{{ summary.totalProducts }}</span>
+          </button>
+          <button class="status-tab tab-danger" [class.active]="selectedStatusFilter === 'OUT_OF_STOCK'" (click)="setStatusFilter('OUT_OF_STOCK')">
+            <i class="bi bi-x-circle-fill"></i> Out of Stock
+            <span class="tab-badge badge-danger">{{ summary.outOfStockCount }}</span>
+          </button>
+          <button class="status-tab tab-warning" [class.active]="selectedStatusFilter === 'LOW_STOCK'" (click)="setStatusFilter('LOW_STOCK')">
+            <i class="bi bi-exclamation-triangle-fill"></i> Low Stock
+            <span class="tab-badge badge-warning">{{ summary.lowStockCount }}</span>
+          </button>
+          <button class="status-tab tab-success" [class.active]="selectedStatusFilter === 'ADEQUATE'" (click)="setStatusFilter('ADEQUATE')">
+            <i class="bi bi-check-circle-fill"></i> Sufficient
+            <span class="tab-badge badge-success">{{ summary.adequateStockCount }}</span>
+          </button>
+        </div>
+
+        <!-- Search Box -->
+        <div class="search-box">
+          <i class="bi bi-search search-icon"></i>
+          <input type="text" [(ngModel)]="searchQuery" (input)="applyFilters()" placeholder="Search product, generic name, batch, brand..." />
+          <button *ngIf="searchQuery" class="clear-search-btn" (click)="searchQuery=''; applyFilters()">
+            <i class="bi bi-x"></i>
+          </button>
+        </div>
+
+        <!-- Category Filter -->
+        <div class="select-box">
+          <label class="select-label"><i class="bi bi-tags"></i> Category:</label>
+          <select [(ngModel)]="selectedCategory" (change)="applyFilters()">
+            <option *ngFor="let cat of categories" [value]="cat">{{ cat }}</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="toolbar-right">
+        <!-- Sort Select -->
+        <div class="select-box">
+          <label class="select-label"><i class="bi bi-sort-down"></i> Sort:</label>
+          <select [(ngModel)]="sortBy" (change)="applyFilters()">
+            <option value="urgency">Urgency (Out of Stock First)</option>
+            <option value="name">Product Name (A-Z)</option>
+            <option value="stock">Current Stock (Lowest First)</option>
+            <option value="alert">Alert Threshold (Highest First)</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- MAIN TABLE SECTION -->
+    <div class="table-container">
+      <!-- Loading State -->
+      <div class="loading-overlay" *ngIf="loading">
+        <div class="spinner-border text-primary" role="status"></div>
+        <span>Loading inventory alert quantities...</span>
+      </div>
+
+      <!-- Empty State -->
+      <div class="empty-state" *ngIf="!loading && filteredAlerts.length === 0">
+        <i class="bi bi-check2-all empty-icon"></i>
+        <h4>No Products Found</h4>
+        <p *ngIf="selectedStatusFilter !== 'ALL'">No products matching filter <strong>{{ selectedStatusFilter }}</strong>.</p>
+        <p *ngIf="selectedStatusFilter === 'ALL'">No inventory records currently available.</p>
+        <button class="btn btn-secondary" (click)="selectedStatusFilter='ALL'; searchQuery=''; selectedCategory='ALL'; applyFilters()">
+          Reset All Filters
+        </button>
+      </div>
+
+      <!-- Data Table -->
+      <table class="alert-table" *ngIf="!loading && filteredAlerts.length > 0">
+        <thead>
+          <tr>
+            <th style="width: 50px;">#</th>
+            <th>Product Details</th>
+            <th>Category</th>
+            <th>Batch / Expiry</th>
+            <th class="text-center">Current Stock</th>
+            <th class="text-center">Alert Limit</th>
+            <th class="text-center">Stock Status</th>
+            <th class="text-center">Suggested Reorder</th>
+            <th class="text-end" style="width: 220px;">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of filteredAlerts; let i = index" [class.row-out-of-stock]="item.status === 'OUT_OF_STOCK'" [class.row-low-stock]="item.status === 'LOW_STOCK'">
+            <td class="text-muted">{{ i + 1 }}</td>
+
+            <!-- Product Info -->
+            <td>
+              <div class="product-cell">
+                <div class="product-avatar" [ngClass]="{
+                  'avatar-red': item.status === 'OUT_OF_STOCK',
+                  'avatar-amber': item.status === 'LOW_STOCK',
+                  'avatar-green': item.status === 'ADEQUATE'
+                }">
+                  <i class="bi bi-capsule"></i>
+                </div>
+                <div class="product-info">
+                  <span class="product-name">{{ item.name }}</span>
+                  <span class="product-generic" *ngIf="item.genericName">{{ item.genericName }}</span>
+                  <span class="product-brand" *ngIf="item.manufacturer"><i class="bi bi-building"></i> {{ item.manufacturer }}</span>
+                </div>
+              </div>
+            </td>
+
+            <!-- Category -->
+            <td>
+              <span class="category-pill">{{ item.category || 'General' }}</span>
+            </td>
+
+            <!-- Batch & Expiry -->
+            <td>
+              <div class="batch-cell">
+                <span class="batch-no"><i class="bi bi-qr-code"></i> {{ item.batchNo || 'N/A' }}</span>
+                <span class="expiry-date"><i class="bi bi-calendar3"></i> Exp: {{ item.expiryDate || 'N/A' }}</span>
+              </div>
+            </td>
+
+            <!-- Current Stock -->
+            <td class="text-center">
+              <div class="stock-cell">
+                <span class="stock-qty-badge" [ngClass]="{
+                  'stock-zero': item.stockQty === 0,
+                  'stock-low': item.stockQty > 0 && item.stockQty <= item.alertQuantity,
+                  'stock-ok': item.stockQty > item.alertQuantity
+                }">
+                  {{ item.stockQty }}
+                </span>
+                <span class="stock-unit-label">Units</span>
+              </div>
+            </td>
+
+            <!-- Alert Threshold -->
+            <td class="text-center">
+              <div class="threshold-pill" (click)="openEditModal(item)" title="Click to change threshold">
+                <i class="bi bi-bell-fill"></i>
+                <span>{{ item.alertQuantity }}</span>
+                <i class="bi bi-pencil edit-icon-hint"></i>
+              </div>
+            </td>
+
+            <!-- Status Badge -->
+            <td class="text-center">
+              <span *ngIf="item.status === 'OUT_OF_STOCK'" class="badge-status badge-out-of-stock">
+                <i class="bi bi-x-octagon-fill"></i> Out of Stock
+              </span>
+              <span *ngIf="item.status === 'LOW_STOCK'" class="badge-status badge-low-stock">
+                <i class="bi bi-exclamation-triangle-fill"></i> Low Stock Alert
+              </span>
+              <span *ngIf="item.status === 'ADEQUATE'" class="badge-status badge-adequate">
+                <i class="bi bi-check-circle-fill"></i> In Stock
+              </span>
+            </td>
+
+            <!-- Suggested Reorder Qty -->
+            <td class="text-center">
+              <span class="reorder-badge" *ngIf="item.reorderQty > 0">
+                +{{ item.reorderQty }} units
+              </span>
+              <span class="text-muted" *ngIf="item.reorderQty === 0">-</span>
+            </td>
+
+            <!-- Actions -->
+            <td class="text-end">
+              <div class="action-buttons">
+                <!-- Edit Alert Qty -->
+                <button class="btn-action btn-threshold" (click)="openEditModal(item)" title="Set Alert Quantity">
+                  <i class="bi bi-sliders"></i>
+                  <span>Set Limit</span>
+                </button>
+
+                <!-- Reorder Purchase -->
+                <button class="btn-action btn-reorder" (click)="reorderProduct(item)" title="Create Purchase Order">
+                  <i class="bi bi-cart-plus-fill"></i>
+                  <span>Reorder</span>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </main>
+</div>
+
+<!-- ============================================================== -->
+<!-- MODAL 1: EDIT ALERT THRESHOLD FOR A SINGLE PRODUCT            -->
+<!-- ============================================================== -->
+<div class="modal-backdrop" *ngIf="isEditModalOpen" (click)="closeEditModal()">
+  <div class="modal-dialog" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <div class="modal-title-wrap">
+        <i class="bi bi-bell-fill modal-icon text-warning"></i>
+        <h3>Set Alert Quantity Threshold</h3>
+      </div>
+      <button class="modal-close-btn" (click)="closeEditModal()"><i class="bi bi-x-lg"></i></button>
+    </div>
+
+    <div class="modal-body" *ngIf="editingProduct">
+      <div class="product-highlight-card">
+        <div class="highlight-title">{{ editingProduct.name }}</div>
+        <div class="highlight-meta">
+          <span><strong>Category:</strong> {{ editingProduct.category || 'General' }}</span>
+          <span><strong>Batch:</strong> {{ editingProduct.batchNo || 'N/A' }}</span>
+          <span><strong>Current Stock:</strong> <span class="badge" [ngClass]="editingProduct.stockQty === 0 ? 'badge-out-of-stock' : (editingProduct.stockQty <= editingProduct.alertQuantity ? 'badge-low-stock' : 'badge-adequate')">{{ editingProduct.stockQty }} units</span></span>
+        </div>
+      </div>
+
+      <div class="form-group mt-3">
+        <label class="form-label">
+          Alert Quantity Limit (Minimum Threshold)
+          <span class="info-text">When stock drops to or below this number, an alert triggers.</span>
+        </label>
+        <div class="input-with-action">
+          <input type="number" min="0" [(ngModel)]="editAlertQty" class="form-control-lg text-center" />
+        </div>
+      </div>
+
+      <!-- Quick Preset Buttons -->
+      <div class="preset-group mt-2">
+        <span class="preset-label">Quick Presets:</span>
+        <button type="button" class="btn-preset" (click)="setQuickPreset(5)">5</button>
+        <button type="button" class="btn-preset" (click)="setQuickPreset(10)">10</button>
+        <button type="button" class="btn-preset" (click)="setQuickPreset(20)">20</button>
+        <button type="button" class="btn-preset" (click)="setQuickPreset(50)">50</button>
+        <button type="button" class="btn-preset" (click)="setQuickPreset(100)">100</button>
+      </div>
+
+      <div class="alert alert-info mt-3" *ngIf="editAlertQty > 0">
+        <i class="bi bi-info-circle-fill me-1"></i>
+        An alert will be raised whenever <strong>{{ editingProduct.name }}</strong> has <strong>{{ editAlertQty }}</strong> or fewer units remaining.
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary" (click)="closeEditModal()" [disabled]="saving">Cancel</button>
+      <button type="button" class="btn btn-primary" (click)="saveEditThreshold()" [disabled]="saving">
+        <i class="bi bi-check2-circle" *ngIf="!saving"></i>
+        <i class="bi bi-arrow-clockwise spin" *ngIf="saving"></i>
+        {{ saving ? 'Saving...' : 'Update Alert Limit' }}
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================== -->
+<!-- MODAL 2: BULK SET ALERT THRESHOLDS                            -->
+<!-- ============================================================== -->
+<div class="modal-backdrop" *ngIf="isBulkModalOpen" (click)="closeBulkModal()">
+  <div class="modal-dialog" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <div class="modal-title-wrap">
+        <i class="bi bi-sliders2-vertical modal-icon text-primary"></i>
+        <h3>Bulk Set Alert Threshold</h3>
+      </div>
+      <button class="modal-close-btn" (click)="closeBulkModal()"><i class="bi bi-x-lg"></i></button>
+    </div>
+
+    <div class="modal-body">
+      <p class="modal-desc" style="font-size: 0.82rem; color: #64748b; margin-bottom: 14px;">
+        Quickly apply a standard low stock alert threshold across an entire category or all inventory products in this store.
+      </p>
+
+      <div class="form-group mb-3">
+        <label class="form-label">Target Category</label>
+        <select class="form-control" [(ngModel)]="bulkCategory">
+          <option value="ALL">All Categories (Entire Inventory)</option>
+          <ng-container *ngFor="let cat of categories">
+            <option *ngIf="cat !== 'ALL'" [value]="cat">{{ cat }}</option>
+          </ng-container>
+        </select>
+      </div>
+
+      <div class="form-group mb-3">
+        <label class="form-label">New Alert Threshold Limit</label>
+        <input type="number" min="0" [(ngModel)]="bulkAlertQty" class="form-control text-center font-bold" />
+      </div>
+
+      <div class="preset-group mb-3">
+        <span class="preset-label">Presets:</span>
+        <button type="button" class="btn-preset" (click)="bulkAlertQty = 5">5</button>
+        <button type="button" class="btn-preset" (click)="bulkAlertQty = 10">10</button>
+        <button type="button" class="btn-preset" (click)="bulkAlertQty = 15">15</button>
+        <button type="button" class="btn-preset" (click)="bulkAlertQty = 25">25</button>
+        <button type="button" class="btn-preset" (click)="bulkAlertQty = 50">50</button>
+      </div>
+
+      <div class="alert alert-warning">
+        <i class="bi bi-exclamation-triangle-fill me-1"></i>
+        This will update the alert threshold for all matching medicines to <strong>{{ bulkAlertQty }} units</strong>.
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary" (click)="closeBulkModal()" [disabled]="saving">Cancel</button>
+      <button type="button" class="btn btn-primary" (click)="saveBulkThreshold()" [disabled]="saving">
+        <i class="bi bi-check2-circle" *ngIf="!saving"></i>
+        <i class="bi bi-arrow-clockwise spin" *ngIf="saving"></i>
+        {{ saving ? 'Updating...' : 'Apply Bulk Threshold' }}
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================== -->
+<!-- TOAST NOTIFICATION                                             -->
+<!-- ============================================================== -->
+<div class="custom-toast" *ngIf="toastVisible" [ngClass]="'toast-' + toastType">
+  <i class="bi" [ngClass]="{
+    'bi-check-circle-fill': toastType === 'success',
+    'bi-x-circle-fill': toastType === 'error',
+    'bi-info-circle-fill': toastType === 'info'
+  }"></i>
+  <span>{{ toastMessage }}</span>
+</div>
+

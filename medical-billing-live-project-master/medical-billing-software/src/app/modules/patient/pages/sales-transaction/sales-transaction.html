@@ -52,20 +52,28 @@
           <i class="bi bi-cart-check-fill menu-icon text-success"></i>
         </a>
 
-                <div class="sub-menu" *ngIf="isSalesMenuOpen && !isSidebarCollapsed">
-          <a routerLink="/sales-completed" class="sub-menu-item">
-            <i class="bi bi-check-circle-fill sub-icon text-success"></i>
-            <span>Completed</span>
+        <div class="sub-menu" *ngIf="isSalesMenuOpen && !isSidebarCollapsed">
+          <a routerLink="/sales-transactions" routerLinkActive="active" class="sub-menu-item">
+            <i class="bi bi-credit-card-2-front-fill sub-icon text-primary"></i>
+            <span>Transaction</span>
           </a>
-          <a routerLink="/sales-suspended" class="sub-menu-item">
+          <a routerLink="/sales-orders" routerLinkActive="active" class="sub-menu-item">
+            <i class="bi bi-box-seam-fill sub-icon text-info"></i>
+            <span>Order</span>
+          </a>
+          <a routerLink="/sales-suspended" routerLinkActive="active" class="sub-menu-item">
             <i class="bi bi-pause-circle-fill sub-icon text-warning"></i>
             <span>Suspended</span>
           </a>
-          <a routerLink="/sales-exchange" class="sub-menu-item">
+          <a routerLink="/sales-completed" routerLinkActive="active" class="sub-menu-item">
+            <i class="bi bi-check-circle-fill sub-icon text-success"></i>
+            <span>Completed</span>
+          </a>
+          <a routerLink="/sales-exchange" routerLinkActive="active" class="sub-menu-item">
             <i class="bi bi-arrow-repeat sub-icon text-purple"></i>
             <span>Exchange</span>
           </a>
-          <a routerLink="/sales-returns" class="sub-menu-item">
+          <a routerLink="/sales-returns" routerLinkActive="active" class="sub-menu-item">
             <i class="bi bi-arrow-counterclockwise sub-icon text-danger"></i>
             <span>Return</span>
           </a>
@@ -96,6 +104,10 @@
             <i class="bi bi-arrow-return-left sub-icon text-danger"></i>
             <span>Purchase Return</span>
           </a>
+          <a routerLink="/alert-quantity" class="sub-menu-item">
+            <i class="bi bi-exclamation-triangle-fill sub-icon text-warning"></i>
+            <span>Alert Quantity</span>
+          </a>
         </div>
       </div>
 
@@ -114,13 +126,17 @@
         </a>
 
         <div class="sub-menu" *ngIf="isSupplierMenuOpen && !isSidebarCollapsed">
-          <a routerLink="/supplier-list" class="sub-menu-item">
+          <a routerLink="/supplier-list" routerLinkActive="active" class="sub-menu-item">
             <i class="bi bi-card-list sub-icon text-primary"></i>
             <span>Supplier List</span>
           </a>
-          <a routerLink="/supplier-registration" class="sub-menu-item">
+          <a routerLink="/supplier-registration" routerLinkActive="active" class="sub-menu-item">
             <i class="bi bi-person-plus-fill sub-icon text-success"></i>
             <span>Add Supplier</span>
+          </a>
+          <a routerLink="/purchase" routerLinkActive="active" class="sub-menu-item">
+            <i class="bi bi-cart-check-fill sub-icon text-info"></i>
+            <span>Supplier Orders</span>
           </a>
         </div>
       </div>
@@ -201,21 +217,21 @@
 
       <!-- 8. SETTINGS (ACTIVE: WAREHOUSE) -->
       <div class="nav-group">
-        <div class="menu-header expanded" (click)="toggleSettingsMenu($event)" *ngIf="!isSidebarCollapsed">
+        <div class="menu-header" (click)="toggleSettingsMenu($event)" [class.expanded]="isSettingsMenuOpen" *ngIf="!isSidebarCollapsed">
           <div class="header-left">
             <i class="bi bi-gear-fill header-icon text-emerald"></i>
             <span>Settings</span>
           </div>
-          <i class="bi bi-chevron-down chevron-icon rotate"></i>
+          <i class="bi bi-chevron-down chevron-icon" [class.rotate]="isSettingsMenuOpen"></i>
         </div>
-        <a *ngIf="isSidebarCollapsed" (click)="openSettingsFromCollapsed($event)" class="menu-item root-item active" style="cursor: pointer;" title="Settings">
+        <a *ngIf="isSidebarCollapsed" (click)="openSettingsFromCollapsed($event)" class="menu-item root-item" style="cursor: pointer;" title="Settings">
           <i class="bi bi-gear-fill menu-icon"></i>
         </a>
         <div class="sub-menu" *ngIf="isSettingsMenuOpen && !isSidebarCollapsed">
           <a routerLink="/settings" class="sub-menu-item"><i class="bi bi-shop-window sub-icon text-emerald"></i><span>Store Configuration</span></a>
           <a routerLink="/category" class="sub-menu-item"><i class="bi bi-tags-fill sub-icon text-primary"></i><span>Category</span></a>
           <a routerLink="/tax" class="sub-menu-item"><i class="bi bi-percent sub-icon text-warning"></i><span>Tax</span></a>
-          <a routerLink="/warehouse" class="sub-menu-item active"><i class="bi bi-building-gear sub-icon text-info"></i><span>Warehouse</span><span class="count-badge" style="background: #0284c7;">DB</span></a>
+          <a routerLink="/warehouse" routerLinkActive="active" class="sub-menu-item"><i class="bi bi-building-gear sub-icon text-info"></i><span>Warehouse</span><span class="count-badge" style="background: #0284c7;">DB</span></a>
           <a routerLink="/brand" class="sub-menu-item"><i class="bi bi-award-fill sub-icon text-purple"></i><span>Brand</span><span class="count-badge" style="background: #9333ea;">DB</span></a>
           <a routerLink="/rack" class="sub-menu-item">
             <i class="bi bi-box-seam sub-icon text-danger"></i>

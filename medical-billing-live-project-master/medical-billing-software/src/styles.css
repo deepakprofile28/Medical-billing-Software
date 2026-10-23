@@ -1,3 +1,13 @@
+:root {
+  --app-theme-color: #10b981;
+  --app-theme-rgb: 16, 185, 129;
+  --app-theme-dark-1: #052e24;
+  --app-theme-dark-2: #031c16;
+  --app-theme-dark-3: #02120e;
+  --app-theme-hover: #059669;
+  --app-theme-light: #34d399;
+}
+
 html, body {
   margin: 0;
   padding: 0;
@@ -604,4 +614,109 @@ nav.sidebar-nav::-webkit-scrollbar,
 
 .breadcrumb-sub i {
   font-size: 0.65rem;
+}
+
+/* ==========================================================================
+   GLOBAL PRINT RULES (POS INVOICES & MEDICAL BILLS)
+   ========================================================================== */
+@media print {
+  /* Reset document for clean printing */
+  html, body {
+    margin: 0 !important;
+    padding: 0 !important;
+    height: auto !important;
+    min-height: auto !important;
+    overflow: visible !important;
+    background: #ffffff !important;
+    color: #000000 !important;
+  }
+
+  body::before,
+  body::after {
+    display: none !important;
+  }
+
+  /* Hide app shell, sidebar navigation, top cards, panels and UI controls */
+  .dashboard-layout-wrapper,
+  .unified-sidebar,
+  .app-sidebar,
+  .sidebar-nav,
+  .sidebar-footer,
+  .top-nav-card,
+  .pos-top-bar,
+  .pos-left-pane,
+  .pos-checkout-panel,
+  .patient-selector-card,
+  .cart-items-card,
+  .cart-totals-summary,
+  .pos-sales-actions-grid,
+  .btn-complete-sale,
+  .modal-top-actions,
+  .toast-banner,
+  .no-print,
+  button {
+    display: none !important;
+  }
+
+  /* Display ONLY the printable invoice modal content */
+  .invoice-modal-backdrop {
+    position: static !important;
+    display: block !important;
+    background: transparent !important;
+    backdrop-filter: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    width: 100% !important;
+    height: auto !important;
+    overflow: visible !important;
+  }
+
+  .invoice-modal-dialog {
+    box-shadow: none !important;
+    border: none !important;
+    border-radius: 0 !important;
+    max-width: 100% !important;
+    width: 100% !important;
+    max-height: none !important;
+    height: auto !important;
+    overflow: visible !important;
+    background: transparent !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  .invoice-sheet-container {
+    background: transparent !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    overflow: visible !important;
+    display: block !important;
+  }
+
+  .invoice-printable-content,
+  #printable-invoice {
+    display: block !important;
+    visibility: visible !important;
+    position: static !important;
+    box-shadow: none !important;
+    border: none !important;
+    padding: 4px !important;
+    margin: 0 auto !important;
+    background: #ffffff !important;
+    color: #000000 !important;
+  }
+
+  .print-thermal .invoice-printable-content,
+  .print-thermal #printable-invoice {
+    width: 72mm !important;
+    max-width: 72mm !important;
+    font-size: 11.5px !important;
+  }
+
+  .print-a4 .invoice-printable-content,
+  .print-a4 #printable-invoice {
+    width: 100% !important;
+    max-width: 100% !important;
+    font-size: 13px !important;
+  }
 }

@@ -58,7 +58,8 @@ export const COMPLETED_MODULE_SECTIONS: ModuleSection[] = [
     icon: 'bi-cart-plus-fill',
     rows: [
       { code: 'PURCHASE', name: 'Purchase List', route: '/purchase', icon: 'bi-bag-plus-fill', read: true, write: true, update: true, delete: true },
-      { code: 'PURCHASE_RETURN', name: 'Purchase Return', route: '/purchase-returns', icon: 'bi-bag-dash-fill', read: true, write: true, update: true, delete: true }
+      { code: 'PURCHASE_RETURN', name: 'Purchase Return', route: '/purchase-returns', icon: 'bi-bag-dash-fill', read: true, write: true, update: true, delete: true },
+      { code: 'ALERT_QUANTITY', name: 'Alert Quantity', route: '/alert-quantity', icon: 'bi-exclamation-triangle-fill', read: true, write: true, update: true, delete: true }
     ]
   },
   {
@@ -66,7 +67,8 @@ export const COMPLETED_MODULE_SECTIONS: ModuleSection[] = [
     icon: 'bi-truck',
     rows: [
       { code: 'SUPPLIER_LIST', name: 'Supplier List', route: '/supplier-list', icon: 'bi-card-list', read: true, write: true, update: true, delete: true },
-      { code: 'SUPPLIER_REGISTRATION', name: 'Add Supplier', route: '/supplier-registration', icon: 'bi-person-plus-fill', read: true, write: true, update: true, delete: true }
+      { code: 'SUPPLIER_REGISTRATION', name: 'Add Supplier', route: '/supplier-registration', icon: 'bi-person-plus-fill', read: true, write: true, update: true, delete: true },
+      { code: 'SUPPLIER_ORDER', name: 'Supplier Orders', route: '/purchase', icon: 'bi-cart-check-fill', read: true, write: true, update: true, delete: true }
     ]
   },
   {
@@ -90,7 +92,8 @@ export const COMPLETED_MODULE_SECTIONS: ModuleSection[] = [
     title: 'DOCTOR MANAGEMENT',
     icon: 'bi-person-badge-fill',
     rows: [
-      { code: 'DOCTORS', name: 'Doctor Management', route: '/doctors', icon: 'bi-person-badge', read: true, write: true, update: true, delete: true }
+      { code: 'DOCTORS', name: 'Doctor Management', route: '/doctors', icon: 'bi-person-badge', read: true, write: true, update: true, delete: true },
+      { code: 'DOCTOR_REGISTRATION', name: 'Add Doctor', route: '/add-doctor', icon: 'bi-person-plus-fill', read: true, write: true, update: true, delete: true }
     ]
   },
   {
@@ -118,7 +121,8 @@ export const COMPLETED_MODULE_SECTIONS: ModuleSection[] = [
       { code: 'TAX_SETTINGS', name: 'Tax Config', route: '/tax', icon: 'bi-percent', read: true, write: true, update: true, delete: true },
       { code: 'WAREHOUSE_SETTINGS', name: 'Warehouse', route: '/warehouse', icon: 'bi-building-gear', read: true, write: true, update: true, delete: true },
       { code: 'BRAND_SETTINGS', name: 'Brand Config', route: '/brand', icon: 'bi-box-fill', read: true, write: true, update: true, delete: true },
-      { code: 'RACK_SETTINGS', name: 'Rack Config', route: '/rack', icon: 'bi-box-seam', read: true, write: true, update: true, delete: true }
+      { code: 'RACK_SETTINGS', name: 'Rack Config', route: '/rack', icon: 'bi-box-seam', read: true, write: true, update: true, delete: true },
+      { code: 'BRANCH_SETTINGS', name: 'Branch Config', route: '/branch', icon: 'bi-diagram-3-fill', read: true, write: true, update: true, delete: true }
     ]
   }
 ];
@@ -196,9 +200,9 @@ export class AccessService {
 
     // Inventory Manager Matrix
     const inventoryCodes = [
-      'PURCHASE', 'PURCHASE_RETURN', 'SUPPLIER_LIST', 'SUPPLIER_REGISTRATION',
+      'PURCHASE', 'PURCHASE_RETURN', 'SUPPLIER_LIST', 'SUPPLIER_REGISTRATION', 'SUPPLIER_ORDER',
       'TABLETS', 'CATEGORIES', 'STORE_SETTINGS', 'WAREHOUSE_SETTINGS',
-      'BRAND_SETTINGS', 'RACK_SETTINGS'
+      'BRAND_SETTINGS', 'RACK_SETTINGS', 'BRANCH_SETTINGS'
     ];
     const inventoryMatrix: { [code: string]: { name: string; route: string; read: boolean; write: boolean; update: boolean; delete: boolean } } = {};
     COMPLETED_MODULE_SECTIONS.forEach(sec => {
@@ -284,7 +288,27 @@ export class AccessService {
       if (data !== null) {
         const parsed = JSON.parse(data);
         if (Array.isArray(parsed)) {
-          return parsed.filter(a => !deletedIds.includes(Number(a.id)));
+          return parsed.filter(a => !deletedIds.includes(Number(a.id))).map(set => {
+            if (set.modulePermissions) {
+              try {
+                const mp = JSON.parse(set.modulePermissions);
+                if (!mp['SUPPLIER_ORDER']) {
+                  mp['SUPPLIER_ORDER'] = {
+                    name: 'Supplier Orders',
+                    route: '/purchase',
+                    read: true,
+                    write: true,
+                    update: true,
+                    delete: true
+                  };
+                  set.modulePermissions = JSON.stringify(mp);
+                }
+              } catch {
+                // ignore
+              }
+            }
+            return set;
+          });
         }
       }
     } catch (e) {

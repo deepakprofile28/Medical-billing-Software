@@ -23,7 +23,7 @@ export class SalesReturnsPage implements OnInit, OnDestroy {
   isDoctorMenuOpen = false;
   isUserMenuOpen = false;
   isSettingsMenuOpen = false;
-  isSalesMenuOpen = false;
+  isSalesMenuOpen = true;
 
   loggedInUser = 'Apollo';
   userRole = 'ADMIN';

@@ -111,6 +111,10 @@
             <i class="bi bi-arrow-return-left sub-icon text-danger"></i>
             <span>Purchase Return</span>
           </a>
+          <a routerLink="/alert-quantity" class="sub-menu-item">
+            <i class="bi bi-exclamation-triangle-fill sub-icon text-warning"></i>
+            <span>Alert Quantity</span>
+          </a>
         </div>
       </div>
 
@@ -383,10 +387,36 @@
           </div>
 
           <div class="banner-actions">
-            <button type="button" class="btn-submit-top" (click)="saveSupplier()" [disabled]="saving">
+            <!-- Approval Button when Inactive in Edit Mode -->
+            <button 
+              *ngIf="isEditing && form.status !== 'ACTIVE'"
+              type="button" 
+              class="btn-approve-top" 
+              (click)="approveSupplier()" 
+              [disabled]="saving || approving"
+              title="Approve and activate this supplier"
+            >
+              <i class="bi bi-patch-check-fill me-1" *ngIf="!approving"></i>
+              <span class="spinner-border spinner-border-sm me-1" *ngIf="approving"></span>
+              <span>Approve Supplier</span>
+            </button>
+
+            <!-- Status Badge when Already Active in Edit Mode -->
+            <div class="badge-approved-top" *ngIf="isEditing && form.status === 'ACTIVE'" title="This supplier is active and approved">
+              <i class="bi bi-check-circle-fill me-1 text-emerald"></i>
+              <span>Approved & Active</span>
+            </div>
+
+            <!-- Inactive Notice when Adding New Supplier -->
+            <div class="badge-pending-top" *ngIf="!isEditing" title="New registration starts as Inactive">
+              <i class="bi bi-hourglass-split me-1 text-amber"></i>
+              <span>Status: Inactive (Pending)</span>
+            </div>
+
+            <button type="button" class="btn-submit-top" (click)="saveSupplier()" [disabled]="saving || approving">
               <i class="bi bi-check2-circle me-1" *ngIf="!saving"></i>
               <span class="spinner-border spinner-border-sm me-1" *ngIf="saving"></span>
-              <span>Submit</span>
+              <span>{{ isEditing ? 'Save Changes' : 'Submit' }}</span>
             </button>
           </div>
         </div>
@@ -783,15 +813,55 @@
           <div class="form-section-block">
             <div class="section-title-line">
               <i class="bi bi-toggles text-warning"></i>
-              <h3>5. Supplier Status, Legal Agreements & Notes</h3>
+              <h3>5. Supplier Status, Approval & Regulatory Notes</h3>
+            </div>
+
+            <!-- Inactive / Pending Approval Action Card -->
+            <div class="approval-notice-card" *ngIf="form.status !== 'ACTIVE'">
+              <div class="notice-icon-box">
+                <i class="bi bi-hourglass-split"></i>
+              </div>
+              <div class="notice-content">
+                <h4>Supplier Status: Inactive (Pending Approval)</h4>
+                <p>
+                  {{ isEditing ? 'This vendor profile is currently INACTIVE. Click "Approve Supplier" to authorize medicine procurement and stock inward orders.' : 'New suppliers are registered with INACTIVE status by default. Once regulatory licenses and bank credentials are confirmed, activate the vendor.' }}
+                </p>
+              </div>
+              <button 
+                *ngIf="isEditing" 
+                type="button" 
+                class="btn-approve-card" 
+                (click)="approveSupplier()" 
+                [disabled]="saving || approving"
+                title="Approve and activate supplier"
+              >
+                <i class="bi bi-patch-check-fill me-1" *ngIf="!approving"></i>
+                <span class="spinner-border spinner-border-sm me-1" *ngIf="approving"></span>
+                <span>Approve Supplier</span>
+              </button>
+            </div>
+
+            <!-- Active / Approved Confirmation Card -->
+            <div class="approved-success-card" *ngIf="form.status === 'ACTIVE'">
+              <div class="notice-icon-box">
+                <i class="bi bi-patch-check-fill"></i>
+              </div>
+              <div class="notice-content">
+                <h4>Supplier Status: Active & Authorized</h4>
+                <p>This vendor is authorized for stock purchases, purchase orders, and inventory deliveries for this pharmacy.</p>
+              </div>
+              <div class="verified-pill">
+                <i class="bi bi-shield-check me-1"></i>
+                <span>Approved Vendor</span>
+              </div>
             </div>
 
             <div class="grid-3-col">
               <div class="input-field-group">
                 <label>Vendor Status</label>
                 <select class="custom-select" [(ngModel)]="form.status">
+                  <option value="INACTIVE">INACTIVE - Procurement suspended / pending approval</option>
                   <option value="ACTIVE">ACTIVE - Authorized for stock purchase inward</option>
-                  <option value="INACTIVE">INACTIVE - Procurement suspended / on hold</option>
                 </select>
               </div>
 

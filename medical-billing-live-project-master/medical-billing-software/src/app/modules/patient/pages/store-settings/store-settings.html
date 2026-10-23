@@ -103,6 +103,10 @@
             <i class="bi bi-arrow-return-left sub-icon text-danger"></i>
             <span>Purchase Return</span>
           </a>
+          <a routerLink="/alert-quantity" class="sub-menu-item">
+            <i class="bi bi-exclamation-triangle-fill sub-icon text-warning"></i>
+            <span>Alert Quantity</span>
+          </a>
         </div>
       </div>
 
@@ -394,8 +398,8 @@
             class="tab-btn" 
             [class.active]="activeTab === 'tax'" 
             (click)="activeTab = 'tax'">
-            <i class="bi bi-shield-check me-2"></i>
-            <span>Tax, D.L. & Currency</span>
+            <i class="bi bi-bell-fill me-2 text-warning"></i>
+            <span>Tax, Currency & Stock Alert</span>
           </button>
 
           <button 
@@ -450,6 +454,143 @@
                     [title]="p.name">
                     <i class="bi" [ngClass]="p.icon"></i>
                   </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Application Theme & Menu Color Customizer -->
+          <div class="theme-customizer-card">
+            <div class="theme-card-header">
+              <div class="theme-header-left">
+                <div class="theme-swatch-badge" [style.background-color]="activeHexColor">
+                  <i class="bi bi-palette-fill text-white"></i>
+                </div>
+                <div>
+                  <h4>Application & Menu Theme Color</h4>
+                  <p>Enter any <strong>Color Code</strong> (e.g. <code>#0284c7</code>, <code>#7c3aed</code>, <code>#10b981</code>, <code>#dc2626</code>) or <strong>Color Name</strong> (e.g. <code>green</code>, <code>blue</code>, <code>purple</code>, <code>teal</code>, <code>red</code>, <code>orange</code>) to dynamically transform menus, buttons, icons & active highlights across the entire software.</p>
+                </div>
+              </div>
+              <div class="active-color-pill">
+                <span class="color-dot" [style.background-color]="activeHexColor"></span>
+                <span class="color-hex-text">{{ activeHexColor | uppercase }}</span>
+              </div>
+            </div>
+
+            <!-- Input Controls Row -->
+            <div class="theme-input-row">
+              <div class="color-text-input-wrap">
+                <label>Change Color (Color Code or Name)</label>
+                <div class="input-with-swatch">
+                  <input 
+                    type="color" 
+                    class="color-picker-input" 
+                    [value]="activeHexColor"
+                    (input)="onColorPickerChange($event)"
+                    title="Click to pick a color visually"
+                  />
+                  <input 
+                    type="text" 
+                    class="modern-input theme-text-input" 
+                    [ngModel]="customColorInput"
+                    (ngModelChange)="onColorInputChange($event)"
+                    placeholder="e.g. #0284c7, blue, purple, #10b981, red..."
+                  />
+                  <span class="preview-swatch-chip" [style.background-color]="activeHexColor" [title]="'Active: ' + activeHexColor"></span>
+                </div>
+                <div class="color-error-hint" *ngIf="colorInputError">
+                  <i class="bi bi-exclamation-triangle-fill me-1"></i>
+                  <span>Unrecognized color format. Please enter a valid hex code (e.g. #0284c7) or color name (e.g. blue, green).</span>
+                </div>
+              </div>
+
+              <!-- Live Demonstration Preview -->
+              <div class="live-theme-mini-preview">
+                <span class="preview-label">Live Preview:</span>
+                <div class="mini-menu-bar" [style.background-color]="activeHexColor">
+                  <span class="mini-pill"><i class="bi bi-hospital me-1"></i>Pharmacy</span>
+                  <span class="mini-active-item"><i class="bi bi-grid-1x2-fill me-1"></i>Active Menu</span>
+                  <span class="mini-btn">Button</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Quick Preset Color Chips -->
+            <div class="theme-presets-section">
+              <span class="presets-title">Popular Pharmacy Theme Presets:</span>
+              <div class="preset-chips-grid">
+                <button 
+                  type="button" 
+                  *ngFor="let preset of colorPresets" 
+                  class="preset-theme-chip" 
+                  [class.active]="activeHexColor.toLowerCase() === preset.color.toLowerCase()"
+                  (click)="selectPresetColor(preset)"
+                  [title]="preset.label + ' (' + preset.color + ')'">
+                  <span class="preset-color-circle" [style.background-color]="preset.color"></span>
+                  <span class="preset-name">{{ preset.label }}</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- POS Net Payable Rounding Mode Card (Round Half or Decimal) -->
+          <div class="rounding-mode-card mb-4">
+            <div class="rounding-card-header">
+              <div class="rounding-header-left">
+                <div class="rounding-icon-badge" [style.background-color]="activeHexColor">
+                  <i class="bi bi-calculator-fill text-white"></i>
+                </div>
+                <div>
+                  <h4>POS Net Payable Rounding Mode (Round Half or Decimal)</h4>
+                  <p>Choose whether the POS Bill Counter calculates <strong>NET PAYABLE AMOUNT</strong> with exact decimal paise (₹347.45) or automatically rounds off to the nearest ₹1.00.</p>
+                </div>
+              </div>
+              <div class="active-rounding-pill" [ngClass]="config.roundingMode === 'round_off' ? 'pill-round' : 'pill-decimal'">
+                <i class="bi" [ngClass]="config.roundingMode === 'round_off' ? 'bi-arrow-left-right' : 'bi-check-circle-fill'"></i>
+                <span>{{ config.roundingMode === 'round_off' ? 'Round Half (₹1.00)' : 'Exact Decimal (Paise)' }}</span>
+              </div>
+            </div>
+
+            <div class="rounding-options-grid">
+              <!-- Option 1: Exact Decimal -->
+              <div 
+                class="rounding-option-tile" 
+                [class.selected]="config.roundingMode !== 'round_off'"
+                (click)="setRoundingMode('decimal')">
+                <div class="tile-top">
+                  <div class="tile-radio">
+                    <span class="radio-dot" *ngIf="config.roundingMode !== 'round_off'"></span>
+                  </div>
+                  <div class="tile-title-box">
+                    <span class="tile-title">Decimal (Exact Paise / Cents)</span>
+                    <span class="tile-tag tag-decimal">Precision / Default</span>
+                  </div>
+                </div>
+                <p class="tile-desc">Preserves exact decimals including paise. No round-off adjustment is added or subtracted.</p>
+                <div class="tile-example">
+                  <span class="ex-label">POS Counter:</span>
+                  <span class="ex-calc">Total: ₹347.45 ➔ <strong>Net Payable: ₹347.45</strong></span>
+                </div>
+              </div>
+
+              <!-- Option 2: Round Half / Round Off -->
+              <div 
+                class="rounding-option-tile" 
+                [class.selected]="config.roundingMode === 'round_off'"
+                (click)="setRoundingMode('round_off')">
+                <div class="tile-top">
+                  <div class="tile-radio">
+                    <span class="radio-dot" *ngIf="config.roundingMode === 'round_off'"></span>
+                  </div>
+                  <div class="tile-title-box">
+                    <span class="tile-title">Round Half (Nearest ₹1.00)</span>
+                    <span class="tile-tag tag-round">Cash Friendly</span>
+                  </div>
+                </div>
+                <p class="tile-desc">Rounds off decimal cents to nearest ₹1.00. Adds a Round Off line (-₹0.45 or +₹0.50).</p>
+                <div class="tile-example">
+                  <span class="ex-label">POS Counter:</span>
+                  <span class="ex-calc">Total: ₹347.45 ➔ <strong>Net Payable: ₹347.00</strong> <small class="text-muted">(-₹0.45)</small></span>
                 </div>
               </div>
             </div>
@@ -608,6 +749,66 @@
             </div>
           </div>
 
+          <!-- Store Low Stock Alert Quantity Threshold Card -->
+          <div class="alert-qty-config-card mt-4">
+            <div class="alert-card-header">
+              <div class="alert-header-left">
+                <div class="alert-icon-box">
+                  <i class="bi bi-bell-fill"></i>
+                </div>
+                <div>
+                  <h4>Store Low Stock Alert Quantity Threshold</h4>
+                  <p>Configure the default alert threshold limit (e.g. <strong>10 units</strong>). When any product's stock is at or below this number, an <strong>Alert Popup</strong> appears across POS billing and inventory to notify you immediately.</p>
+                </div>
+              </div>
+              <button type="button" class="btn-test-alert" (click)="triggerAlertPopup(true)" title="Preview Alert Popup">
+                <i class="bi bi-play-circle-fill me-1"></i> Test Alert Popup
+              </button>
+            </div>
+
+            <div class="alert-input-section mt-3">
+              <div class="form-grid-2">
+                <div class="form-group">
+                  <label><strong>Alert Quantity Limit (Units)</strong> <span class="text-danger">*</span></label>
+                  <div class="input-with-icon">
+                    <i class="bi bi-exclamation-triangle-fill text-warning"></i>
+                    <input 
+                      type="number" 
+                      min="0" 
+                      max="10000"
+                      class="modern-input font-bold text-center alert-qty-input" 
+                      [(ngModel)]="config.alertQuantity" 
+                      (ngModelChange)="onAlertQuantityChange($event)"
+                      placeholder="10" />
+                  </div>
+                  <small class="text-muted mt-1 d-block">
+                    Any medicine with stock &le; <strong>{{ config.alertQuantity || 10 }} units</strong> triggers an Alert Popup.
+                  </small>
+                </div>
+
+                <div class="form-group">
+                  <label>Quick Preset Limits</label>
+                  <div class="alert-chips-grid">
+                    <button type="button" class="alert-chip-btn" [class.active]="config.alertQuantity === 5" (click)="setPresetAlertQuantity(5)">5 Units</button>
+                    <button type="button" class="alert-chip-btn" [class.active]="config.alertQuantity === 10" (click)="setPresetAlertQuantity(10)">10 Units (Default)</button>
+                    <button type="button" class="alert-chip-btn" [class.active]="config.alertQuantity === 15" (click)="setPresetAlertQuantity(15)">15 Units</button>
+                    <button type="button" class="alert-chip-btn" [class.active]="config.alertQuantity === 20" (click)="setPresetAlertQuantity(20)">20 Units</button>
+                    <button type="button" class="alert-chip-btn" [class.active]="config.alertQuantity === 50" (click)="setPresetAlertQuantity(50)">50 Units</button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="alert-summary-callout mt-3">
+                <div class="callout-icon">
+                  <i class="bi bi-shield-exclamation text-warning"></i>
+                </div>
+                <div class="callout-text">
+                  <strong>Active Alert Rule:</strong> When product stock drops to <strong>{{ config.alertQuantity || 10 }} units or less</strong>, an Alert Popup will be triggered to warn you so you can reorder stock immediately.
+                </div>
+              </div>
+            </div>
+          </div>
+
         </div>
 
         <!-- ================= TAB 3: POS RECEIPT & INVOICE SETUP ================= -->
@@ -647,15 +848,29 @@
               <input type="text" class="modern-input" [(ngModel)]="config.invoicePrefix" placeholder="INV-" />
               <small class="text-muted">Invoices will be formatted like <strong>{{ config.invoicePrefix || 'INV-' }}20260903-8821</strong></small>
 
-              <div class="toggle-switch-box mt-3">
-                <label class="switch-label">
-                  <input type="checkbox" [(ngModel)]="config.enableRoundOff" />
-                  <span class="switch-slider"></span>
-                </label>
-                <div class="switch-text">
-                  <strong>Enable Auto Round-Off</strong>
-                  <small>Rounds off decimal cents to nearest ₹1.00</small>
+              <div class="rounding-tab3-box mt-3">
+                <label class="control-label d-block mb-1"><strong>POS Net Payable Rounding Mode</strong></label>
+                <div class="tab3-rounding-grid">
+                  <button 
+                    type="button" 
+                    class="tab3-mode-btn" 
+                    [class.active]="config.roundingMode !== 'round_off'"
+                    (click)="setRoundingMode('decimal')">
+                    <i class="bi bi-percent me-1"></i>
+                    <span>Decimal (Exact ₹347.45)</span>
+                  </button>
+                  <button 
+                    type="button" 
+                    class="tab3-mode-btn" 
+                    [class.active]="config.roundingMode === 'round_off'"
+                    (click)="setRoundingMode('round_off')">
+                    <i class="bi bi-arrow-left-right me-1"></i>
+                    <span>Round Half (Nearest ₹1.00)</span>
+                  </button>
                 </div>
+                <small class="text-muted d-block mt-1">
+                  Active Mode: <strong>{{ config.roundingMode === 'round_off' ? 'Round Half to ₹1.00 (Nearest Integer)' : 'Decimal Mode (Exact Paise)' }}</strong>
+                </small>
               </div>
             </div>
 
@@ -786,8 +1001,84 @@
 
       </section>
 
-    </div>
+  <!-- ============================================================== -->
+  <!-- ALERT QUANTITY POPUP MODAL                                      -->
+  <!-- ============================================================== -->
+  <div class="alert-popup-backdrop" *ngIf="showAlertPopup" (click)="closeAlertPopup()">
+    <div class="alert-popup-dialog" (click)="$event.stopPropagation()">
+      <div class="alert-popup-header">
+        <div class="alert-header-left-wrap">
+          <div class="alert-bell-anim">
+            <i class="bi bi-bell-fill"></i>
+          </div>
+          <div class="alert-header-text">
+            <span class="alert-badge-top">LOW STOCK ALERT NOTIFICATION</span>
+            <h3>Alert Quantity Triggered!</h3>
+            <p class="alert-sub">Threshold Configured in Store Settings: <strong>{{ config.alertQuantity || 10 }} Units</strong></p>
+          </div>
+        </div>
+        <button class="alert-popup-close" (click)="closeAlertPopup()"><i class="bi bi-x-lg"></i></button>
+      </div>
 
-  </main>
+      <div class="alert-popup-body">
+        <div class="alert-banner-warn">
+          <i class="bi bi-exclamation-triangle-fill"></i>
+          <div>
+            <strong>Alert Quantity Threshold: {{ config.alertQuantity || 10 }} Units</strong>
+            <p>Whenever any product's stock is at or below this number, this Alert Popup will warn the user so stock can be reordered immediately.</p>
+          </div>
+        </div>
+
+        <div class="alert-loading-state text-center py-3" *ngIf="loadingLowStock">
+          <div class="spinner-border text-warning spinner-border-sm me-2" role="status"></div>
+          <span class="text-muted">Scanning inventory for medicines &le; {{ config.alertQuantity || 10 }} units...</span>
+        </div>
+
+        <div class="alert-products-list" *ngIf="!loadingLowStock && lowStockMedicines.length > 0">
+          <div class="list-title d-flex justify-content-between align-items-center">
+            <span>Medicines Currently At or Below Alert Quantity ({{ lowStockMedicines.length }}):</span>
+            <span class="badge bg-danger">{{ lowStockMedicines.length }} items need reorder</span>
+          </div>
+          <div class="products-scroll">
+            <div class="alert-product-item" *ngFor="let med of lowStockMedicines">
+              <div class="item-left">
+                <div class="item-icon-circle" [ngClass]="med.stockQty === 0 ? 'circle-red' : 'circle-amber'">
+                  <i class="bi bi-capsule"></i>
+                </div>
+                <div>
+                  <strong class="med-name">{{ med.name }}</strong>
+                  <span class="med-sub">{{ med.genericName || 'Medicine' }} &bull; Batch: {{ med.batchNo || 'N/A' }}</span>
+                </div>
+              </div>
+              <div class="item-right text-end">
+                <span class="stock-badge" [ngClass]="med.stockQty === 0 ? 'stock-zero' : 'stock-low'">
+                  {{ med.stockQty }} units
+                </span>
+                <span class="status-text-sub">{{ med.stockQty === 0 ? 'Out of Stock' : 'Low Stock' }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="alert-empty-notice text-center py-3" *ngIf="!loadingLowStock && lowStockMedicines.length === 0">
+          <i class="bi bi-check-circle-fill text-success" style="font-size: 2rem;"></i>
+          <h5 class="mt-2 mb-1">Stock Levels are Healthy!</h5>
+          <p class="text-muted small mb-0">All products in your catalog currently have more than {{ config.alertQuantity || 10 }} units available in inventory.</p>
+        </div>
+      </div>
+
+      <div class="alert-popup-footer">
+        <button type="button" class="btn-alert-voice" (click)="replayAlertVoice()" style="background: #fffbeb; border: 1.5px solid #f59e0b; color: #b45309; padding: 8px 14px; border-radius: 8px; font-weight: 700; font-size: 0.88rem; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;">
+          <i class="bi bi-volume-up-fill text-warning"></i> Hear Voice Alert
+        </button>
+        <a routerLink="/alert-quantity" (click)="closeAlertPopup()" class="btn-alert-link">
+          <i class="bi bi-box-arrow-up-right me-1"></i> Open Alert Quantity Page
+        </a>
+        <button type="button" class="btn-alert-ack" (click)="closeAlertPopup()">
+          <i class="bi bi-check2 me-1"></i> Acknowledge & Close
+        </button>
+      </div>
+    </div>
+  </div>
 
 </div>

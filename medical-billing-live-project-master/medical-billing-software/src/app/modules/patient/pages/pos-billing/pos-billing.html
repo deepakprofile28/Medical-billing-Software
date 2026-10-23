@@ -101,6 +101,10 @@
             <i class="bi bi-arrow-return-left sub-icon text-danger"></i>
             <span>Purchase Return</span>
           </a>
+          <a routerLink="/alert-quantity" class="sub-menu-item">
+            <i class="bi bi-exclamation-triangle-fill sub-icon text-warning"></i>
+            <span>Alert Quantity</span>
+          </a>
         </div>
       </div>
 
@@ -701,10 +705,22 @@
             <span>₹{{ (cgstTotal + sgstTotal).toFixed(2) }}</span>
           </div>
 
+          <div class="summary-line" *ngIf="enableRoundOff && roundOff !== 0">
+            <span class="text-muted">Round Off:</span>
+            <span [class.text-success]="roundOff < 0" [class.text-danger]="roundOff > 0">
+              {{ roundOff > 0 ? '+' : '' }}₹{{ roundOff.toFixed(2) }}
+            </span>
+          </div>
+
           <!-- GRAND TOTAL BANNER (MODERN GRADIENT) -->
           <div class="grand-total-banner">
             <div class="gt-left">
-              <span class="gt-label">NET PAYABLE AMOUNT</span>
+              <div class="d-flex align-items-center gap-2">
+                <span class="gt-label">NET PAYABLE AMOUNT</span>
+                <span class="badge" [ngClass]="enableRoundOff ? 'bg-warning text-dark' : 'bg-success text-white'" style="font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 12px;">
+                  {{ enableRoundOff ? 'Round Half' : 'Decimal' }}
+                </span>
+              </div>
               <small class="gt-items">{{ cart.length }} items in bill</small>
             </div>
             <div class="gt-amount">
@@ -874,6 +890,27 @@
         </div>
       </div>
 
+      <!-- Low Stock Warning Banner in Invoice Modal -->
+      <div class="no-print" *ngIf="lowStockItemsSoldAfterBill.length > 0" style="background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%); border: 1.5px solid #f59e0b; border-radius: 12px; padding: 12px 16px; margin: 12px 16px 0; display: flex; align-items: center; justify-content: space-between; gap: 12px; box-shadow: 0 4px 12px rgba(245,158,11,0.15);">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <div style="width: 38px; height: 38px; border-radius: 50%; background: #f59e0b; color: white; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; flex-shrink: 0;">
+            <i class="bi bi-bell-fill"></i>
+          </div>
+          <div>
+            <strong style="color: #92400e; font-size: 0.92rem; display: block;">Low Stock Alert After Billing!</strong>
+            <span style="color: #78350f; font-size: 0.83rem;">{{ lowStockItemsSoldAfterBill.length }} product(s) dropped to &le; {{ alertThreshold }} units during this sale.</span>
+          </div>
+        </div>
+        <div style="display: flex; gap: 8px; flex-shrink: 0;">
+          <button type="button" class="btn btn-sm" (click)="replayVoiceAlert()" style="font-weight: 600; background: white; border: 1px solid #d97706; color: #92400e; border-radius: 8px; padding: 6px 12px; display: inline-flex; align-items: center; gap: 4px;">
+            <i class="bi bi-volume-up-fill text-warning"></i> Voice Alert
+          </button>
+          <button type="button" class="btn btn-sm btn-warning" (click)="showPostBillLowStockModal = true" style="background: #f59e0b; color: white; font-weight: 700; border: none; border-radius: 8px; padding: 6px 14px; display: inline-flex; align-items: center; gap: 6px;">
+            <i class="bi bi-exclamation-triangle-fill"></i> View Stock Alert
+          </button>
+        </div>
+      </div>
+
       <!-- Printable Invoice Sheet Container -->
       <div class="invoice-sheet-container" *ngIf="currentInvoice as inv">
         <div class="invoice-printable-content" id="printable-invoice">
@@ -954,6 +991,11 @@
             <div class="inv-total-row">
               <span>Total GST:</span>
               <span>₹{{ ((inv.cgstTotal || 0) + (inv.sgstTotal || 0)).toFixed(2) }}</span>
+            </div>
+
+            <div class="inv-total-row" *ngIf="(inv.roundOff || 0) !== 0">
+              <span>Round Off:</span>
+              <span>{{ (inv.roundOff || 0) > 0 ? '+' : '' }}₹{{ (inv.roundOff || 0).toFixed(2) }}</span>
             </div>
 
             <div class="inv-total-row grand-row">
@@ -1189,4 +1231,121 @@
     </div>
   </div>
 
+  <!-- Low Stock Alert Popup Modal -->
+  <div class="invoice-modal-backdrop" *ngIf="showLowStockAlert">
+    <div class="pos-dialog-card pos-dialog-sm" style="max-width: 480px; text-align: center; border-radius: 18px; overflow: hidden; box-shadow: 0 25px 60px rgba(0,0,0,0.3);">
+      <div style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white; padding: 24px 20px 20px;">
+        <div style="width: 58px; height: 58px; border-radius: 50%; background: rgba(255,255,255,0.22); display: flex; align-items: center; justify-content: center; margin: 0 auto 12px; font-size: 1.8rem;">
+          <i class="bi bi-exclamation-triangle-fill"></i>
+        </div>
+        <h3 style="margin: 0; font-size: 1.25rem; font-weight: 700; color: white;">Low Stock Alert Warning!</h3>
+        <p style="margin: 6px 0 0; opacity: 0.95; font-size: 0.88rem; color: #fffbeb;">Store Alert Quantity Limit: <strong>{{ alertThreshold }} Units</strong></p>
+      </div>
+      <div style="padding: 22px 24px; text-align: center; background: white;">
+        <p style="color: #475569; font-size: 0.95rem; line-height: 1.5; margin-bottom: 16px;">
+          Product <strong>"{{ alertProduct?.name }}"</strong> is running low on inventory stock!
+        </p>
+        <div style="background: #fef3c7; border: 1.5px dashed #f59e0b; border-radius: 12px; padding: 14px 18px; display: inline-flex; align-items: center; gap: 14px; margin-bottom: 20px;">
+          <div style="text-align: left;">
+            <div style="font-size: 0.75rem; color: #92400e; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Available Stock</div>
+            <div style="font-size: 1.45rem; font-weight: 800; color: #b45309;">{{ alertStockQty }} Units Left</div>
+          </div>
+          <span style="background: #ef4444; color: white; font-size: 0.75rem; font-weight: 700; padding: 5px 12px; border-radius: 999px;">Critical Stock</span>
+        </div>
+        <p style="font-size: 0.83rem; color: #64748b; margin-bottom: 22px; line-height: 1.4;">
+          This item has been added to the bill, but you should reorder stock soon to prevent stockout.
+        </p>
+        <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+          <button type="button" class="btn btn-outline-warning" style="padding: 10px 14px; border-radius: 10px; font-weight: 600; display: inline-flex; align-items: center; gap: 6px;" (click)="replayVoiceAlert()">
+            <i class="bi bi-volume-up-fill"></i> Hear Voice Alert
+          </button>
+          <button type="button" class="btn btn-secondary" style="padding: 10px 18px; border-radius: 10px; font-weight: 600;" (click)="closeLowStockAlert()">
+            Continue Billing
+          </button>
+          <a routerLink="/alert-quantity" (click)="closeLowStockAlert()" class="btn btn-warning" style="background: #f59e0b; border-color: #f59e0b; color: white; padding: 10px 18px; border-radius: 10px; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
+            <i class="bi bi-box-seam"></i> Manage / Purchase
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= POST-BILLING LOW STOCK ALERT MODAL ================= -->
+  <div class="invoice-modal-backdrop" *ngIf="showPostBillLowStockModal" style="z-index: 99999;">
+    <div class="pos-dialog-card pos-dialog-md" style="max-width: 620px; border-radius: 20px; overflow: hidden; box-shadow: 0 25px 60px rgba(0,0,0,0.35); border: none; background: white;">
+      <!-- Header -->
+      <div style="background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%); color: white; padding: 22px 24px; position: relative;">
+        <div style="display: flex; align-items: center; gap: 14px;">
+          <div style="width: 52px; height: 52px; border-radius: 50%; background: rgba(255,255,255,0.22); display: flex; align-items: center; justify-content: center; font-size: 1.6rem; flex-shrink: 0;">
+            <i class="bi bi-exclamation-triangle-fill"></i>
+          </div>
+          <div>
+            <h3 style="margin: 0; font-size: 1.28rem; font-weight: 800; color: white;">Stock Reduced Below Alert Limit!</h3>
+            <p style="margin: 4px 0 0; opacity: 0.95; font-size: 0.86rem; color: #fee2e2;">
+              Completed bill deducted stock: <strong>{{ lowStockItemsSoldAfterBill.length }} product(s)</strong> are now &le; {{ alertThreshold }} units.
+            </p>
+          </div>
+        </div>
+        <button type="button" class="btn-close-modal" (click)="closePostBillLowStockModal()" style="position: absolute; top: 18px; right: 18px; color: white; background: rgba(255,255,255,0.25); border: none; border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer;">
+          <i class="bi bi-x-lg"></i>
+        </button>
+      </div>
+
+      <!-- Body Content -->
+      <div style="padding: 22px 24px; background: #fff;">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px;">
+          <div style="font-size: 0.85rem; font-weight: 700; color: #334155; text-transform: uppercase; letter-spacing: 0.5px;">
+            Medicines Needing Immediate Reorder:
+          </div>
+          <button type="button" class="btn btn-sm btn-outline-danger" (click)="replayVoiceAlert()" style="font-weight: 600; display: inline-flex; align-items: center; gap: 6px; border-radius: 8px;">
+            <i class="bi bi-volume-up-fill"></i> Hear Voice Alert
+          </button>
+        </div>
+
+        <div style="max-height: 240px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 12px;">
+          <table class="table mb-0" style="font-size: 0.9rem; width: 100%;">
+            <thead style="background: #f8fafc; font-size: 0.78rem; text-transform: uppercase; color: #64748b;">
+              <tr>
+                <th style="padding: 10px 14px;">Medicine</th>
+                <th style="padding: 10px 14px; text-align: center;">Previous</th>
+                <th style="padding: 10px 14px; text-align: center;">Remaining</th>
+                <th style="padding: 10px 14px; text-align: center;">Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let item of lowStockItemsSoldAfterBill">
+                <td style="padding: 12px 14px; font-weight: 600; color: #1e293b;">
+                  {{ item.name }}
+                  <div *ngIf="item.category" style="font-size: 0.75rem; color: #64748b; font-weight: 400;">{{ item.category }}</div>
+                </td>
+                <td style="padding: 12px 14px; text-align: center; color: #64748b; text-decoration: line-through;">
+                  {{ item.previousStock }} units
+                </td>
+                <td style="padding: 12px 14px; text-align: center;">
+                  <strong [style.color]="item.stock === 0 ? '#ef4444' : '#d97706'" style="font-size: 1.05rem;">
+                    {{ item.stock }} units
+                  </strong>
+                </td>
+                <td style="padding: 12px 14px; text-align: center;">
+                  <span *ngIf="item.stock === 0" style="background: #fee2e2; color: #991b1b; padding: 4px 10px; border-radius: 999px; font-size: 0.75rem; font-weight: 700;">Out of Stock</span>
+                  <span *ngIf="item.stock > 0" style="background: #fef3c7; color: #92400e; padding: 4px 10px; border-radius: 999px; font-size: 0.75rem; font-weight: 700;">Low Stock</span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div style="margin-top: 20px; display: flex; align-items: center; justify-content: space-between; gap: 12px;">
+          <button type="button" class="btn btn-light" (click)="closePostBillLowStockModal()" style="font-weight: 600; padding: 10px 20px; border-radius: 10px; border: 1px solid #cbd5e1;">
+            Continue Next Bill
+          </button>
+          <a routerLink="/alert-quantity" (click)="closePostBillLowStockModal()" class="btn btn-warning" style="background: #f59e0b; border-color: #f59e0b; color: white; font-weight: 700; padding: 10px 20px; border-radius: 10px; text-decoration: none; display: inline-flex; align-items: center; gap: 8px;">
+            <i class="bi bi-box-seam"></i> Open Alert Quantity / Reorder
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
 </div>
+

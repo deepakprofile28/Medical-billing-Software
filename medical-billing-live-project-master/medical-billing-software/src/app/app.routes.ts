@@ -36,6 +36,7 @@ import { RackSettings } from './modules/patient/pages/rack-settings/rack-setting
 
 import { PurchaseList } from './modules/patient/pages/purchase/purchase-list/purchase-list';
 import { PurchaseReturnsList } from './modules/patient/pages/purchase-returns/purchase-returns-list/purchase-returns-list';
+import { AlertQuantityPage } from './modules/patient/pages/alert-quantity/alert-quantity';
 import { SupplierManagement } from './modules/patient/pages/supplier-management/supplier-management';
 import { SupplierRegistration } from './modules/patient/pages/supplier-registration/supplier-registration';
 
@@ -65,6 +66,11 @@ export const routes: Routes = [
   {
     path: 'purchase-returns',
     component: PurchaseReturnsList,
+    canActivate: [authGuard]
+  },
+  {
+    path: 'alert-quantity',
+    component: AlertQuantityPage,
     canActivate: [authGuard]
   },
 
@@ -97,6 +103,16 @@ export const routes: Routes = [
   {
     path: 'add-supplier',
     redirectTo: 'supplier-registration',
+    pathMatch: 'full'
+  },
+  {
+    path: 'supplier-order',
+    redirectTo: 'purchase',
+    pathMatch: 'full'
+  },
+  {
+    path: 'supplier-orders',
+    redirectTo: 'purchase',
     pathMatch: 'full'
   },
 

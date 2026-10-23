@@ -10,6 +10,8 @@ import { CategoryService, Category } from '../../../services/category.service';
 import { DoctorService, Doctor } from '../../../services/doctor.service';
 import { WarehouseService, Warehouse } from '../../../services/warehouse.service';
 import { SalesService, SuspendedOrder, CompletedSale } from '../../../services/sales.service';
+import { StoreConfigService } from '../../../services/store-config.service';
+import { AudioAlertService } from '../../../services/audio-alert.service';
 
 @Component({
   selector: 'app-pos-billing',
@@ -98,6 +100,8 @@ export class PosBilling implements OnInit, OnDestroy {
   sgstTotal = 0;
   roundOff = 0;
   grandTotal = 0;
+  enableRoundOff = false;
+  roundingMode: 'round_off' | 'decimal' = 'decimal';
 
   // Payment
   paymentMethod: 'Cash' | 'UPI' | 'Card' | 'Insurance' | 'Credit' = 'Cash';
@@ -143,6 +147,38 @@ export class PosBilling implements OnInit, OnDestroy {
   loadingSuspended = false;
   loadingCompleted = false;
 
+  // =====================================================
+  // LOW STOCK ALERT POPUPS & VOICE ALERTS
+  // =====================================================
+  showLowStockAlert = false;
+  alertProduct: MedicineItem | null = null;
+  alertStockQty = 0;
+  alertThreshold = 10;
+
+  // Post-Billing Low Stock Alert State
+  showPostBillLowStockModal = false;
+  lowStockItemsSoldAfterBill: { id?: number; name: string; category?: string; stock: number; previousStock: number }[] = [];
+
+  closeLowStockAlert(): void {
+    this.showLowStockAlert = false;
+  }
+
+  closePostBillLowStockModal(): void {
+    this.showPostBillLowStockModal = false;
+    this.lowStockItemsSoldAfterBill = [];
+  }
+
+  replayVoiceAlert(): void {
+    if (this.lowStockItemsSoldAfterBill.length > 0) {
+      this.audioAlert.triggerBatchLowStockAlert(this.lowStockItemsSoldAfterBill, this.alertThreshold);
+    } else if (this.alertProduct) {
+      this.audioAlert.triggerStockAlert(this.alertProduct.name, this.alertStockQty, this.alertThreshold);
+    } else {
+      this.audioAlert.playAlarmChime(2);
+      this.audioAlert.speak(`Warning! Low stock alert threshold is ${this.alertThreshold} units.`);
+    }
+  }
+
   constructor(
     private posService: PosService,
     private medicineService: MedicineService,
@@ -152,6 +188,8 @@ export class PosBilling implements OnInit, OnDestroy {
     private authService: AuthService,
     private categoryService: CategoryService,
     private salesService: SalesService,
+    private storeConfigService: StoreConfigService,
+    private audioAlert: AudioAlertService,
     private router: Router,
     private cdr: ChangeDetectorRef
   ) {}
@@ -236,6 +274,24 @@ export class PosBilling implements OnInit, OnDestroy {
     this.cashierRole = (this.authService.getRole() || 'ADMIN').toUpperCase();
 
     try {
+      // Initialize rounding mode from storeConfigService or localStorage
+      const cfg = this.storeConfigService.getCurrentConfig();
+      if (cfg) {
+        if (cfg.roundingMode) {
+          this.roundingMode = cfg.roundingMode;
+          this.enableRoundOff = (cfg.roundingMode === 'round_off');
+        } else if (cfg.enableRoundOff !== undefined) {
+          this.enableRoundOff = !!cfg.enableRoundOff;
+          this.roundingMode = this.enableRoundOff ? 'round_off' : 'decimal';
+        }
+      }
+
+      const storedMode = localStorage.getItem('medbill_rounding_mode');
+      if (storedMode === 'round_off' || storedMode === 'decimal') {
+        this.roundingMode = storedMode;
+        this.enableRoundOff = (storedMode === 'round_off');
+      }
+
       const stored = localStorage.getItem('medbill_store_settings');
       if (stored) {
         const s = JSON.parse(stored);
@@ -244,7 +300,30 @@ export class PosBilling implements OnInit, OnDestroy {
         if (s.gstin) this.activeStoreGstin = s.gstin;
         if (s.drugLicenseNo) this.activeStoreDlNo = s.drugLicenseNo;
         if (s.defaultReceiptType) this.printReceiptType = s.defaultReceiptType;
+        if (s.roundingMode) {
+          this.roundingMode = s.roundingMode;
+          this.enableRoundOff = (s.roundingMode === 'round_off');
+        } else if (s.enableRoundOff !== undefined) {
+          this.enableRoundOff = !!s.enableRoundOff;
+          this.roundingMode = this.enableRoundOff ? 'round_off' : 'decimal';
+        }
       }
+
+      // Also listen reactively for updates to store configuration
+      this.storeConfigService.config$.subscribe((c) => {
+        if (c) {
+          if (c.roundingMode) {
+            this.roundingMode = c.roundingMode;
+            this.enableRoundOff = (c.roundingMode === 'round_off');
+          } else if (c.enableRoundOff !== undefined) {
+            this.enableRoundOff = !!c.enableRoundOff;
+            this.roundingMode = this.enableRoundOff ? 'round_off' : 'decimal';
+          }
+          if (this.cart && this.cart.length > 0) {
+            this.calculateCartTotals();
+          }
+        }
+      });
     } catch (e) {
       console.warn('Error reading store settings in POS:', e);
     }
@@ -429,6 +508,16 @@ export class PosBilling implements OnInit, OnDestroy {
     }
     this.calculateCartTotals();
     this.showToast(`Added "${med.name}" to bill`);
+
+    // Check Store Low Stock Alert threshold
+    const alertLimit = this.storeConfigService.getAlertQuantity ? this.storeConfigService.getAlertQuantity() : 10;
+    if (availableStock > 0 && availableStock <= alertLimit) {
+      this.alertProduct = med;
+      this.alertStockQty = availableStock;
+      this.alertThreshold = alertLimit;
+      this.showLowStockAlert = true;
+      this.audioAlert.triggerStockAlert(med.name, availableStock, alertLimit);
+    }
   }
 
   increaseQty(item: CartItem): void {
@@ -534,9 +623,14 @@ export class PosBilling implements OnInit, OnDestroy {
     this.sgstTotal = sgst * taxRatio;
 
     const exactTotal = this.taxableAmount + this.cgstTotal + this.sgstTotal;
-    const rounded = Math.round(exactTotal);
-    this.roundOff = rounded - exactTotal;
-    this.grandTotal = rounded;
+    if (this.enableRoundOff) {
+      const rounded = Math.round(exactTotal);
+      this.roundOff = Number((rounded - exactTotal).toFixed(2));
+      this.grandTotal = rounded;
+    } else {
+      this.roundOff = 0;
+      this.grandTotal = Number(exactTotal.toFixed(2));
+    }
 
     // Default amount received to grand total for cash
     if (this.amountReceived === 0 || this.amountReceived < this.grandTotal) {
@@ -659,6 +753,11 @@ export class PosBilling implements OnInit, OnDestroy {
     this.showInvoiceModal = true;
     this.showToast(`Invoice #${invoice.invoiceNo} Generated!`);
 
+    // Auto-trigger print for "COMPLETE SALE & PRINT BILL"
+    setTimeout(() => {
+      this.printInvoice();
+    }, 350);
+
     // Sync to Completed Sales records
     const completedRecord: CompletedSale = {
       invoiceNo: invoice.invoiceNo,
@@ -674,6 +773,10 @@ export class PosBilling implements OnInit, OnDestroy {
       error: () => { this.loadCompletedSales(); }
     });
 
+    const alertLimit = this.storeConfigService.getAlertQuantity ? this.storeConfigService.getAlertQuantity() : 10;
+    this.alertThreshold = alertLimit;
+    const lowStockSold: { id?: number; name: string; category?: string; stock: number; previousStock: number }[] = [];
+
     // Deduct stock for sold items in backend database
     for (const item of this.cart) {
       const medId = item.medicine.id;
@@ -685,6 +788,17 @@ export class PosBilling implements OnInit, OnDestroy {
           match.stockQty = newStock;
         }
         item.medicine.stockQty = newStock;
+
+        // Check if item reached critical alert stock level
+        if (newStock <= alertLimit) {
+          lowStockSold.push({
+            id: medId,
+            name: item.medicine.name,
+            category: item.medicine.category,
+            stock: newStock,
+            previousStock: currentStock
+          });
+        }
 
         this.medicineService.getMedicineById(medId).subscribe({
           next: (dbMed) => {
@@ -702,15 +816,317 @@ export class PosBilling implements OnInit, OnDestroy {
         });
       }
     }
+
+    if (lowStockSold.length > 0) {
+      this.lowStockItemsSoldAfterBill = lowStockSold;
+      // Trigger voice and alarm alert for cashier
+      setTimeout(() => {
+        this.audioAlert.triggerBatchLowStockAlert(lowStockSold, alertLimit);
+      }, 700);
+    }
   }
 
   printInvoice(): void {
-    window.print();
+    if (!this.currentInvoice) {
+      this.showToast('No active invoice to print!', true);
+      return;
+    }
+
+    const inv = this.currentInvoice;
+    const isThermal = this.printReceiptType === 'thermal';
+
+    // Build items HTML rows
+    const itemsHtml = (inv.items || []).map((it: any, index: number) => {
+      const medName = it.medicine?.name || it.name || 'Medicine Item';
+      const genName = it.medicine?.genericName || it.genericName || '';
+      const batch = it.medicine?.batchNo || it.batchNo || 'N/A';
+      const qty = it.quantity || 1;
+      const rate = (it.unitPrice !== undefined ? Number(it.unitPrice) : 0).toFixed(2);
+      const total = (it.totalAmount !== undefined ? Number(it.totalAmount) : (Number(rate) * qty)).toFixed(2);
+
+      return `
+        <tr>
+          <td style="padding: 4px 2px; vertical-align: top;">
+            <div style="font-weight: 700;">${index + 1}. ${medName}</div>
+            ${genName ? `<div style="font-size: ${isThermal ? '9.5px' : '11px'}; color: #444;">${genName}</div>` : ''}
+          </td>
+          <td style="padding: 4px 2px; vertical-align: top; text-align: center;">${batch}</td>
+          <td style="padding: 4px 2px; vertical-align: top; text-align: center; font-weight: bold;">${qty}</td>
+          <td style="padding: 4px 2px; vertical-align: top; text-align: right;">₹${rate}</td>
+          <td style="padding: 4px 2px; vertical-align: top; text-align: right; font-weight: bold;">₹${total}</td>
+        </tr>
+      `;
+    }).join('');
+
+    const formattedDate = inv.invoiceDate 
+      ? new Date(inv.invoiceDate).toLocaleString('en-IN', {
+          day: '2-digit', month: '2-digit', year: 'numeric',
+          hour: '2-digit', minute: '2-digit', hour12: true
+        })
+      : new Date().toLocaleString('en-IN');
+
+    // Remove any previous print iframe
+    const oldIframe = document.getElementById('posReceiptPrintFrame');
+    if (oldIframe && oldIframe.parentNode) {
+      oldIframe.parentNode.removeChild(oldIframe);
+    }
+
+    const iframe = document.createElement('iframe');
+    iframe.id = 'posReceiptPrintFrame';
+    iframe.name = 'posReceiptPrintFrame';
+    iframe.style.position = 'fixed';
+    iframe.style.top = '-9999px';
+    iframe.style.left = '-9999px';
+    iframe.style.width = '0';
+    iframe.style.height = '0';
+    iframe.style.border = '0';
+    document.body.appendChild(iframe);
+
+    const doc = iframe.contentWindow?.document || iframe.contentDocument;
+    if (!doc) {
+      window.print();
+      return;
+    }
+
+    const receiptHtml = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>Invoice - ${inv.invoiceNumber || inv.invoiceNo}</title>
+        <meta charset="utf-8">
+        <style>
+          @page {
+            size: ${isThermal ? '80mm auto' : 'A4 portrait'};
+            margin: ${isThermal ? '3mm' : '15mm'};
+          }
+          * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+          }
+          body {
+            font-family: ${isThermal ? "'Courier New', Courier, monospace" : "'Segoe UI', Roboto, Helvetica, Arial, sans-serif"};
+            color: #000;
+            background: #fff;
+            font-size: ${isThermal ? '11.5px' : '13px'};
+            line-height: 1.35;
+            padding: ${isThermal ? '2px' : '12px'};
+            width: ${isThermal ? '72mm' : '100%'};
+            margin: 0 auto;
+          }
+          .header {
+            text-align: center;
+            margin-bottom: 8px;
+          }
+          .store-name {
+            font-size: ${isThermal ? '17px' : '22px'};
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+          }
+          .address {
+            font-size: ${isThermal ? '10.5px' : '12px'};
+            color: #222;
+            margin-top: 2px;
+          }
+          .licenses {
+            font-size: ${isThermal ? '10px' : '11px'};
+            color: #333;
+            margin-top: 2px;
+          }
+          .bill-title {
+            font-size: ${isThermal ? '11px' : '13px'};
+            font-weight: 800;
+            margin: 6px 0;
+            padding: 3px 0;
+            border-top: 1px dashed #333;
+            border-bottom: 1px dashed #333;
+            text-align: center;
+            letter-spacing: 1px;
+          }
+          .meta-grid {
+            display: flex;
+            justify-content: space-between;
+            font-size: ${isThermal ? '11px' : '12px'};
+            line-height: 1.45;
+            margin-bottom: 6px;
+          }
+          .meta-col { flex: 1; }
+          .meta-col.right { text-align: right; }
+          .divider {
+            border-bottom: 1px dashed #333;
+            margin: 6px 0;
+          }
+          table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: ${isThermal ? '11px' : '12px'};
+            margin: 6px 0;
+          }
+          th {
+            border-bottom: 1px dashed #333;
+            padding: 4px 2px;
+            font-weight: 800;
+            text-align: left;
+          }
+          td {
+            padding: 4px 2px;
+            vertical-align: top;
+          }
+          .totals-wrap {
+            margin-top: 4px;
+            font-size: ${isThermal ? '11px' : '12.5px'};
+          }
+          .total-line {
+            display: flex;
+            justify-content: space-between;
+            padding: 2px 0;
+          }
+          .grand-total-line {
+            display: flex;
+            justify-content: space-between;
+            padding: 6px 0;
+            font-size: ${isThermal ? '14px' : '16px'};
+            font-weight: 900;
+            border-top: 1px solid #000;
+            border-bottom: 1px solid #000;
+            margin: 4px 0;
+          }
+          .footer {
+            text-align: center;
+            margin-top: 12px;
+            font-size: ${isThermal ? '10px' : '11px'};
+            line-height: 1.4;
+          }
+          .recovery {
+            font-weight: 800;
+            margin-bottom: 3px;
+          }
+          .tagline {
+            font-size: 9px;
+            color: #666;
+            margin-top: 4px;
+          }
+        </style>
+      </head>
+      <body>
+        <div class="header">
+          <div class="store-name">${inv.storeName || 'PHARMACY'}</div>
+          <div class="address">${inv.storeAddress || ''}</div>
+          <div class="licenses">
+            ${inv.storeGstin ? `GSTIN: ${inv.storeGstin}` : ''}
+            ${inv.storeDlNo ? ` | D.L. No: ${inv.storeDlNo}` : ''}
+          </div>
+          <div class="bill-title">TAX INVOICE / CASH BILL</div>
+        </div>
+
+        <div class="meta-grid">
+          <div class="meta-col">
+            <div><strong>Invoice:</strong> ${inv.invoiceNumber || inv.invoiceNo}</div>
+            <div><strong>Date:</strong> ${formattedDate}</div>
+            <div><strong>Cashier:</strong> ${inv.cashierName || 'Cashier'}</div>
+          </div>
+          <div class="meta-col right">
+            <div><strong>Patient:</strong> ${inv.customerName || inv.patientName || 'Walk-in Customer'}</div>
+            ${inv.customerMobile && inv.customerMobile !== 'N/A' ? `<div><strong>Mobile:</strong> ${inv.customerMobile}</div>` : ''}
+            ${inv.doctorName ? `<div><strong>Doctor:</strong> ${inv.doctorName}</div>` : ''}
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <table>
+          <thead>
+            <tr>
+              <th style="width: 42%;">Item</th>
+              <th style="width: 18%; text-align: center;">Batch</th>
+              <th style="width: 10%; text-align: center;">Qty</th>
+              <th style="width: 15%; text-align: right;">Rate</th>
+              <th style="width: 15%; text-align: right;">Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${itemsHtml || '<tr><td colspan="5" style="text-align:center; padding: 8px;">No items</td></tr>'}
+          </tbody>
+        </table>
+
+        <div class="divider"></div>
+
+        <div class="totals-wrap">
+          <div class="total-line">
+            <span>Gross Subtotal:</span>
+            <span>₹${(inv.subtotal || 0).toFixed(2)}</span>
+          </div>
+          ${(inv.discountTotal || 0) > 0 ? `
+            <div class="total-line">
+              <span>Discount Total:</span>
+              <span>- ₹${(inv.discountTotal || 0).toFixed(2)}</span>
+            </div>
+          ` : ''}
+          <div class="total-line">
+            <span>Taxable Value:</span>
+            <span>₹${(inv.taxableAmount || 0).toFixed(2)}</span>
+          </div>
+          <div class="total-line">
+            <span>Total GST (CGST+SGST):</span>
+            <span>₹${((inv.cgstTotal || 0) + (inv.sgstTotal || 0)).toFixed(2)}</span>
+          </div>
+          ${(inv.roundOff || 0) !== 0 ? `
+            <div class="total-line">
+              <span>Round Off:</span>
+              <span>${(inv.roundOff || 0) > 0 ? '+' : ''}₹${(inv.roundOff || 0).toFixed(2)}</span>
+            </div>
+          ` : ''}
+          <div class="grand-total-line">
+            <span>NET AMOUNT PAYABLE:</span>
+            <span>₹${(inv.grandTotal || 0).toFixed(2)}</span>
+          </div>
+          <div class="total-line">
+            <span>Payment Mode: ${inv.paymentMethod || 'Cash'}</span>
+            <span>Received: ₹${(inv.amountReceived || inv.grandTotal || 0).toFixed(2)}</span>
+          </div>
+          ${(inv.changeDue || 0) > 0 ? `
+            <div class="total-line">
+              <span>Change Returned:</span>
+              <span>₹${(inv.changeDue || 0).toFixed(2)}</span>
+            </div>
+          ` : ''}
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="footer">
+          <div class="recovery">*** WISHING YOU A SPEEDY RECOVERY! ***</div>
+          <div>Medicines once sold cannot be returned without original cash receipt.</div>
+          <div class="tagline">Powered by PharmaCare POS Terminal</div>
+        </div>
+      </body>
+      </html>
+    `;
+
+    doc.open();
+    doc.write(receiptHtml);
+    doc.close();
+
+    // Trigger print in iframe after short render delay
+    setTimeout(() => {
+      try {
+        iframe.contentWindow?.focus();
+        iframe.contentWindow?.print();
+      } catch (err) {
+        console.warn('Iframe print error fallback to window.print:', err);
+        window.print();
+      }
+    }, 250);
   }
 
   closeInvoiceModal(): void {
     this.showInvoiceModal = false;
     this.startNewSale();
+    if (this.lowStockItemsSoldAfterBill.length > 0) {
+      this.showPostBillLowStockModal = true;
+      this.audioAlert.triggerBatchLowStockAlert(this.lowStockItemsSoldAfterBill, this.alertThreshold);
+    }
   }
 
   startNewSale(): void {
